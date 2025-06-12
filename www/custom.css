@@ -1,0 +1,251 @@
+:root {
+  --primary-color: #0077b6;
+  --primary-hover: #005f99;
+  --accent-color: #90e0ef;
+  --light-bg: #f0fdff;
+  --hover-bg: #DCEEFF;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+/* Compact form controls */
+.form-control,
+.selectpicker {
+  padding: 4px 8px !important;
+  font-size: 13px !important;
+}
+
+/* Label adjustments */
+label,
+.control-label {
+  font-size: 13px !important;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+/* Reduce spacing between form elements */
+.shiny-input-container {
+  margin-bottom: 10px;
+}
+
+/* Limit dropdown height and enable scroll */
+.dropdown-menu.inner {
+  max-height: 150px !important;
+  overflow-y: auto !important;
+}
+
+
+textarea.form-control {
+  font-size: 14px;
+  min-height: 150px;
+}
+.shiny-input-container {
+  margin-bottom: 10px;
+}
+
+body {
+  background-color: #FFFFFF !important;
+  color: #1c1c1c;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+h1, h2, h3 {
+  color: var(--primary-color);
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: bold;
+}
+
+h2 {
+  font-size: 26px;
+  font-weight: bold;
+}
+
+h3 {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+label, .control-label, .shiny-input-container {
+  color: #1c1c1c;
+  font-size: 15px;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+.navbar-default .navbar-nav > li > a,
+.navbar-default .navbar-brand {
+  color: var(--primary-color) !important;
+}
+
+.navbar-default {
+  border-bottom: 3px solid var(--accent-color);
+}
+
+.btn-primary, .btn-success {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.btn-primary:hover, .btn-success:hover {
+  background-color: var(--primary-hover);
+}
+
+
+.well, .panel {
+  background-color: #ffffff;
+  border-left: 4px solid  var(--primary-color);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.selectize-input {
+  background-color: #ffffff !important;
+  border: 1px solid  var(--primary-color) !important;
+}
+
+.form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 5px rgba(0,119,182,0.5);
+}
+
+
+.checkbox label, .radio label {
+  font-weight: 500;
+  font-size: 15px;
+}
+
+.dropdown-menu {
+  background-color: #f0fdff;
+}
+
+.dropdown-menu > li > a:hover {
+  background-color: var(--accent-color);
+  color: var(--primary-hover);
+}
+
+#main_navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.hover-highlight {
+  background-color: #ffffff;
+  border: 2px solid transparent;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+.hover-highlight:hover {
+  background-color: var(--hover-bg);
+  border-color: var(--primary-hover);
+}
+
+
+*:focus {
+  outline: 2px dashed var(--primary-color);
+}
+
+/* Reduce padding and height of input fields and buttons */
+input[type="text"],
+input[type="number"],
+.selectize-input,
+.form-control,
+.picker__input,
+.shiny-input-container {
+  font-size: 13px;
+  padding: 5px 8px;
+  height: auto !important;
+}
+
+/* Compact buttons */
+.btn {
+  padding: 5px 10px;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+/* Smaller labels */
+label, .control-label {
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+/* Reduce spacing around input containers */
+.shiny-input-container {
+  margin-bottom: 8px;
+}
+.card p {
+  margin: 2px 0 !important;
+  font-size: 13px;
+}
+
+.paper-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.paper-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 5px 0;
+  margin-bottom: 1px;
+  row-gap: 4px;
+}
+
+.paper-meta-item {
+  flex: 1 1 22%;
+  font-size: 13px;
+  padding: 1px 8px;
+  box-sizing: border-box;
+  word-break: break-word;
+}
+
+.metadata-bold {
+  font-weight: bold;
+}
+
+.metadata-light {
+  color: #555;
+}
+
+.paper-card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #005f99;
+  text-align: center;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.paper-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin-bottom: 2px; 
+}
+
+
+.paper-meta-item {
+  flex: 1 1 22%;
+  font-size: 12px;
+  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+
+.metadata-bold {
+  font-weight: bold;
+}
+
+.metadata-light {
+  color: #666;
+}
