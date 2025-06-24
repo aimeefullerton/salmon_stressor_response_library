@@ -1,8 +1,8 @@
 ## Collaborators
 
-Aimee Fullerton
-Morgan Bond
-Paxton Calhoun
+Aimee Fullerton,
+Morgan Bond,
+Paxton Calhoun,
 Danielle Andrews (outside)
 
 
