@@ -17,7 +17,7 @@ addResourcePath("teamimg", "modules/images")
 # UI
 ui <- navbarPage(
   id = "main_navbar",
-  title = "NOAA",
+  title = "Salmon Stressor-Response eLibrary",
   selected = "dashboard",
   
   # Welcome Tab
@@ -52,7 +52,7 @@ ui <- navbarPage(
 
       
       
-      h1("Welcome to NOAA Dashboard"),
+      h1("Welcome to the Salmon Stressor-Response eLibrary"),
       tags$div(
         h2("About Us"),
         about_us("about_us")
