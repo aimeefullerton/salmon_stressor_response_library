@@ -54,22 +54,58 @@ server <- function(input, output, session) {
 
 
   # Launch admin authentication
-  admin_ok <- adminAuthServer("auth", correct_pw = "secret123")
+  # admin_ok <- adminAuthServer("auth", correct_pw = "secret123")
   
+  # output$categories_auth_ui <- renderUI({
+  #   if (!admin_ok()) {
+  #     adminAuthUI("auth")
+  #   } else {
+  #     tagList(
+  #       actionButton("logout_admin", "Logout", class = "btn btn-danger mb-3"),
+  #       manageCategoriesUI("manage_categories")
+  #     )
+  #   }
+  # })
+
+  # observeEvent(admin_ok(), {
+  #   if (admin_ok()) {
+  #     manageCategoriesServer("manage_categories", db)
+  #   }
+  # })
+  
+  # Global logout tracker
+  admin_logged_in <- reactiveVal(FALSE)
+
+  # Pass in a function that toggles this
+  admin_ok <- adminAuthServer("auth", correct_pw = "secret123", updateStatus = admin_logged_in)
+
   output$categories_auth_ui <- renderUI({
-    if (!admin_ok()) {
+    if (!admin_logged_in()) {
       adminAuthUI("auth")
     } else {
-      manageCategoriesUI("manage_categories")
+      tagList(
+        div(
+          style = "display: flex; justify-content: flex-end; margin-bottom: 10px;",
+          actionButton("logout_admin", "Logout", class = "btn btn-danger")
+        ),
+        manageCategoriesUI("manage_categories")
+      )
     }
   })
-  
-  observeEvent(admin_ok(), {
-    if (admin_ok()) {
+
+
+  observeEvent(admin_logged_in(), {
+    if (admin_logged_in()) {
       manageCategoriesServer("manage_categories", db)
     }
   })
-  
+
+  # Handle logout
+  observeEvent(input$logout_admin, {
+    admin_logged_in(FALSE)
+  })
+
+
   # Connect to database
   db <- tryCatch(
     dbConnect(SQLite(), "data/stressor_responses.sqlite"),

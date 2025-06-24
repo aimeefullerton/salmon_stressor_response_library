@@ -16,11 +16,17 @@ manageCategoriesUI <- function(id) {
     "Life Stage"           = "life_stages",
     "Activity"             = "activities",
     "Genus Latin"          = "genus_latins",
-    "Species Latin"        = "species_latins"
+    "Species Latin"        = "species_latins",
+    "Stressor Category"      = "broad_stressor_names",
+    "Research Article Type" = "research_article_types",
+    "Country"                = "location_countries",
+    "State/Province"         = "location_state_provinces",
+    "Watershed Lab"          = "location_watershed_labs",
+    "River/Creek"            = "location_river_creeks"
   )
   
   tagList(
-    # — Category panels —
+    # — Category panels
     fluidRow(
       column(6,
              wellPanel(
