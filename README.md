@@ -31,9 +31,9 @@ This e-Library will:
       </a>
     </td>
     <td>
-      <a href="https://github.com/<username>">
+      <a href="https://github.com/Paxtonc07">
         <figure align='center'>
-          <img src="https://github.com/<username>.png" width=50 height=50/>
+          <img src="https://github.com/Paxtonc07.png" width=50 height=50/>
           <br/>
           <figcaption>Paxton Calhoun</figcaption>
         </figure>
