@@ -1,11 +1,11 @@
 acknowledgement_ui <- function(id, n) {
   ns <- NS(id)
-  
+
   tagList(
     fluidRow(
       column(12, h4("Photos", style = "text-align: left; margin-top: 30px; margin-bottom: 10px;"))
     ),
-    
+
     # Dynamic Pictures Section (n pictures)
     fluidRow(
       style = "display: flex; justify-content: flex-start; flex-wrap: wrap; gap: 15px; margin-top: 10px;",
@@ -19,17 +19,17 @@ acknowledgement_ui <- function(id, n) {
         )
       })
     ),
-    
+
     # Acknowledgement Heading
     fluidRow(
       column(12, h3("Acknowledgement", style = "text-align: left; margin-top: 40px;"))
     ),
-    
+
     # NOAA Team-Sponsors Heading
     fluidRow(
       column(12, h4("NOAA Team-Sponsors", style = "text-align: center; margin-top: 20px;"))
     ),
-    
+
     # Sponsors' Photos
     fluidRow(
       style = "display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 20px;",
@@ -50,14 +50,14 @@ acknowledgement_ui <- function(id, n) {
         tags$p("Danielle Andrews", class = "text-center", style = "font-size: 16px;")
       )
     ),
-    
+
     # Team Photo Section (Formatted Group Photo + Individual Team Members)
     fluidRow(
       column(12, h3("Team", style = "text-align: center; margin-top: 30px; margin-bottom: 30px;"))
     ),
     fluidRow(
       style = "display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 40px;",
-      
+
       # Group Photo Block
       tags$div(
         style = "width: 300px; text-align: center;",
@@ -66,9 +66,10 @@ acknowledgement_ui <- function(id, n) {
           class = "img-fluid img-thumbnail",
           style = "width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"
         ),
-        tags$p("SU Student Development Team", style = "margin-top: 10px; font-size: 16px;")
+        tags$p("SU Student Development Team", style = "margin: 10px 0 0 0; font-size: 16px;"),
+        tags$p("From left to right: Maelice Yamdjieu, Garrett Ringler, Lavanya Bunadri, and Ruqhaiya Syeda", style = "font-size: 14px; font-style: italic; margin-top: 5px;")
       ),
-      
+
       # Individual Team Member Block
       tags$div(
         style = "width: 230px; text-align: center;",
@@ -76,12 +77,10 @@ acknowledgement_ui <- function(id, n) {
           src = "teamimg/Mendible.jpg",
           style = "width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);"
         ),
-        tags$p("Dr. Mendible", style = "margin-top: 10px; font-size: 16px;")
+        tags$p("Dr. Ariana Mendible, Professor of Mathematics at Seattle University", style = "margin-top: 10px; font-size: 16px;")
       )
-    
-    
     ),
-    
+
     # Additional Sources Section
     fluidRow(
       column(12, h4("Additional Sources", style = "text-align: left; margin-top: 50px;"))
