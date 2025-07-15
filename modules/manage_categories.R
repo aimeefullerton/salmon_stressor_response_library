@@ -7,24 +7,24 @@ library(shinyWidgets)
 # UI function for Manage Categories module
 manageCategoriesUI <- function(id) {
   ns <- NS(id)
-  
+
   cat_choices <- list(
-    "Stressor Name"        = "stressor_names",
-    "Stressor Metric"      = "stressor_metrics",
-    "Species Common Name"  = "species_common_names",
-    "Geography"            = "geographies",
-    "Life Stage"           = "life_stages",
-    "Activity"             = "activities",
-    "Genus Latin"          = "genus_latins",
-    "Species Latin"        = "species_latins",
-    "Stressor Category"      = "broad_stressor_names",
+    "Stressor Name"         = "stressor_names",
+    "Stressor Metric"       = "stressor_metrics",
+    "Species Common Name"   = "species_common_names",
+    "Geography"             = "geographies",
+    "Life Stage"            = "life_stages",
+    "Activity"              = "activities",
+    "Genus Latin"           = "genus_latins",
+    "Species Latin"         = "species_latins",
+    "Stressor Category"     = "broad_stressor_names",
     "Research Article Type" = "research_article_types",
-    "Country"                = "location_countries",
-    "State/Province"         = "location_state_provinces",
-    "Watershed Lab"          = "location_watershed_labs",
-    "River/Creek"            = "location_river_creeks"
+    "Country"               = "location_countries",
+    "State/Province"        = "location_states_provinces",
+    "Watershed/Lab"         = "location_watersheds_labs",
+    "River/Creek"           = "location_rivers_creeks"
   )
-  
+
   tagList(
     # — Category panels
     fluidRow(
@@ -48,7 +48,7 @@ manageCategoriesUI <- function(id) {
       )
     ),
     tags$hr(),
-    
+
     # — Article Deletion Panel —
     fluidRow(
       column(12,
@@ -87,7 +87,7 @@ manageCategoriesServer <- function(id, db, onUpdate = NULL) {
     ns <- session$ns
 
     #
-    # 1) —— ADD CATEGORY —— 
+    # 1) —— ADD CATEGORY ——
     #
     observeEvent(input$add_cat, {
       req(input$new_cat_name)
@@ -107,7 +107,7 @@ manageCategoriesServer <- function(id, db, onUpdate = NULL) {
     })
 
     #
-    # 2) —— DELETE CATEGORY —— 
+    # 2) —— DELETE CATEGORY ——
     #
     observeEvent(input$del_cat_type, {
       names <- dbGetQuery(db,
@@ -136,7 +136,7 @@ manageCategoriesServer <- function(id, db, onUpdate = NULL) {
     })
 
     #
-    # 3) —— SEARCH ARTICLES —— 
+    # 3) —— SEARCH ARTICLES ——
     #
     observeEvent(input$search_article, {
       query  <- "SELECT main_id, title FROM stressor_responses WHERE 1=1"
@@ -163,7 +163,7 @@ manageCategoriesServer <- function(id, db, onUpdate = NULL) {
     })
 
     #
-    # 4) —— DELETE ARTICLE —— 
+    # 4) —— DELETE ARTICLE ——
     #
     observeEvent(input$del_article_btn, {
       req(input$del_article_sel)
@@ -194,4 +194,4 @@ manageCategoriesServer <- function(id, db, onUpdate = NULL) {
   })
 
 }
-# nolint end 
+# nolint end

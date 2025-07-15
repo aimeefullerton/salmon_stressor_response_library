@@ -12,12 +12,12 @@ filter_data_server <- function(input, data, session) {
     if (!is.null(input$species) && length(input$species) > 0) {
       data_filtered <- data_filtered[data_filtered$species_common_name %in% input$species, ]
     }
-    
+
     # Filter: geography
     if (!is.null(input$geography) && length(input$geography) > 0) {
       data_filtered <- data_filtered[data_filtered$geography %in% input$geography, ]
     }
-    
+
     # Filter: life stage
     if (!is.null(input$life_stage) && length(input$life_stage) > 0) {
       data_filtered <- data_filtered[
@@ -26,17 +26,17 @@ filter_data_server <- function(input, data, session) {
         })),
       ]
     }
-    
+
     # Filter: activity
     if (!is.null(input$activity) && length(input$activity) > 0) {
       data_filtered <- data_filtered[data_filtered$activity %in% input$activity, ]
     }
-    
+
     # Filter: genus latin
     if (!is.null(input$genus_latin) && length(input$genus_latin) > 0) {
       data_filtered <- data_filtered[data_filtered$genus_latin %in% input$genus_latin, ]
     }
-    
+
     # Filter: species latin
     if (!is.null(input$species_latin) && length(input$species_latin) > 0) {
       data_filtered <- data_filtered[data_filtered$species_latin %in% input$species_latin, ]
@@ -84,3 +84,4 @@ filter_data_server <- function(input, data, session) {
 
   return(filtered_data)
 }
+# nolint end
