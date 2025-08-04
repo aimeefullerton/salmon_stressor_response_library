@@ -19,7 +19,7 @@ ui <- navbarPage(
   id = "main_navbar",
   title = "Salmon Stressor-Response eLibrary",
   selected = "dashboard",
-  
+
   # Welcome Tab
   tabPanel(
     title = "Welcome",
@@ -50,8 +50,8 @@ ui <- navbarPage(
   "))
       ),
 
-      
-      
+
+
       h1("Welcome to the Salmon Stressor-Response eLibrary"),
       tags$div(
         h2("About Us"),
@@ -63,7 +63,7 @@ ui <- navbarPage(
       )
     )
   ),
-  
+
   # Dashboard Tab
 
   tabPanel("Analyze Data", edaUI("eda")),
@@ -72,7 +72,7 @@ ui <- navbarPage(
     value = "dashboard",
     fluidPage(
       useShinyjs(),
-      
+
       conditionalPanel(
         condition = "!window.location.search.includes('main_id')",
         fluidRow(
@@ -125,7 +125,7 @@ ui <- navbarPage(
           ),
           fluidRow(
             column(12, div(style = "text-align: right;",
-                           actionLink("reset_filters", "Reset Filters",
+                           actionButton("reset_filters_btn", "Reset Filters",
                                       style = "color: #0073e6; font-size: 14px; text-decoration: none; margin-right: 10px;")))
           )
         ),
@@ -145,20 +145,20 @@ ui <- navbarPage(
           label = "Download",
           icon = icon("download"),
           tooltip = tooltipOptions(title = "Choose what to download"),
-          
+
           # Download type selector
           radioButtons("download_option", label = NULL,
-                       choices = c("All Records" = "all", 
-                                   "Filtered Records" = "filtered", 
+                       choices = c("All Records" = "all",
+                                   "Filtered Records" = "filtered",
                                    "Selected Records" = "selected"),
                        selected = "all"),
-          
+
           # Wrapped Confirm Download button with proper styling
           div(style = "width: 100%;",
               downloadButton("download_csv", "Confirm Download", class = "btn btn-success text-white btn-block"))
         ),
-        
-        
+
+
         fluidRow(
           column(6, offset = 3, uiOutput("paper_cards"))
         ),
@@ -193,7 +193,7 @@ ui <- navbarPage(
         "))
 
       ),
-      
+
       conditionalPanel(
         condition = "window.location.search.includes('main_id')",
         fluidRow(
@@ -202,14 +202,14 @@ ui <- navbarPage(
       )
     )
   ),
-  
+
   # Upload Tab
   tabPanel(
     title = "Upload Data",
     value = "upload_data",
     upload_ui("upload")
   ),
-  
+
   # Admin Tab
   tabPanel(
     title = "Admin",
