@@ -55,7 +55,7 @@ server <- function(input, output, session) {
 
   # Launch admin authentication
   # admin_ok <- adminAuthServer("auth", correct_pw = "secret123")
-  
+
   # output$categories_auth_ui <- renderUI({
   #   if (!admin_ok()) {
   #     adminAuthUI("auth")
@@ -72,7 +72,7 @@ server <- function(input, output, session) {
   #     manageCategoriesServer("manage_categories", db)
   #   }
   # })
-  
+
   # Global logout tracker
   admin_logged_in <- reactiveVal(FALSE)
 
@@ -113,19 +113,19 @@ server <- function(input, output, session) {
       stop("Error: Unable to connect to the database.")
     }
   )
-  
+
   if (!"stressor_responses" %in% dbListTables(db)) {
     stop("Error: Table `stressor_responses` does not exist in the database.")
   }
-  
+
   data <- dbReadTable(db, "stressor_responses")
-  
+
   filtered_data <- filter_data_server(input, data, session)
-  
+
   progressive_data <- reactive({
     req(data)
     df <- data
-    
+
     if (!is.null(input$stressor) && length(input$stressor) > 0) {
       df <- df[df$stressor_name %in% input$stressor, ]
     }
@@ -152,10 +152,10 @@ server <- function(input, output, session) {
     if (!is.null(input$species_latin) && length(input$species_latin) > 0) {
       df <- df[df$species_latin %in% input$species_latin, ]
     }
-    
+
     df
   })
-  
+
   # pagination <- pagination_server(input, filtered_data)
   # paginated_data <- pagination$paginated_data
   # output$page_info <- renderText(pagination$page_info())
@@ -166,20 +166,23 @@ server <- function(input, output, session) {
 
   update_filters_server(input, output, session, data, db)
   toggle_filters_server(input, session)
-  reset_filters_server(input, session)
-  
+
+  observeEvent(input$reset_filters_btn, {
+    reset_filters_server(input, session)
+  })
+
   upload_server("upload")
 
   edaServer("eda", db_path = "data/stressor_responses.sqlite")
-  
+
   render_papers_server(output, paginated_data, input, session)
-  
+
   # Download handler setup
   setup_download_csv(output, paginated_data, db, input)
 
-  
 
-  
+
+
   # Article display logic
   observe({
     query <- parseQueryString(session$clientData$url_search)
@@ -202,7 +205,7 @@ server <- function(input, output, session) {
       }
     }
   })
-  
+
   # Section toggles
   observeEvent(input$toggle_metadata, { toggle("metadata_section") })
   observeEvent(input$toggle_description, { toggle("description_section") })
@@ -215,7 +218,7 @@ server <- function(input, output, session) {
   observeEvent(input$toggle_interactive_plot, { toggle("interactive_plot_section") })
   observeEvent(input$prev_page, { updateNumericInput(session, "page", value = max(1, input$page - 1)) })
   observeEvent(input$next_page, { updateNumericInput(session, "page", value = input$page + 1) })
-  
+
   # Close DB connection on session end
   session$onSessionEnded(function() {
     dbDisconnect(db)
