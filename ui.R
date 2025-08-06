@@ -75,14 +75,14 @@ ui <- navbarPage(
           column(8, textInput("search", "Search All Text", placeholder = "Type keywords...")),
           column(4, actionButton("toggle_filters", "Show Filters", icon = icon("filter")))
         ),
-        shinyjs::hidden(
-          fluidRow(
-            column(6, numericInput("page", NULL, value = 1, min = 1)),
-            column(6, numericInput("page_size", NULL, value = 10, min = 1))
-          )
-        ),
+        # shinyjs::hidden(
+        #   fluidRow(
+        #     column(6, numericInput("page", NULL, value = 1, min = 1)),
+        #     column(6, numericInput("page_size", NULL, value = 10, min = 1))
+        #   )
+        # ),
         conditionalPanel(
-          condition = "input.toggle_filters % 2 == 1",
+          condition = "input.toggle_filters % 2 == 1 || input.stressor.length > 0 || input.stressor_metric.length > 0 || input.species.length > 0 || input.geography.length > 0 || input.life_stage.length > 0 || input.activity.length > 0 || input.genus_latin.length > 0 || input.species_latin.length > 0 || input.research_article_type.length > 0 || input.location_country.length > 0 || input.location_state_province.length > 0 || input.location_watershed_lab.length > 0 || input.location_river_creek.length > 0 || input.broad_stressor_name.length > 0",
           fluidRow(
             column(3, pickerInput("stressor", "Stressor Name",
               choices = list(), multiple = TRUE,

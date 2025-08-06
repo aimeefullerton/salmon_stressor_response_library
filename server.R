@@ -20,31 +20,61 @@ source("modules/eda.R", local = TRUE)
 
 
 server <- function(input, output, session) {
-  observeEvent(input$main_navbar,
-    {
-      if (input$main_navbar == "dashboard") {
-        updateFilterDropdowns()
-      }
-    },
-    ignoreInit = TRUE
+  # Store filter state
+  filter_state <- reactiveValues(
+    stressor = NULL,
+    stressor_metric = NULL,
+    species = NULL,
+    geography = NULL,
+    life_stage = NULL,
+    activity = NULL,
+    genus_latin = NULL,
+    species_latin = NULL,
+    research_article_type = NULL,
+    location_country = NULL,
+    location_state_province = NULL,
+    location_watershed_lab = NULL,
+    location_river_creek = NULL,
+    broad_stressor_name = NULL
   )
 
-  updateFilterDropdowns <- function() {
-    updatePickerInput(session, "stressor", choices = getCategoryChoices("stressor_names"))
-    updatePickerInput(session, "stressor_metric", choices = getCategoryChoices("stressor_metrics"))
-    updatePickerInput(session, "species", choices = getCategoryChoices("species_common_names"))
-    updatePickerInput(session, "geography", choices = getCategoryChoices("geographies"))
-    updatePickerInput(session, "life_stage", choices = getCategoryChoices("life_stages"))
-    updatePickerInput(session, "activity", choices = getCategoryChoices("activities"))
-    updatePickerInput(session, "genus_latin", choices = getCategoryChoices("genus_latins"))
-    updatePickerInput(session, "species_latin", choices = getCategoryChoices("species_latins"))
-    updatePickerInput(session, "research_article_type", choices = getCategoryChoices("research_article_types"))
-    updatePickerInput(session, "location_country", choices = getCategoryChoices("location_countries"))
-    updatePickerInput(session, "location_state_province", choices = getCategoryChoices("location_state_provinces"))
-    updatePickerInput(session, "location_watershed_lab", choices = getCategoryChoices("location_watershed_labs"))
-    updatePickerInput(session, "location_river_creek", choices = getCategoryChoices("location_river_creeks"))
-    updatePickerInput(session, "broad_stressor_name", choices = getCategoryChoices("broad_stressor_names"))
-  }
+  # Save filter state whenever a filter changes
+  observe({
+    filter_state$stressor <- input$stressor
+    filter_state$stressor_metric <- input$stressor_metric
+    filter_state$species <- input$species
+    filter_state$geography <- input$geography
+    filter_state$life_stage <- input$life_stage
+    filter_state$activity <- input$activity
+    filter_state$genus_latin <- input$genus_latin
+    filter_state$species_latin <- input$species_latin
+    filter_state$research_article_type <- input$research_article_type
+    filter_state$location_country <- input$location_country
+    filter_state$location_state_province <- input$location_state_province
+    filter_state$location_watershed_lab <- input$location_watershed_lab
+    filter_state$location_river_creek <- input$location_river_creek
+    filter_state$broad_stressor_name <- input$broad_stressor_name
+  })
+
+  # Restore filter state when returning to dashboard tab
+  observeEvent(input$main_navbar, {
+    if (input$main_navbar == "dashboard") {
+      updatePickerInput(session, "stressor", selected = filter_state$stressor)
+      updatePickerInput(session, "stressor_metric", selected = filter_state$stressor_metric)
+      updatePickerInput(session, "species", selected = filter_state$species)
+      updatePickerInput(session, "geography", selected = filter_state$geography)
+      updatePickerInput(session, "life_stage", selected = filter_state$life_stage)
+      updatePickerInput(session, "activity", selected = filter_state$activity)
+      updatePickerInput(session, "genus_latin", selected = filter_state$genus_latin)
+      updatePickerInput(session, "species_latin", selected = filter_state$species_latin)
+      updatePickerInput(session, "research_article_type", selected = filter_state$research_article_type)
+      updatePickerInput(session, "location_country", selected = filter_state$location_country)
+      updatePickerInput(session, "location_state_province", selected = filter_state$location_state_province)
+      updatePickerInput(session, "location_watershed_lab", selected = filter_state$location_watershed_lab)
+      updatePickerInput(session, "location_river_creek", selected = filter_state$location_river_creek)
+      updatePickerInput(session, "broad_stressor_name", selected = filter_state$broad_stressor_name)
+    }
+  })
 
   getCategoryChoices <- function(table_name) {
     tryCatch(
