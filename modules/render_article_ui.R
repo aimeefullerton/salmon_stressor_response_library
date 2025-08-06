@@ -2,6 +2,7 @@
 
 library(shinyjs)
 library(dygraphs)
+source("modules/back_button.R", local = TRUE)
 
 render_article_ui <- function(output, session) {
   output$article_content <- renderUI({
@@ -13,26 +14,7 @@ render_article_ui <- function(output, session) {
 
 
       # Back button to return to dashboard
-      tags$a(
-        href = "?",
-        tags$div(id = "customArrow", class = "arrow-container")
-      ),
-      tags$style(HTML("
-        .arrow-container {
-          width: 30px;
-          height: 30px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-        }
-
-        .arrow-container::before {
-          content: '\\2190'; /* Unicode for left arrow */
-          font-size: 35px;
-          color: #2C3E50;
-        }
-      ")),
+      create_back_button(),
 
       # ===== Article title =====
       fluidRow(
