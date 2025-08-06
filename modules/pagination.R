@@ -1,6 +1,6 @@
 # nolint start
-# modules/pagination.R
 
+# modules/pagination.R
 pagination_server <- function(input, output, session, filtered_data) {
   current_page <- reactiveVal(1)
   page_size <- reactiveVal(5)
@@ -40,7 +40,9 @@ pagination_server <- function(input, output, session, filtered_data) {
 
   paginated_data <- reactive({
     df <- filtered_data()
-    if (nrow(df) == 0) return(df)
+    if (nrow(df) == 0) {
+      return(df)
+    }
 
     if (load_more_mode()) {
       df[1:min(nrow(df), items_shown()), , drop = FALSE]
@@ -56,7 +58,9 @@ pagination_server <- function(input, output, session, filtered_data) {
   page_info <- reactive({
     df <- filtered_data()
     total <- nrow(df)
-    if (total == 0) return("0 results")
+    if (total == 0) {
+      return("0 results")
+    }
 
     if (load_more_mode()) {
       shown <- items_shown()
@@ -72,6 +76,5 @@ pagination_server <- function(input, output, session, filtered_data) {
 
   return(list(paginated_data = paginated_data, page_info = page_info))
 }
-
 
 # nolint end

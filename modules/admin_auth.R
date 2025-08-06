@@ -1,4 +1,5 @@
 # nolint start
+
 library(shiny)
 
 # UI: shows a password box + login button
@@ -17,7 +18,6 @@ adminAuthUI <- function(id) {
     tags$hr()
   )
 }
-
 
 # Server: checks against a hard-coded password
 # Returns a reactiveVal(TRUE/FALSE) for login status
@@ -38,8 +38,6 @@ adminAuthServer <- function(id, correct_pw = "secret123", updateStatus = reactiv
 
     return(logged_in)
   })
-
 }
-
 
 # nolint end

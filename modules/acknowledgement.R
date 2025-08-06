@@ -1,3 +1,5 @@
+# nolint start
+
 acknowledgement_ui <- function(id, n) {
   ns <- NS(id)
 
@@ -87,12 +89,14 @@ acknowledgement_ui <- function(id, n) {
     ),
     fluidRow(
       column(12,
-             tags$ul(
-               tags$li(tags$a(href = "https://www.noaa.gov", "NOAA Official Website", target = "_blank")),
-               tags$li(tags$a(href = "https://www.fisheries.noaa.gov/region/west-coast/northwest-science", "NOAA Fisheries", target = "_blank"))
-             ),
-             style = "text-align: left; font-size: 16px; margin-bottom: 40px;"
+        tags$ul(
+          tags$li(tags$a(href = "https://www.noaa.gov", "NOAA Official Website", target = "_blank")),
+          tags$li(tags$a(href = "https://www.fisheries.noaa.gov/region/west-coast/northwest-science", "NOAA Fisheries", target = "_blank"))
+        ),
+        style = "text-align: left; font-size: 16px; margin-bottom: 40px;"
       )
     )
   )
 }
+
+# nolint end

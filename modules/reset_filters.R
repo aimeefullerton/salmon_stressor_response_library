@@ -11,7 +11,6 @@ reset_filters_server <- function(input, session) {
     updatePickerInput(session, "activity", selected = "All")
     updatePickerInput(session, "genus_latin", selected = "All")
     updatePickerInput(session, "species_latin", selected = "All")
-
     # New filters
     updatePickerInput(session, "research_article_type", selected = "All")
     updatePickerInput(session, "location_country", selected = "All")
