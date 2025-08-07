@@ -13,7 +13,7 @@ render_article_ui <- function(output, session) {
       useShinyjs(), # Enabling JavaScript for toggling sections
 
 
-      # Back button to return to dashboard
+      # Back button to return to dashboard at the top of the article
       create_back_button(),
 
       # ===== Article title =====

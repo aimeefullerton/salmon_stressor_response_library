@@ -17,7 +17,7 @@ source("modules/upload.R", local = TRUE)
 source("modules/admin_auth.R", local = TRUE)
 source("modules/manage_categories.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
-
+source("modules/back_button.R", local = TRUE)
 
 server <- function(input, output, session) {
   # Store filter state
@@ -216,27 +216,55 @@ server <- function(input, output, session) {
   # Article display logic
   observe({
     query <- parseQueryString(session$clientData$url_search)
+
+    # Only handle article rendering when main_id is present
     if (!is.null(query$main_id)) {
       main_id <- as.numeric(query$main_id)
       if (!is.na(main_id)) {
+        # Fetch article data from the database
         tryCatch(
           {
             render_article_ui(output, session)
             render_article_server(input, output, session, main_id, db)
           },
           error = function(e) {
+            # create error message when article fails to render
             output$article_content <- renderUI({
-              tags$p(paste("Error rendering article:", e$message), style = "color: red; font-weight: bold;")
+              tagList(
+                # Add the back button even on error
+                create_back_button(),
+                # Error message
+                div(
+                  style = "margin-top: 20px; padding: 20px; border: 1px solid #dc3545; background-color: #f8d7da; border-radius: 8px;",
+                  tags$h4("Error loading article", style = "color: #721c24; margin-bottom: 10px;"),
+                  tags$p(paste("Unable to render article:", e$message),
+                    style = "color: #721c24; font-weight: bold; margin: 0;"
+                  )
+                )
+              )
             })
             print(e)
           }
         )
       } else {
-        output$article_content <- renderUI(
-          tags$p("Article not found.", style = "color: red; font-weight: bold;")
-        )
+        # Create back button and "not found" message for invalid main_id
+        output$article_content <- renderUI({
+          tagList(
+            # Add the back button for invalid article ID
+            create_back_button(),
+            # Not found message
+            div(
+              style = "margin-top: 20px; padding: 20px; border: 1px solid #ffc107; background-color: #fff3cd; border-radius: 8px;",
+              tags$h4("Article Not Found", style = "color: #856404; margin-bottom: 10px;"),
+              tags$p("The requested article could not be found.",
+                style = "color: #856404; font-weight: bold; margin: 0;"
+              )
+            )
+          )
+        })
       }
     }
+    # Removed the filter restoration from here - it's now handled by URL monitoring
   })
 
   # Section toggles
