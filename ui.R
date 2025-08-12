@@ -11,7 +11,6 @@ source("modules/about_us.R", local = TRUE)
 source("modules/acknowledgement.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
 
-
 #* Static resource for team images
 addResourcePath("teamimg", "modules/images")
 
@@ -47,6 +46,74 @@ ui <- navbarPage(
         tags$script(HTML("
           Shiny.addCustomMessageHandler('download_csv', function(data) {
             document.getElementById(data.id).click();
+          });
+
+          // Enhanced navigation and filter management
+          var filterManagement = {
+            // Track filter state in browser memory as backup
+            filterState: {},
+
+            // Save current filter values
+            saveFilters: function() {
+              this.filterState = {
+                stressor: $('#stressor').val() || [],
+                stressor_metric: $('#stressor_metric').val() || [],
+                species: $('#species').val() || [],
+                geography: $('#geography').val() || [],
+                life_stage: $('#life_stage').val() || [],
+                activity: $('#activity').val() || [],
+                genus_latin: $('#genus_latin').val() || [],
+                species_latin: $('#species_latin').val() || [],
+                research_article_type: $('#research_article_type').val() || [],
+                location_country: $('#location_country').val() || [],
+                location_state_province: $('#location_state_province').val() || [],
+                location_watershed_lab: $('#location_watershed_lab').val() || [],
+                location_river_creek: $('#location_river_creek').val() || [],
+                broad_stressor_name: $('#broad_stressor_name').val() || []
+              };
+              console.log('Filters saved to JavaScript:', this.filterState);
+            },
+
+            // Navigate back to dashboard
+            backToDashboard: function() {
+              // Clean URL (remove main_id parameter)
+              var url = new URL(window.location);
+              url.searchParams.delete('main_id');
+
+              // Update browser URL without page reload
+              window.history.pushState({}, '', url.toString());
+
+              // Notify Shiny of URL change
+              Shiny.setInputValue('url_changed', Date.now(), {priority: 'event'});
+
+              // Trigger filter restoration after a delay
+              setTimeout(function() {
+                Shiny.setInputValue('trigger_filter_restore', Date.now(), {priority: 'event'});
+              }, 300);
+            }
+          };
+
+          // Save filters before navigating to article
+          $(document).on('click', 'a[onclick*=\"showArticle\"], .card-link', function() {
+            filterManagement.saveFilters();
+          });
+
+          // Monitor URL changes (browser back/forward)
+          window.addEventListener('popstate', function(event) {
+            // Trigger filter restoration when using browser navigation
+            if (!window.location.search.includes('main_id')) {
+              setTimeout(function() {
+                Shiny.setInputValue('trigger_filter_restore', Date.now(), {priority: 'event'});
+              }, 200);
+            }
+          });
+
+          // Debug: Monitor filter changes
+          $(document).on('shiny:inputchanged', function(event) {
+            if (event.name && (event.name.includes('stressor') || event.name.includes('species') || event.name.includes('geography'))
+                && !window.location.search.includes('main_id')) {
+              console.log('Filter updated in dashboard:', event.name, event.value);
+            }
           });
         "))
       ),
