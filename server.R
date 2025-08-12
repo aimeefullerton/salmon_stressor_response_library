@@ -2,8 +2,8 @@
 
 # Load required modules
 source("global.R")
-source("modules/about_us.R", local = TRUE) # Restored
-source("modules/acknowledgement.R", local = TRUE) # Restored
+source("modules/about_us.R", local = TRUE)
+source("modules/acknowledgement.R", local = TRUE)
 source("modules/filters.R", local = TRUE)
 source("modules/pagination.R", local = TRUE)
 source("modules/render_papers.R", local = TRUE)
@@ -20,7 +20,7 @@ source("modules/eda.R", local = TRUE)
 source("modules/back_button.R", local = TRUE)
 
 server <- function(input, output, session) {
-  # Store filter state
+  # Enhanced filter state storage with tracking
   filter_state <- reactiveValues(
     stressor = NULL,
     stressor_metric = NULL,
@@ -35,45 +35,213 @@ server <- function(input, output, session) {
     location_state_province = NULL,
     location_watershed_lab = NULL,
     location_river_creek = NULL,
-    broad_stressor_name = NULL
+    broad_stressor_name = NULL,
+    initialized = FALSE,
+    in_article_view = FALSE,
+    restoring = FALSE # Add flag to prevent multiple restorations
   )
 
-  # Save filter state whenever a filter changes
+  # Track current view state
+  current_view <- reactiveVal("dashboard")
+
+  # Safe filter restoration function
+  restore_filters_safely <- function() {
+    tryCatch(
+      {
+        # Prevent multiple simultaneous restorations
+        isolate({
+          if (isTRUE(filter_state$restoring)) {
+            cat("Filter restoration already in progress, skipping...\n")
+            return()
+          }
+          filter_state$restoring <- TRUE
+        })
+
+        # Isolate the reactive values to avoid reactive context issues
+        isolate({
+          if (isTRUE(filter_state$initialized)) {
+            # Capture values in isolation
+            saved_stressor <- filter_state$stressor
+            saved_stressor_metric <- filter_state$stressor_metric
+            saved_species <- filter_state$species
+            saved_geography <- filter_state$geography
+            saved_life_stage <- filter_state$life_stage
+            saved_activity <- filter_state$activity
+            saved_genus_latin <- filter_state$genus_latin
+            saved_species_latin <- filter_state$species_latin
+            saved_research_article_type <- filter_state$research_article_type
+            saved_location_country <- filter_state$location_country
+            saved_location_state_province <- filter_state$location_state_province
+            saved_location_watershed_lab <- filter_state$location_watershed_lab
+            saved_location_river_creek <- filter_state$location_river_creek
+            saved_broad_stressor_name <- filter_state$broad_stressor_name
+
+            # Helper function to check if a filter has values
+            has_value <- function(x) {
+              tryCatch(
+                {
+                  !is.null(x) && length(x) > 0 && !all(is.na(x)) && !all(x == "")
+                },
+                error = function(e) FALSE
+              )
+            }
+
+            # Check if any filters were actually set
+            has_filters <- has_value(saved_stressor) || has_value(saved_stressor_metric) ||
+              has_value(saved_species) || has_value(saved_geography) ||
+              has_value(saved_life_stage) || has_value(saved_activity) ||
+              has_value(saved_genus_latin) || has_value(saved_species_latin) ||
+              has_value(saved_research_article_type) || has_value(saved_location_country) ||
+              has_value(saved_location_state_province) || has_value(saved_location_watershed_lab) ||
+              has_value(saved_location_river_creek) || has_value(saved_broad_stressor_name)
+
+            # Use later to ensure UI elements are ready
+            later::later(function() {
+              tryCatch(
+                {
+                  updatePickerInput(session, "stressor", selected = saved_stressor)
+                  updatePickerInput(session, "stressor_metric", selected = saved_stressor_metric)
+                  updatePickerInput(session, "species", selected = saved_species)
+                  updatePickerInput(session, "geography", selected = saved_geography)
+                  updatePickerInput(session, "life_stage", selected = saved_life_stage)
+                  updatePickerInput(session, "activity", selected = saved_activity)
+                  updatePickerInput(session, "genus_latin", selected = saved_genus_latin)
+                  updatePickerInput(session, "species_latin", selected = saved_species_latin)
+                  updatePickerInput(session, "research_article_type", selected = saved_research_article_type)
+                  updatePickerInput(session, "location_country", selected = saved_location_country)
+                  updatePickerInput(session, "location_state_province", selected = saved_location_state_province)
+                  updatePickerInput(session, "location_watershed_lab", selected = saved_location_watershed_lab)
+                  updatePickerInput(session, "location_river_creek", selected = saved_location_river_creek)
+                  updatePickerInput(session, "broad_stressor_name", selected = saved_broad_stressor_name)
+
+                  # Show filters if any were set
+                  if (isTRUE(has_filters)) {
+                    # Force the filter panel to show by simulating button click
+                    later::later(function() {
+                      shinyjs::runjs("
+                    try {
+                      var toggleBtn = $('#toggle_filters');
+                      if (toggleBtn.length > 0) {
+                        var isShowingFilters = toggleBtn.text().includes('Hide');
+                        if (!isShowingFilters) {
+                          toggleBtn.click();
+                        }
+                      }
+                    } catch(e) {
+                      console.log('Error toggling filters:', e);
+                    }
+                  ")
+                    }, delay = 0.1)
+                  }
+
+                  # Reset the restoring flag
+                  filter_state$restoring <- FALSE
+                  cat("Filters restored successfully (has_filters:", has_filters, ")\n")
+                },
+                error = function(e) {
+                  filter_state$restoring <- FALSE
+                  cat("Error in updatePickerInput:", e$message, "\n")
+                }
+              )
+            }, delay = 0.3)
+          } else {
+            filter_state$restoring <- FALSE
+            cat("No filter state to restore (not initialized)\n")
+          }
+        })
+      },
+      error = function(e) {
+        # Ensure restoring flag is reset even if there's an error
+        tryCatch(
+          {
+            filter_state$restoring <- FALSE
+          },
+          error = function(e2) {
+            # Ignore errors when setting restoring flag
+          }
+        )
+        cat("Error in restore_filters_safely:", e$message, "\n")
+      }
+    )
+  }
+
+  # Monitor URL changes to detect view transitions
   observe({
-    filter_state$stressor <- input$stressor
-    filter_state$stressor_metric <- input$stressor_metric
-    filter_state$species <- input$species
-    filter_state$geography <- input$geography
-    filter_state$life_stage <- input$life_stage
-    filter_state$activity <- input$activity
-    filter_state$genus_latin <- input$genus_latin
-    filter_state$species_latin <- input$species_latin
-    filter_state$research_article_type <- input$research_article_type
-    filter_state$location_country <- input$location_country
-    filter_state$location_state_province <- input$location_state_province
-    filter_state$location_watershed_lab <- input$location_watershed_lab
-    filter_state$location_river_creek <- input$location_river_creek
-    filter_state$broad_stressor_name <- input$broad_stressor_name
+    query <- parseQueryString(session$clientData$url_search)
+
+    if (!is.null(query$main_id)) {
+      # We're in article view
+      if (current_view() == "dashboard") {
+        filter_state$in_article_view <- TRUE
+        current_view("article")
+      }
+    } else {
+      # We're in dashboard view
+      if (current_view() == "article") {
+        # Just returned from article view - restore filters
+        current_view("dashboard")
+        restore_filters_safely()
+      }
+    }
+  })
+
+  # Save filter state whenever a filter changes (only in dashboard view)
+  observe({
+    query <- parseQueryString(session$clientData$url_search)
+
+    # Only save state when we're in dashboard view
+    if (is.null(query$main_id)) {
+      filter_state$stressor <- input$stressor
+      filter_state$stressor_metric <- input$stressor_metric
+      filter_state$species <- input$species
+      filter_state$geography <- input$geography
+      filter_state$life_stage <- input$life_stage
+      filter_state$activity <- input$activity
+      filter_state$genus_latin <- input$genus_latin
+      filter_state$species_latin <- input$species_latin
+      filter_state$research_article_type <- input$research_article_type
+      filter_state$location_country <- input$location_country
+      filter_state$location_state_province <- input$location_state_province
+      filter_state$location_watershed_lab <- input$location_watershed_lab
+      filter_state$location_river_creek <- input$location_river_creek
+      filter_state$broad_stressor_name <- input$broad_stressor_name
+      filter_state$initialized <- TRUE
+    }
   })
 
   # Restore filter state when returning to dashboard tab
   observeEvent(input$main_navbar, {
     if (input$main_navbar == "dashboard") {
-      updatePickerInput(session, "stressor", selected = filter_state$stressor)
-      updatePickerInput(session, "stressor_metric", selected = filter_state$stressor_metric)
-      updatePickerInput(session, "species", selected = filter_state$species)
-      updatePickerInput(session, "geography", selected = filter_state$geography)
-      updatePickerInput(session, "life_stage", selected = filter_state$life_stage)
-      updatePickerInput(session, "activity", selected = filter_state$activity)
-      updatePickerInput(session, "genus_latin", selected = filter_state$genus_latin)
-      updatePickerInput(session, "species_latin", selected = filter_state$species_latin)
-      updatePickerInput(session, "research_article_type", selected = filter_state$research_article_type)
-      updatePickerInput(session, "location_country", selected = filter_state$location_country)
-      updatePickerInput(session, "location_state_province", selected = filter_state$location_state_province)
-      updatePickerInput(session, "location_watershed_lab", selected = filter_state$location_watershed_lab)
-      updatePickerInput(session, "location_river_creek", selected = filter_state$location_river_creek)
-      updatePickerInput(session, "broad_stressor_name", selected = filter_state$broad_stressor_name)
+      restore_filters_safely()
     }
+  })
+
+  # Manual filter restoration trigger (for JavaScript calls)
+  observeEvent(input$trigger_filter_restore, {
+    restore_filters_safely()
+  })
+
+  # Handle back to dashboard button click
+  observeEvent(input$back_to_dashboard, {
+    # Update URL to remove main_id parameter
+    query <- parseQueryString(session$clientData$url_search)
+    query$main_id <- NULL
+
+    # Rebuild query string
+    if (length(query) > 0) {
+      query_string <- paste(names(query), query, sep = "=", collapse = "&")
+      new_url <- paste0("?", query_string)
+    } else {
+      new_url <- ""
+    }
+
+    # Update the URL
+    updateQueryString(new_url, mode = "replace", session = session)
+
+    # Restore filters after URL update
+    later::later(function() {
+      restore_filters_safely()
+    }, delay = 0.3)
   })
 
   getCategoryChoices <- function(table_name) {
@@ -86,26 +254,6 @@ server <- function(input, output, session) {
       }
     )
   }
-
-  # Launch admin authentication
-  # admin_ok <- adminAuthServer("auth", correct_pw = "secret123")
-
-  # output$categories_auth_ui <- renderUI({
-  #   if (!admin_ok()) {
-  #     adminAuthUI("auth")
-  #   } else {
-  #     tagList(
-  #       actionButton("logout_admin", "Logout", class = "btn btn-danger mb-3"),
-  #       manageCategoriesUI("manage_categories")
-  #     )
-  #   }
-  # })
-
-  # observeEvent(admin_ok(), {
-  #   if (admin_ok()) {
-  #     manageCategoriesServer("manage_categories", db)
-  #   }
-  # })
 
   # Global logout tracker
   admin_logged_in <- reactiveVal(FALSE)
@@ -137,7 +285,6 @@ server <- function(input, output, session) {
   observeEvent(input$logout_admin, {
     admin_logged_in(FALSE)
   })
-
 
   # Connect to database
   db <- tryCatch(
@@ -189,9 +336,6 @@ server <- function(input, output, session) {
     df
   })
 
-  # pagination <- pagination_server(input, filtered_data)
-  # paginated_data <- pagination$paginated_data
-  # output$page_info <- renderText(pagination$page_info())
   pagination <- pagination_server(input, output, session, filtered_data)
   paginated_data <- pagination$paginated_data
   output$page_info <- renderText(pagination$page_info())
@@ -264,7 +408,6 @@ server <- function(input, output, session) {
         })
       }
     }
-    # Removed the filter restoration from here - it's now handled by URL monitoring
   })
 
   # Section toggles
