@@ -20,9 +20,9 @@ ui <- navbarPage(
   title = "Salmon Stressor-Response eLibrary",
   selected = "dashboard",
 
-  # Welcome Tab
+  # About Tab
   tabPanel(
-    title = "Welcome",
+    title = "About",
     value = "NOAA info",
     fluidPage(
       useShinyjs(),
@@ -51,7 +51,6 @@ ui <- navbarPage(
       ),
       h1("Welcome to the Salmon Stressor-Response eLibrary"),
       tags$div(
-        h2("About Us"),
         about_us("about_us")
       ),
       tags$hr(),
