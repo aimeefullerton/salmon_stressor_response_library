@@ -9,7 +9,7 @@ source("modules/manage_categories.R", local = TRUE)
 source("modules/about_us.R", local = TRUE)
 source("modules/acknowledgement.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
-
+source("modules/user_guide.R", local = TRUE)
 
 # Static resource for team images
 addResourcePath("teamimg", "modules/images")
@@ -60,8 +60,13 @@ ui <- navbarPage(
     )
   ),
 
-  # Dashboard Tab
+  # User Guide Tab
+  tabPanel("User Guide", userGuideUI("user_guide")),
+
+  # Analyze Data Tab
   tabPanel("Analyze Data", edaUI("eda")),
+
+  # Dashboard Tab
   tabPanel(
     title = "SRF Dashboard",
     value = "dashboard",
