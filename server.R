@@ -178,7 +178,7 @@ server <- function(input, output, session) {
   render_papers_server(output, paginated_data, input, session)
 
   # Download handler setup
-  setup_download_csv(output, paginated_data, db, input)
+  setup_download_csv(output, paginated_data, db, input, session)
 
   # Article display logic
   # observe({
