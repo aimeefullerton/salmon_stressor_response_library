@@ -32,6 +32,7 @@ setup_download_csv <- function(output, paginated_data, db_path, input, session) 
     }
   })
   
+
   # Assign data to be downloaded
   output$download_csv <- downloadHandler(
     filename = function() {
@@ -45,16 +46,18 @@ setup_download_csv <- function(output, paginated_data, db_path, input, session) 
     contentType = "text/csv",
     content = function(file) {
       df <- switch(input$download_option,
-                   all = {
-                     tryCatch({
-                       conn <- dbConnect(SQLite(), db_path)
-                       on.exit(dbDisconnect(conn), add = TRUE)
-                       dbReadTable(conn, "stressor_responses")
-                     }, error = function(e) {
-                       showNotification("Failed to read from database; returning cached copy.", type = "error")
-                       return(data)
-                     })
-                   },
+                   all = 
+                     #{
+                     # tryCatch({
+                     #   conn <- dbConnect(SQLite(), db_path)
+                     #   on.exit(dbDisconnect(conn), add = TRUE)
+                     #   dbReadTable(conn, "stressor_responses")
+                     # }, error = function(e) {
+                     #   showNotification("Failed to read from database; returning cached copy.", type = "error")
+                     #   return(data.frame())
+                     # })
+                     #}
+                     data,
                    filtered = paginated_data(),
                    selected = {
                      sel <- get_selected_rows() # Call the reactive expression
