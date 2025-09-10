@@ -3,6 +3,7 @@
 library(shiny)
 library(DBI)
 library(RSQLite)
+library(markdown)
 
 # Connect to SQLite database
 db_path <- "data/stressor_responses.sqlite"
@@ -40,3 +41,4 @@ if ("stressor_responses" %in% dbListTables(conn)) {
 dbDisconnect(conn)
 
 # nolint end
+
