@@ -478,23 +478,23 @@
         "Package": "commonmark",
         "Type": "Package",
         "Title": "High Performance CommonMark and Github Markdown Rendering in R",
-        "Version": "1.9.1",
-        "Authors@R": "c(\n    person(\"Jeroen\", \"Ooms\", ,\"jeroen@berkeley.edu\", role = c(\"aut\", \"cre\"),\n        comment = c(ORCID = \"0000-0002-4035-0289\")),\n    person(\"John MacFarlane\", role = \"cph\", comment = \"Author of cmark\"))",
-        "URL": "https://docs.ropensci.org/commonmark/\nhttps://r-lib.r-universe.dev/commonmark\nhttps://github.github.com/gfm/ (spec)",
-        "BugReports": "https://github.com/r-lib/commonmark/issues",
-        "Description": "The CommonMark specification defines a rationalized version of markdown\n    syntax. This package uses the 'cmark' reference implementation for converting\n    markdown text into various formats including html, latex and groff man. In\n    addition it exposes the markdown parse tree in xml format. Also includes opt-in\n    support for GFM extensions including tables, autolinks, and strikethrough text.",
+        "Version": "2.0.0",
+        "Authors@R": "c(\n    person(\"Jeroen\", \"Ooms\", ,\"jeroenooms@gmail.com\", role = c(\"aut\", \"cre\"),\n        comment = c(ORCID = \"0000-0002-4035-0289\")),\n    person(\"John MacFarlane\", role = \"cph\", comment = \"Author of cmark\"))",
+        "Description": "The CommonMark specification <https://github.github.com/gfm/> defines\n    a rationalized version of markdown syntax. This package uses the 'cmark' \n    reference implementation for converting markdown text into various formats\n    including html, latex and groff man. In addition it exposes the markdown\n    parse tree in xml format. Also includes opt-in support for GFM extensions\n    including tables, autolinks, and strikethrough text.",
         "License": "BSD_2_clause + file LICENSE",
+        "URL": "https://docs.ropensci.org/commonmark/\nhttps://ropensci.r-universe.dev/commonmark",
+        "BugReports": "https://github.com/r-lib/commonmark/issues",
         "Suggests": "curl, testthat, xml2",
-        "RoxygenNote": "7.2.3",
+        "RoxygenNote": "7.3.2",
         "Language": "en-US",
         "Encoding": "UTF-8",
         "NeedsCompilation": "yes",
-        "Packaged": "2024-01-30 11:29:56 UTC; jeroen",
-        "Author": "Jeroen Ooms [aut, cre] (<https://orcid.org/0000-0002-4035-0289>),\n  John MacFarlane [cph] (Author of cmark)",
-        "Maintainer": "Jeroen Ooms <jeroen@berkeley.edu>",
+        "Packaged": "2025-07-07 13:20:39 UTC; jeroen",
+        "Author": "Jeroen Ooms [aut, cre] (ORCID: <https://orcid.org/0000-0002-4035-0289>),\n  John MacFarlane [cph] (Author of cmark)",
+        "Maintainer": "Jeroen Ooms <jeroenooms@gmail.com>",
         "Repository": "CRAN",
-        "Date/Publication": "2024-01-30 12:40:02 UTC",
-        "Built": "R 4.4.1; x86_64-w64-mingw32; 2024-07-02 00:29:57 UTC; windows",
+        "Date/Publication": "2025-07-07 13:40:02 UTC",
+        "Built": "R 4.4.3; x86_64-w64-mingw32; 2025-09-05 00:43:20 UTC; windows",
         "Archs": "x64"
       }
     },
@@ -993,27 +993,28 @@
       "description": {
         "Package": "gtable",
         "Title": "Arrange 'Grobs' in Tables",
-        "Version": "0.3.5",
+        "Version": "0.3.6",
         "Authors@R": "c(\n    person(\"Hadley\", \"Wickham\", , \"hadley@posit.co\", role = \"aut\"),\n    person(\"Thomas Lin\", \"Pedersen\", , \"thomas.pedersen@posit.co\", role = c(\"aut\", \"cre\")),\n    person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\"))\n  )",
         "Description": "Tools to make it easier to work with \"tables\" of 'grobs'. The\n    'gtable' package defines a 'gtable' grob class that specifies a grid\n    along with a list of grobs and their placement in the grid. Further\n    the package makes it easy to manipulate and combine 'gtable' objects\n    so that complex compositions can be built up sequentially.",
         "License": "MIT + file LICENSE",
         "URL": "https://gtable.r-lib.org, https://github.com/r-lib/gtable",
         "BugReports": "https://github.com/r-lib/gtable/issues",
-        "Depends": "R (>= 3.5)",
-        "Imports": "cli, glue, grid, lifecycle, rlang (>= 1.1.0)",
+        "Depends": "R (>= 4.0)",
+        "Imports": "cli, glue, grid, lifecycle, rlang (>= 1.1.0), stats",
         "Suggests": "covr, ggplot2, knitr, profvis, rmarkdown, testthat (>= 3.0.0)",
         "VignetteBuilder": "knitr",
         "Config/Needs/website": "tidyverse/tidytemplate",
         "Config/testthat/edition": "3",
+        "Config/usethis/last-upkeep": "2024-10-25",
         "Encoding": "UTF-8",
-        "RoxygenNote": "7.3.1",
+        "RoxygenNote": "7.3.2",
         "NeedsCompilation": "no",
-        "Packaged": "2024-04-22 10:46:27 UTC; thomas",
+        "Packaged": "2024-10-25 12:42:05 UTC; thomas",
         "Author": "Hadley Wickham [aut],\n  Thomas Lin Pedersen [aut, cre],\n  Posit Software, PBC [cph, fnd]",
         "Maintainer": "Thomas Lin Pedersen <thomas.pedersen@posit.co>",
         "Repository": "CRAN",
-        "Date/Publication": "2024-04-22 20:40:02 UTC",
-        "Built": "R 4.4.1; ; 2024-07-09 01:24:04 UTC; windows"
+        "Date/Publication": "2024-10-25 13:20:02 UTC",
+        "Built": "R 4.4.3; ; 2025-07-28 01:48:36 UTC; windows"
       }
     },
     "highr": {
@@ -1409,6 +1410,34 @@
         "Built": "R 4.4.1; ; 2024-07-02 01:04:41 UTC; windows"
       }
     },
+    "litedown": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "litedown",
+        "Type": "Package",
+        "Title": "A Lightweight Version of R Markdown",
+        "Version": "0.7",
+        "Authors@R": "c(\n    person(\"Yihui\", \"Xie\", role = c(\"aut\", \"cre\"), email = \"xie@yihui.name\", comment = c(ORCID = \"0000-0003-0645-5666\", URL = \"https://yihui.org\")),\n    person(\"Tim\", \"Taylor\", role = \"ctb\", comment = c(ORCID = \"0000-0002-8587-7113\")),\n    person()\n    )",
+        "Description": "Render R Markdown to Markdown (without using 'knitr'), and Markdown\n    to lightweight HTML or 'LaTeX' documents with the 'commonmark' package (instead\n    of 'Pandoc'). Some missing Markdown features in 'commonmark' are also\n    supported, such as raw HTML or 'LaTeX' blocks, 'LaTeX' math, superscripts,\n    subscripts, footnotes, element attributes, and appendices,\n    but not all 'Pandoc' Markdown features are (or will be) supported. With\n    additional JavaScript and CSS, you can also create HTML slides and articles.\n    This package can be viewed as a trimmed-down version of R Markdown and\n    'knitr'. It does not aim at rich Markdown features or a large variety of\n    output formats (the primary formats are HTML and 'LaTeX'). Book and website\n    projects of multiple input documents are also supported.",
+        "Depends": "R (>= 3.2.0)",
+        "Imports": "utils, commonmark (>= 1.9.5), xfun (>= 0.52)",
+        "Suggests": "rbibutils, rstudioapi, tinytex",
+        "License": "MIT + file LICENSE",
+        "URL": "https://github.com/yihui/litedown",
+        "BugReports": "https://github.com/yihui/litedown/issues",
+        "VignetteBuilder": "litedown",
+        "RoxygenNote": "7.3.2",
+        "Encoding": "UTF-8",
+        "NeedsCompilation": "no",
+        "Packaged": "2025-04-08 05:16:55 UTC; runner",
+        "Author": "Yihui Xie [aut, cre] (<https://orcid.org/0000-0003-0645-5666>,\n    https://yihui.org),\n  Tim Taylor [ctb] (<https://orcid.org/0000-0002-8587-7113>)",
+        "Maintainer": "Yihui Xie <xie@yihui.name>",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-04-08 05:40:02 UTC",
+        "Built": "R 4.4.3; ; 2025-09-05 01:26:08 UTC; windows"
+      }
+    },
     "magrittr": {
       "Source": "CRAN",
       "Repository": "https://cran.rstudio.com",
@@ -1437,6 +1466,33 @@
         "Date/Publication": "2022-03-30 07:30:09 UTC",
         "Built": "R 4.4.1; x86_64-w64-mingw32; 2024-07-02 00:29:42 UTC; windows",
         "Archs": "x64"
+      }
+    },
+    "markdown": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "markdown",
+        "Type": "Package",
+        "Title": "Render Markdown with 'commonmark'",
+        "Version": "2.0",
+        "Authors@R": "c(\n   person(\"Yihui\", \"Xie\", role = c(\"aut\", \"cre\"), email = \"xie@yihui.name\", comment = c(ORCID = \"0000-0003-0645-5666\")),\n   person(\"JJ\", \"Allaire\", role = \"aut\"),\n   person(\"Jeffrey\", \"Horner\", role = \"aut\"),\n   person(\"Henrik\", \"Bengtsson\", role = \"ctb\"),\n   person(\"Jim\", \"Hester\", role = \"ctb\"),\n   person(\"Yixuan\", \"Qiu\", role = \"ctb\"),\n   person(\"Kohske\", \"Takahashi\", role = \"ctb\"),\n   person(\"Adam\", \"November\", role = \"ctb\"),\n   person(\"Nacho\", \"Caballero\", role = \"ctb\"),\n   person(\"Jeroen\", \"Ooms\", role = \"ctb\"),\n   person(\"Thomas\", \"Leeper\", role = \"ctb\"),\n   person(\"Joe\", \"Cheng\", role = \"ctb\"),\n   person(\"Andrzej\", \"Oles\", role = \"ctb\"),\n   person(given = \"Posit Software, PBC\", role = c(\"cph\", \"fnd\"))\n   )",
+        "Description": "Render Markdown to full and lightweight HTML/LaTeX documents with\n    the 'commonmark' package. This package has been superseded by 'litedown'.",
+        "Depends": "R (>= 2.11.1)",
+        "Imports": "utils, xfun, litedown (>= 0.6)",
+        "Suggests": "knitr, rmarkdown (>= 2.18), yaml, RCurl",
+        "License": "MIT + file LICENSE",
+        "URL": "https://github.com/rstudio/markdown",
+        "BugReports": "https://github.com/rstudio/markdown/issues",
+        "RoxygenNote": "7.3.2",
+        "Encoding": "UTF-8",
+        "NeedsCompilation": "no",
+        "Packaged": "2025-03-23 17:06:26 UTC; runner",
+        "Author": "Yihui Xie [aut, cre] (<https://orcid.org/0000-0003-0645-5666>),\n  JJ Allaire [aut],\n  Jeffrey Horner [aut],\n  Henrik Bengtsson [ctb],\n  Jim Hester [ctb],\n  Yixuan Qiu [ctb],\n  Kohske Takahashi [ctb],\n  Adam November [ctb],\n  Nacho Caballero [ctb],\n  Jeroen Ooms [ctb],\n  Thomas Leeper [ctb],\n  Joe Cheng [ctb],\n  Andrzej Oles [ctb],\n  Posit Software, PBC [cph, fnd]",
+        "Maintainer": "Yihui Xie <xie@yihui.name>",
+        "Repository": "CRAN",
+        "Date/Publication": "2025-03-23 19:30:03 UTC",
+        "Built": "R 4.4.3; ; 2025-09-05 01:49:04 UTC; windows"
       }
     },
     "memoise": {
@@ -2367,12 +2423,12 @@
         "Package": "xfun",
         "Type": "Package",
         "Title": "Supporting Functions for Packages Maintained by 'Yihui Xie'",
-        "Version": "0.49",
-        "Authors@R": "c(\n  person(\"Yihui\", \"Xie\", role = c(\"aut\", \"cre\", \"cph\"), email = \"xie@yihui.name\", comment = c(ORCID = \"0000-0003-0645-5666\")),\n  person(\"Wush\", \"Wu\", role = \"ctb\"),\n  person(\"Daijiang\", \"Li\", role = \"ctb\"),\n  person(\"Xianying\", \"Tan\", role = \"ctb\"),\n  person(\"Salim\", \"Brüggemann\", role = \"ctb\", email = \"salim-b@pm.me\", comment = c(ORCID = \"0000-0002-5329-5987\")),\n  person(\"Christophe\", \"Dervieux\", role = \"ctb\"),\n  person()\n  )",
+        "Version": "0.53",
+        "Authors@R": "c(\n  person(\"Yihui\", \"Xie\", role = c(\"aut\", \"cre\", \"cph\"), email = \"xie@yihui.name\", comment = c(ORCID = \"0000-0003-0645-5666\", URL = \"https://yihui.org\")),\n  person(\"Wush\", \"Wu\", role = \"ctb\"),\n  person(\"Daijiang\", \"Li\", role = \"ctb\"),\n  person(\"Xianying\", \"Tan\", role = \"ctb\"),\n  person(\"Salim\", \"Brüggemann\", role = \"ctb\", email = \"salim-b@pm.me\", comment = c(ORCID = \"0000-0002-5329-5987\")),\n  person(\"Christophe\", \"Dervieux\", role = \"ctb\"),\n  person()\n  )",
         "Description": "Miscellaneous functions commonly used in other packages maintained by 'Yihui Xie'.",
         "Depends": "R (>= 3.2.0)",
         "Imports": "grDevices, stats, tools",
-        "Suggests": "testit, parallel, codetools, methods, rstudioapi, tinytex (>=\n0.30), mime, litedown, commonmark, knitr (>= 1.47), remotes,\npak, rhub, renv, curl, xml2, jsonlite, magick, yaml, qs,\nrmarkdown",
+        "Suggests": "testit, parallel, codetools, methods, rstudioapi, tinytex (>=\n0.30), mime, litedown (>= 0.6), commonmark, knitr (>= 1.50),\nremotes, pak, curl, xml2, jsonlite, magick, yaml, data.table,\nqs",
         "License": "MIT + file LICENSE",
         "URL": "https://github.com/yihui/xfun",
         "BugReports": "https://github.com/yihui/xfun/issues",
@@ -2380,12 +2436,12 @@
         "RoxygenNote": "7.3.2",
         "VignetteBuilder": "litedown",
         "NeedsCompilation": "yes",
-        "Packaged": "2024-10-31 16:27:34 UTC; yihui",
-        "Author": "Yihui Xie [aut, cre, cph] (<https://orcid.org/0000-0003-0645-5666>),\n  Wush Wu [ctb],\n  Daijiang Li [ctb],\n  Xianying Tan [ctb],\n  Salim Brüggemann [ctb] (<https://orcid.org/0000-0002-5329-5987>),\n  Christophe Dervieux [ctb]",
+        "Packaged": "2025-08-18 23:51:54 UTC; yihui",
+        "Author": "Yihui Xie [aut, cre, cph] (ORCID:\n    <https://orcid.org/0000-0003-0645-5666>, URL: https://yihui.org),\n  Wush Wu [ctb],\n  Daijiang Li [ctb],\n  Xianying Tan [ctb],\n  Salim Brüggemann [ctb] (ORCID: <https://orcid.org/0000-0002-5329-5987>),\n  Christophe Dervieux [ctb]",
         "Maintainer": "Yihui Xie <xie@yihui.name>",
         "Repository": "CRAN",
-        "Date/Publication": "2024-10-31 18:10:02 UTC",
-        "Built": "R 4.4.2; x86_64-w64-mingw32; 2024-11-07 01:39:45 UTC; windows",
+        "Date/Publication": "2025-08-19 02:50:02 UTC",
+        "Built": "R 4.4.3; x86_64-w64-mingw32; 2025-09-05 00:43:34 UTC; windows",
         "Archs": "x64"
       }
     },
@@ -2515,17 +2571,23 @@
     "data/stressor_responses_may_29.sqlite": {
       "checksum": "2e5faf1b16823909cc95ae672aa6b139"
     },
+    "data/user_guide/extracted_data.md": {
+      "checksum": "0fa29b455766f2ea2f21c44cdcd97ea2"
+    },
+    "data/user_guide/metadata_fields.md": {
+      "checksum": "354c4452e8cfcb11d1e6035876d47624"
+    },
     "global.R": {
-      "checksum": "382795278e65ae70206fa4e65f1232b6"
+      "checksum": "145c15ade462067c7d3b8ac7aa18d649"
     },
     "LICENSE_Apache_2.0": {
       "checksum": "d229da563da18fe5d58cd95a6467d584"
     },
     "modules/about_us.R": {
-      "checksum": "4b8c5c2d5c7ab41df05814a91a504989"
+      "checksum": "ea9c46f475a05bd97e1679b49cf8762f"
     },
     "modules/acknowledgement.R": {
-      "checksum": "da2c7cae8bcd62efc5bdefe4ce9a71df"
+      "checksum": "8fefbd5e3b28c21006f6726b33d661b3"
     },
     "modules/admin_auth.R": {
       "checksum": "da5cc6f01a560175fad1f4ab56ea0e65"
@@ -2537,7 +2599,7 @@
       "checksum": "0a717abfd35bd1b49faeee9ed1a2f18e"
     },
     "modules/filters.R": {
-      "checksum": "9cf4544edfc8c0b0b91f9bb9f0e5ce6b"
+      "checksum": "1c8afe8ba0369ba0c8ae06bb710031ec"
     },
     "modules/images/Aimee.jpg": {
       "checksum": "94369530a8088cdbc777839ea9171a23"
@@ -2606,7 +2668,7 @@
       "checksum": "c8b9c4772df3a66a3e1bf6b4d83a8701"
     },
     "modules/images/Mendible.jpg": {
-      "checksum": "22e6bd2029ff7bfe6397137962ca096e"
+      "checksum": "ed8945c0f7e924bd440d80feaf88aa63"
     },
     "modules/images/Morgan.jpg": {
       "checksum": "3dece98c230095793705aeec847740c7"
@@ -2615,10 +2677,10 @@
       "checksum": "632c5495c589bf188514b88664b69ac7"
     },
     "modules/images/Team.jpg": {
-      "checksum": "81aea53c15b1fa3fe3ba4729cc28473a"
+      "checksum": "ac6a764be7c65c3442c62014f9db878c"
     },
     "modules/manage_categories.R": {
-      "checksum": "d9254e67ecd782eded1fc3b4a1182c46"
+      "checksum": "69bd21b3201d5929c5745547a6211390"
     },
     "modules/pagination.R": {
       "checksum": "13a5c07d7fff1380cf0a3d9949c790a3"
@@ -2627,10 +2689,10 @@
       "checksum": "cbc9749e2f50a85ac5054bf4d5afb567"
     },
     "modules/render_article_ui.R": {
-      "checksum": "87f8c592d8b540e104bcb80d0afde0ff"
+      "checksum": "7ac260d70c7bebb2510b237c2c6907b7"
     },
     "modules/render_papers.R": {
-      "checksum": "4dc6c5cd5a95cb8a80c6c7c21ad699ba"
+      "checksum": "ff771852f86da71b3562f8b5fce8b011"
     },
     "modules/reset_filters.R": {
       "checksum": "840b25012352828e303a0fc8dafae4f2"
@@ -2644,8 +2706,11 @@
     "modules/upload.R": {
       "checksum": "73d5a127b2766dca78ca1d9b69c715b3"
     },
+    "modules/user_guide.R": {
+      "checksum": "9cf1030066db11a89fa6f78a7d0d43f5"
+    },
     "README.md": {
-      "checksum": "aa16a6d615668885912fd7d9df0ca93d"
+      "checksum": "d57f046e1e7926a4fd410c7b7d0a33f0"
     },
     "scripts_db_modification/add_lookup_tables.R": {
       "checksum": "59ae979ed18912c70ce0e100db7fc74a"
@@ -2681,13 +2746,13 @@
       "checksum": "67c96238c5770c744ad91aff02a4431e"
     },
     "server.R": {
-      "checksum": "716a772f5331d896bcbf1c63d738ee6c"
+      "checksum": "0f072721ad421dfcecd5d8cf23cd3981"
     },
     "ui.R": {
-      "checksum": "0c5a93052c448655f13cf65377458d6f"
+      "checksum": "5a62c3b48ac73720e62cda757cc3f0a4"
     },
     "www/custom.css": {
-      "checksum": "8ac578652dbca4105846c0db6c2ab304"
+      "checksum": "df1cbb3862532decb137f738722d432f"
     }
   },
   "users": null
