@@ -26,16 +26,18 @@
 
 
 library(DBI)
-library(RSQLite)
 library(jsonlite)
+library(RSQLite)
+library(RPostgres)
+library(pool)
 
 # Connect to your SQLite database
 con <- dbConnect(SQLite(), "data/stressor_responses.sqlite")
 
 # Get all rows with main_id <= 132 and non-null old JSON
 rows <- dbGetQuery(con, "
-  SELECT main_id, csv_data_json_old 
-  FROM stressor_responses 
+  SELECT main_id, csv_data_json_old
+  FROM stressor_responses
   WHERE main_id <= 132 AND csv_data_json_old IS NOT NULL
 ")
 
@@ -66,20 +68,24 @@ for (i in 1:nrow(rows)) {
   main_id <- rows$main_id[i]
   old_json <- rows$csv_data_json_old[i]
 
-  parsed <- tryCatch({
-    fromJSON(old_json, simplifyVector = FALSE)
-  }, error = function(e) {
-    cat("Failed to parse JSON for ID:", main_id, "\n")
-    return(NULL)
-  })
+  parsed <- tryCatch(
+    {
+      fromJSON(old_json, simplifyVector = FALSE)
+    },
+    error = function(e) {
+      cat("Failed to parse JSON for ID:", main_id, "\n")
+      return(NULL)
+    }
+  )
 
   if (!is.null(parsed)) {
     new_parsed <- convert_to_named_json(parsed)
 
     if (!is.null(new_parsed)) {
       new_json <- toJSON(new_parsed, auto_unbox = TRUE)
-      dbExecute(con, "UPDATE stressor_responses SET csv_data_json = ? WHERE main_id = ?", 
-                params = list(new_json, main_id))
+      dbExecute(con, "UPDATE stressor_responses SET csv_data_json = ? WHERE main_id = ?",
+        params = list(new_json, main_id)
+      )
       cat("Updated main_id:", main_id, "\n")
     } else {
       cat("Skipped main_id:", main_id, " - No valid rows\n")

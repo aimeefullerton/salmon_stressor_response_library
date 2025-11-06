@@ -1,6 +1,8 @@
 # Load necessary libraries
 library(DBI)
 library(RSQLite)
+library(RPostgres)
+library(pool)
 
 # Connect to the db
 con <- dbConnect(SQLite(), "data/stressor_responses.sqlite")

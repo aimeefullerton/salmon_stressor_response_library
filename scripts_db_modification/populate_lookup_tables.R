@@ -1,9 +1,11 @@
 library(DBI)
 library(RSQLite)
+library(RPostgres)
+library(pool)
 
 con <- dbConnect(SQLite(), dbname = "path/to/your_database.sqlite")
 
-#function to populate from stressor_responses
+# function to populate from stressor_responses
 populate_from_main <- function(con) {
   mapping <- list(
     stressor_names        = "stressor_name",
@@ -15,8 +17,8 @@ populate_from_main <- function(con) {
     genus_latins          = "genus_latin",
     species_latins        = "species_latin"
   )
-  
-  for(tbl in names(mapping)) {
+
+  for (tbl in names(mapping)) {
     col <- mapping[[tbl]]
     sql <- sprintf(
       "INSERT OR IGNORE INTO %s(name)
