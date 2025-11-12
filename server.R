@@ -18,7 +18,6 @@ source("modules/admin_auth.R", local = TRUE)
 source("modules/manage_categories.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
 
-
 server <- function(input, output, session) {
   observeEvent(input$main_navbar,
     {
@@ -56,7 +55,6 @@ server <- function(input, output, session) {
       }
     )
   }
-
 
   # Launch admin authentication
   # admin_ok <- adminAuthServer("auth", correct_pw = "secret123")
@@ -109,19 +107,16 @@ server <- function(input, output, session) {
     admin_logged_in(FALSE)
   })
 
-  # Connect to database
-  db <- tryCatch(
-    dbConnect(SQLite(), "data/stressor_responses.sqlite"),
-    error = function(e) {
-      stop("Error: Unable to connect to the database.")
-    }
-  )
+  # Connect to database, using the pool from global.R
+  db <- pool
 
-  if (!"stressor_responses" %in% dbListTables(db)) {
-    stop("Error: Table `stressor_responses` does not exist in the database.")
+  table_exists <- dbExistsTable(db, Id(schema = db_config$schema, table = "stressor_responses"))
+  if (!table_exists) {
+    warning("Table `stressor_responses` does not exist in the database.")
+    data <- data.frame()
+  } else {
+    data <- dbReadTable(db, Id(schema = db_config$schema, table = "stressor_responses"))
   }
-
-  data <- dbReadTable(db, "stressor_responses")
 
   filtered_data <- filter_data_server(input, data, session)
 
@@ -173,7 +168,7 @@ server <- function(input, output, session) {
 
   upload_server("upload")
 
-  edaServer("eda", db_path = "data/stressor_responses.sqlite")
+  edaServer("eda")
 
   render_papers_server(output, paginated_data, input, session)
 
@@ -282,11 +277,12 @@ server <- function(input, output, session) {
   observeEvent(input$next_page, {
     updateNumericInput(session, "page", value = input$page + 1)
   })
-
-  # Close DB connection on session end
-  session$onSessionEnded(function() {
-    dbDisconnect(db)
-  })
 }
+
+# only close connection pool when app is shut down
+onStop(function() {
+  poolClose(pool)
+  cat("db connection pool closed.\n")
+})
 
 # nolint end

@@ -1,5 +1,2 @@
-.renviron
-r-commands.md
-shiny-cheatsheet.png
-sqlite-to-postgres-migration/*
-config.yml
+.Renviron
+_notes/*

@@ -1,12 +1,11 @@
 # nolint start
 library(shiny)
 library(DBI)
-library(RSQLite)
 library(RPostgres)
 library(pool)
 
-# Hardcoded path to database
-db_path <- "data/stressor_responses.sqlite"
+# add access to db_config
+source("global.R")
 
 setup_download_csv <- function(output, paginated_data, db, input, session) {
   get_selected_rows <- function(df) {
@@ -32,9 +31,8 @@ setup_download_csv <- function(output, paginated_data, db, input, session) {
         all = {
           tryCatch(
             {
-              conn <- dbConnect(SQLite(), db_path)
-              on.exit(dbDisconnect(conn), add = TRUE)
-              dbReadTable(conn, "stressor_responses")
+              # use pool db connection from global.R
+              dbReadTable(pool, "stressor_responses")
             },
             error = function(e) {
               showNotification("Failed to read from database.", type = "error")
@@ -60,4 +58,5 @@ setup_download_csv <- function(output, paginated_data, db, input, session) {
     }
   )
 }
+
 # nolint end

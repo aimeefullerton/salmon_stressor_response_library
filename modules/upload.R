@@ -157,7 +157,7 @@ upload_ui <- function(id) {
   )
 }
 
-upload_server <- function(id, db_path = "data/stressor_responses.sqlite") {
+upload_server <- function(id, db_conn = pool) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -181,13 +181,10 @@ upload_server <- function(id, db_path = "data/stressor_responses.sqlite") {
 
     # Populate dropdowns on page load
     session$onFlushed(function() {
-      con <- dbConnect(SQLite(), db_path)
-      on.exit(dbDisconnect(con), add = TRUE)
-
       for (input_id in names(lookup_tables)) {
         table <- lookup_tables[[input_id]]
         query <- sprintf("SELECT name FROM %s WHERE name IS NOT NULL AND TRIM(name) != '' ORDER BY name", table)
-        values <- dbGetQuery(con, query)$name
+        values <- dbGetQuery(db_conn, query)$name
         updatePickerInput(session, inputId = input_id, choices = values, selected = NULL)
       }
     }, once = TRUE)
@@ -197,11 +194,9 @@ upload_server <- function(id, db_path = "data/stressor_responses.sqlite") {
       req(input$title)
 
 
-      con <- dbConnect(SQLite(), db_path)
-      on.exit(dbDisconnect(con), add = TRUE)
-
+      # use pool instead of creating a new connection
       # Check if the title already exists
-      existing_title <- dbGetQuery(con, "SELECT 1 FROM stressor_responses WHERE title = ? LIMIT 1", params = list(input$title))
+      existing_title <- dbGetQuery(db_conn, "SELECT 1 FROM stressor_responses WHERE title = $1 LIMIT 1", params = list(input$title))
 
       if (nrow(existing_title) > 0) {
         showModal(modalDialog(
@@ -218,9 +213,9 @@ upload_server <- function(id, db_path = "data/stressor_responses.sqlite") {
         values <- input[[input_id]]
         if (!is.null(values)) {
           for (val in values) {
-            existing <- dbGetQuery(con, sprintf("SELECT 1 FROM %s WHERE LOWER(name) = LOWER(?) LIMIT 1", table), params = list(val))
+            existing <- dbGetQuery(db_conn, sprintf("SELECT 1 FROM %s WHERE LOWER(name) = LOWER($1) LIMIT 1", table), params = list(val))
             if (nrow(existing) == 0) {
-              dbExecute(con, sprintf("INSERT INTO %s (name) VALUES (?)", table), params = list(val))
+              dbExecute(db_conn, sprintf("INSERT INTO %s (name) VALUES ($1)", table), params = list(val))
             }
           }
         }
@@ -239,7 +234,8 @@ upload_server <- function(id, db_path = "data/stressor_responses.sqlite") {
       }
 
       # Step 2: Insert into main table - FIXED COLUMN NAMES
-      dbExecute(con, "
+      #* replaced SQLite placeholders with Postgres placeholders
+      dbExecute(db_conn, "
         INSERT INTO stressor_responses (
           title, stressor_name, specific_stressor_metric, stressor_units,
           species_common_name, genus_latin, species_latin, geography,
@@ -250,7 +246,7 @@ upload_server <- function(id, db_path = "data/stressor_responses.sqlite") {
           vital_rate, season, activity_details, stressor_magnitude, poe_chain,
           covariates_dependencies, citations_citation_text, citations_citation_links,
           citation_link, revision_log, csv_data_json
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31)
       ",
         params = list(
           input$title,
@@ -295,7 +291,7 @@ upload_server <- function(id, db_path = "data/stressor_responses.sqlite") {
       ))
 
       # Get the ID of the newly inserted row
-      main_id <- dbGetQuery(con, "SELECT last_insert_rowid() AS id")$id
+      main_id <- dbGetQuery(db_conn, "SELECT currval(pg_get_serial_sequence('stressor_responses', 'main_id')) AS id")$id
     })
 
     observeEvent(input$preview, {

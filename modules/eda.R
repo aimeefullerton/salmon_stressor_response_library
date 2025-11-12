@@ -3,7 +3,6 @@ library(shiny)
 library(DBI)
 library(dplyr)
 library(ggplot2)
-library(RSQLite)
 library(RPostgres)
 library(pool)
 
@@ -22,7 +21,7 @@ edaUI <- function(id) {
 }
 
 # Server for EDA module
-edaServer <- function(id, db_path = "data/stressor_responses.sqlite") {
+edaServer <- function(id) {
   moduleServer(id, function(input, output, session) {
     # Shared colors
     bar_fill <- "#F49D5C"
@@ -30,9 +29,8 @@ edaServer <- function(id, db_path = "data/stressor_responses.sqlite") {
 
     # Helper to pull top N counts for any column
     top_n_counts <- function(tbl, col, n = 10) {
-      db <- dbConnect(SQLite(), db_path)
-      on.exit(dbDisconnect(db), add = TRUE)
-      df <- dbGetQuery(db, sprintf("
+      # use pool from global.R
+      df <- dbGetQuery(pool, sprintf("
         SELECT %s AS value, COUNT(*) AS n
         FROM stressor_responses
         WHERE %s IS NOT NULL AND TRIM(%s) <> ''
@@ -61,12 +59,9 @@ edaServer <- function(id, db_path = "data/stressor_responses.sqlite") {
         )
     })
 
-
     # 3) Life‐stages (explode comma‐separated)
     output$plot_lifestage <- renderPlot({
-      db <- dbConnect(SQLite(), db_path)
-      on.exit(dbDisconnect(db), add = TRUE)
-      df0 <- dbGetQuery(db, "
+      df0 <- dbGetQuery(pool, "
         SELECT life_stages
         FROM stressor_responses
         WHERE life_stages IS NOT NULL AND TRIM(life_stages) <> ''

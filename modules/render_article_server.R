@@ -5,7 +5,6 @@ library(jsonlite)
 library(ggplot2)
 library(zoo)
 library(plotly)
-library(RSQLite)
 library(RPostgres)
 library(pool)
 
@@ -17,7 +16,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
 
   # Fetch article data from SQLite
   paper <- dbGetQuery(db,
-    "SELECT * FROM stressor_responses WHERE main_id = ?",
+    "SELECT * FROM stressor_responses WHERE main_id = $1",
     params = list(paper_id)
   )
 
