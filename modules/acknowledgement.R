@@ -53,9 +53,31 @@ acknowledgement_ui <- function(id, n) {
       )
     ),
 
+    # Original designers
+    fluidRow(
+      column(
+        12,
+        tags$div(
+          style = "display: flex; flex-direction: column; margin-top: 40px; max-width: 700px; margin: 0 auto;",
+          h4("The original design/layout for this e-library came from the following collaborators in Canada:", style = "text-align: center;"),
+          tags$div(
+            style = "text-align: left;",
+            tags$ul(
+              style = "list-style-type: disc; display: inline-block; text-align: left;",
+              tags$li("Sierra Sullivan"),
+              tags$li("Jordan Rosenfeld"),
+              tags$li("Matthew Bayly"),
+              tags$li("Mathew Bakken"),
+              tags$li("Alex Tekatch")
+            )
+          )
+        )
+      )
+    ),
+
     # Team Photo Section (Formatted Group Photo + Individual Team Members)
     fluidRow(
-      column(12, h3("Team", style = "text-align: center; margin-top: 30px; margin-bottom: 30px;"))
+      column(12, h3("Student Team", style = "text-align: center; margin-top: 30px; margin-bottom: 30px;"))
     ),
     fluidRow(
       style = "display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 40px;",
