@@ -64,11 +64,11 @@ acknowledgement_ui <- function(id, n) {
             style = "text-align: left;",
             tags$ul(
               style = "list-style-type: disc; display: inline-block; text-align: left;",
-              tags$li("Sierra Sullivan"),
-              tags$li("Jordan Rosenfeld"),
-              tags$li("Matthew Bayly"),
-              tags$li("Mathew Bakken"),
-              tags$li("Alex Tekatch")
+              tags$li("Sierra Sullivan (The University of British Columbia)"),
+              tags$li("Jordan Rosenfeld (British Columbia Ministry of Environment)"),
+              tags$li("Matthew Bayly (M.J. Bayly Analytics Ltd.)"),
+              tags$li("Mathew Bakken (The University of British Columbia)"),
+              tags$li("Alexandra Tekatch (ESSA Technologies Ltd.)")
             )
           )
         )
@@ -121,3 +121,4 @@ acknowledgement_ui <- function(id, n) {
   )
 }
 # nolint end
+
