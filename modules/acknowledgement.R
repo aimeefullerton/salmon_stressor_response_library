@@ -1,17 +1,18 @@
+# nolint start
 acknowledgement_ui <- function(id, n) {
   ns <- NS(id)
 
   tagList(
     fluidRow(
-      column(12, h4("Photos", style = "text-align: left; margin-top: 30px; margin-bottom: 10px;"))
+      column(12, h3("Photos", style = "text-align: center; margin-top: 20px; margin-bottom: 30px;"))
     ),
 
-    # Dynamic Pictures Section (n pictures)
+    # Dynamic Pictures Section
     fluidRow(
-      style = "display: flex; justify-content: flex-start; flex-wrap: wrap; gap: 15px; margin-top: 10px;",
+      style = "display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 10px;",
       lapply(1:n, function(i) {
         tags$div(
-          style = "width: 200px; height: 200px; overflow: hidden; border: 2px solid #ddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);",
+          style = "width: 200px; height: 200px; overflow: hidden; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);",
           tags$img(
             src = paste0("teamimg/highlight/pic", i, ".jpg"),
             style = "width: 100%; height: 100%; object-fit: cover;"
@@ -19,15 +20,16 @@ acknowledgement_ui <- function(id, n) {
         )
       })
     ),
+    hr(),
 
     # Acknowledgement Heading
     fluidRow(
-      column(12, h3("Acknowledgement", style = "text-align: left; margin-top: 40px;"))
+      column(12, h3("Acknowledgements", style = "text-align: center; margin-top: 20px; margin-bottom: 30px;"))
     ),
 
     # NOAA Team-Sponsors Heading
     fluidRow(
-      column(12, h4("NOAA Team-Sponsors", style = "text-align: center; margin-top: 20px;"))
+      column(12, h4("NOAA Team-Sponsors", style = "text-align: center;"))
     ),
 
     # Sponsors' Photos
@@ -51,9 +53,31 @@ acknowledgement_ui <- function(id, n) {
       )
     ),
 
+    # Original designers
+    fluidRow(
+      column(
+        12,
+        tags$div(
+          style = "display: flex; flex-direction: column; margin-top: 40px; max-width: 700px; margin: 0 auto;",
+          h4("The original design/layout for this e-library came from the following collaborators in Canada:", style = "text-align: center;"),
+          tags$div(
+            style = "text-align: left;",
+            tags$ul(
+              style = "list-style-type: disc; display: inline-block; text-align: left;",
+              tags$li("Sierra Sullivan (The University of British Columbia)"),
+              tags$li("Jordan Rosenfeld (British Columbia Ministry of Environment)"),
+              tags$li("Matthew Bayly (M.J. Bayly Analytics Ltd.)"),
+              tags$li("Mathew Bakken (The University of British Columbia)"),
+              tags$li("Alexandra Tekatch (ESSA Technologies Ltd.)")
+            )
+          )
+        )
+      )
+    ),
+
     # Team Photo Section (Formatted Group Photo + Individual Team Members)
     fluidRow(
-      column(12, h3("Team", style = "text-align: center; margin-top: 30px; margin-bottom: 30px;"))
+      column(12, h3("Student Team", style = "text-align: center; margin-top: 30px; margin-bottom: 30px;"))
     ),
     fluidRow(
       style = "display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 40px;",
@@ -87,12 +111,14 @@ acknowledgement_ui <- function(id, n) {
     ),
     fluidRow(
       column(12,
-             tags$ul(
-               tags$li(tags$a(href = "https://www.noaa.gov", "NOAA Official Website", target = "_blank")),
-               tags$li(tags$a(href = "https://www.fisheries.noaa.gov/region/west-coast/northwest-science", "NOAA Fisheries", target = "_blank"))
-             ),
-             style = "text-align: left; font-size: 16px; margin-bottom: 40px;"
+        tags$ul(
+          tags$li(tags$a(href = "https://www.noaa.gov", "NOAA Official Website", target = "_blank")),
+          tags$li(tags$a(href = "https://www.fisheries.noaa.gov/region/west-coast/northwest-science", "NOAA Fisheries", target = "_blank"))
+        ),
+        style = "text-align: left; font-size: 16px; margin-bottom: 40px;"
       )
     )
   )
 }
+# nolint end
+

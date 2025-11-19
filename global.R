@@ -2,6 +2,7 @@
 
 library(shiny)
 library(DBI)
+library(markdown)
 library(RPostgres)
 library(pool)
 
