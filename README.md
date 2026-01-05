@@ -1,6 +1,6 @@
-# Description (forthcoming)
+# Description (work-in-progress)
 
-Vision: To host an electronic library of Pacific salmon stressor-response functions as a “one-stop-shop” for life cycle modelers that is searchable, user-friendly, and open-source
+Vision: To host an electronic library of Pacific salmon stressor-response functions as a “one-stop-shop” for life cycle modelers that is searchable, user-friendly, and open-source.
 
 This e-Library will:
 
