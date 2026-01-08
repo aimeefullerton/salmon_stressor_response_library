@@ -8,6 +8,7 @@ library(pool)
 source("global.R")
 
 setup_download_csv <- function(output, paginated_data, db_path, input, session) {
+  
   # Identify which rows are selected
   get_selected_rows <- reactive({
     df <- paginated_data()
@@ -15,14 +16,14 @@ setup_download_csv <- function(output, paginated_data, db_path, input, session) 
     if (nrow(df) == 0) {
       return(logical(0))
     }
-
+    
     sapply(df$main_id, function(id) {
       inp <- paste0("select_article_", id)
       # Check if the input exists and is TRUE
       isTRUE(input[[inp]]) # was: !is.null(input[[inp]]) && input[[inp]]
     })
   })
-
+  
   # Use observeEvent to trigger a change in the radio buttons when the selected rows change
   observeEvent(get_selected_rows(), {
     if (any(get_selected_rows())) {
@@ -31,7 +32,7 @@ setup_download_csv <- function(output, paginated_data, db_path, input, session) 
       updateRadioButtons(session = session, inputId = "download_option", selected = "filtered")
     }
   })
-
+  
 
   # Assign data to be downloaded
   output$download_csv <- downloadHandler(
@@ -50,9 +51,8 @@ setup_download_csv <- function(output, paginated_data, db_path, input, session) 
         all = {
           tryCatch(
             {
-              conn <- dbConnect(SQLite(), db_path)
-              on.exit(dbDisconnect(conn), add = TRUE)
-              dbReadTable(conn, "stressor_responses")
+              # use pool db connection from global.R
+              dbReadTable(pool, "stressor_responses")
             },
             error = function(e) {
               showNotification("Failed to read from database.", type = "error")
