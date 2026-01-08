@@ -181,11 +181,11 @@ ui <- navbarPage(
           radioButtons("download_option",
             label = NULL,
             choices = c(
-              "All Records" = "all",
-              "Filtered Records" = "filtered",
-              "Selected Records" = "selected"
+              "Filtered records" = "filtered",
+              "Selected records" = "selected",
+              "Entire database" = "all"
             ),
-            selected = "all"
+            selected = "filtered"
           ),
 
           # Wrapped Confirm Download button with proper styling
