@@ -9,7 +9,7 @@ source("modules/manage_categories.R", local = TRUE)
 source("modules/about_us.R", local = TRUE)
 source("modules/acknowledgement.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
-
+source("modules/user_guide.R", local = TRUE)
 
 # Static resource for team images
 addResourcePath("teamimg", "modules/images")
@@ -20,9 +20,9 @@ ui <- navbarPage(
   title = "Salmon Stressor-Response eLibrary",
   selected = "dashboard",
 
-  # Welcome Tab
+  # About Tab
   tabPanel(
-    title = "Welcome",
+    title = "About",
     value = "NOAA info",
     fluidPage(
       useShinyjs(),
@@ -51,7 +51,6 @@ ui <- navbarPage(
       ),
       h1("Welcome to the Salmon Stressor-Response eLibrary"),
       tags$div(
-        h2("About Us"),
         about_us("about_us")
       ),
       tags$hr(),
@@ -61,8 +60,13 @@ ui <- navbarPage(
     )
   ),
 
-  # Dashboard Tab
+  # User Guide Tab
+  tabPanel("User Guide", userGuideUI("user_guide")),
+
+  # Analyze Data Tab
   tabPanel("Analyze Data", edaUI("eda")),
+
+  # Dashboard Tab
   tabPanel(
     title = "SRF Dashboard",
     value = "dashboard",
