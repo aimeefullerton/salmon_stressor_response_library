@@ -1,7 +1,6 @@
 # nolint start
 
 # Load required modules
-source("global.R")
 source("modules/about_us.R", local = TRUE) # Restored
 source("modules/acknowledgement.R", local = TRUE) # Restored
 source("modules/filters.R", local = TRUE)
