@@ -276,12 +276,12 @@ server <- function(input, output, session) {
   observeEvent(input$next_page, {
     updateNumericInput(session, "page", value = input$page + 1)
   })
-}
 
-# only close connection pool when app is shut down
-onStop(function() {
-  poolClose(pool)
-  cat("db connection pool closed.\n")
-})
+  # only close connection pool when app is shut down
+  onStop(function() {
+    poolClose(pool)
+    cat("db connection pool closed.\n")
+  })
+}
 
 # nolint end
