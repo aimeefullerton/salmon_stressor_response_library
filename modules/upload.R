@@ -109,7 +109,9 @@ upload_ui <- function(id) {
         helpText(
           "Upload a csv data file for the SR relationship. Columns should include stressor, response, sd, low_limit, up_limit.",
           "One file only.", "2 MB limit.", "Allowed types: csv."
-        )
+        ),
+        # Validation status display
+        uiOutput(ns("csv_validation_status"))
       ))
     ),
 
@@ -189,124 +191,246 @@ upload_server <- function(id, db_conn = pool) {
       }
     }, once = TRUE)
 
+    # Real-time CSV validation display
+    output$csv_validation_status <- renderUI({
+      if (is.null(input$sr_csv_file)) {
+        return(NULL)
+      }
+
+      validation_result <- validate_csv_upload(input$sr_csv_file)
+
+      if (validation_result$valid) {
+        return(HTML(create_alert_html(
+          type = "success",
+          message = "CSV file validated successfully",
+          details = list(sprintf("Rows: %d", nrow(validation_result$data)))
+        )))
+      } else {
+        return(HTML(create_alert_html(
+          type = "error",
+          message = validation_result$message,
+          details = validation_result$all_issues
+        )))
+      }
+    })
+
     # Save data when button is clicked
     observeEvent(input$save, {
       req(input$title)
 
-
-      # use pool instead of creating a new connection
-      # Check if the title already exists
-      existing_title <- dbGetQuery(db_conn, "SELECT 1 FROM stressor_responses WHERE title = $1 LIMIT 1", params = list(input$title))
-
-      if (nrow(existing_title) > 0) {
-        showModal(modalDialog(
-          title = "⚠️ Duplicate Title",
-          "A stressor response with this title already exists. Please use a different title.",
-          easyClose = TRUE
-        ))
+      # Step 1: Validate required fields
+      if (trimws(input$title) == "") {
+        show_error_modal(
+          session,
+          "❌ Missing Title",
+          "Please enter a title for this stressor response profile before saving."
+        )
         return()
       }
 
-      # Step 1: Insert new metadata values into lookup tables
-      for (input_id in names(lookup_tables)) {
-        table <- lookup_tables[[input_id]]
-        values <- input[[input_id]]
-        if (!is.null(values)) {
-          for (val in values) {
-            existing <- dbGetQuery(db_conn, sprintf("SELECT 1 FROM %s WHERE LOWER(name) = LOWER($1) LIMIT 1", table), params = list(val))
-            if (nrow(existing) == 0) {
-              dbExecute(db_conn, sprintf("INSERT INTO %s (name) VALUES ($1)", table), params = list(val))
-            }
-          }
+      # Step 2: Check for title duplication
+      title_check <- check_title_duplicate(input$title, db_conn)
+      if (title_check$duplicate) {
+        show_error_modal(
+          session,
+          "❌ Duplicate Title",
+          title_check$message
+        )
+        return()
+      }
+
+      # Step 3: Validate CSV if uploaded
+      csv_validation_result <- NULL
+      if (!is.null(input$sr_csv_file)) {
+        csv_validation_result <- validate_csv_upload(input$sr_csv_file)
+        if (!csv_validation_result$valid) {
+          error_msg <- get_csv_error_message(csv_validation_result)
+          show_error_modal(
+            session,
+            error_msg$title,
+            error_msg$message,
+            error_msg$issues
+          )
+          log_error("CSV Upload", error_msg$message, list(file = input$sr_csv_file$name))
+          return()
         }
       }
 
-      # Convert uploaded CSV to JSON string
+      # Step 4: Check for data conflicts
+      conflict_check <- check_data_conflict(
+        input$stressor_name,
+        input$species_common_name,
+        input$geography,
+        db_conn
+      )
+      if (conflict_check$conflict) {
+        # Show warning but allow user to proceed
+        show_warning_modal(
+          session,
+          "⚠️ Potential Data Conflict Detected",
+          conflict_check$message
+        )
+        return()
+      }
+
+      # Step 5: Insert new metadata values into lookup tables
+      tryCatch(
+        {
+          for (input_id in names(lookup_tables)) {
+            table <- lookup_tables[[input_id]]
+            values <- input[[input_id]]
+            if (!is.null(values)) {
+              for (val in values) {
+                existing <- dbGetQuery(db_conn, sprintf("SELECT 1 FROM %s WHERE LOWER(name) = LOWER($1) LIMIT 1", table), params = list(val))
+                if (nrow(existing) == 0) {
+                  dbExecute(db_conn, sprintf("INSERT INTO %s (name) VALUES ($1)", table), params = list(val))
+                }
+              }
+            }
+          }
+        },
+        error = function(e) {
+          show_error_modal(
+            session,
+            "❌ Error Saving Metadata",
+            sprintf("Failed to save metadata values: %s", conditionMessage(e))
+          )
+          log_error("Metadata Insert", conditionMessage(e))
+          stop(e)
+        }
+      )
+
+      # Step 6: Convert uploaded CSV to JSON string
       csv_json <- NULL
-      if (!is.null(input$sr_csv_file)) {
-        try(
+      if (!is.null(csv_validation_result) && csv_validation_result$valid) {
+        tryCatch(
           {
-            df_csv <- read.csv(input$sr_csv_file$datapath, stringsAsFactors = FALSE)
-            csv_json <- jsonlite::toJSON(df_csv, pretty = TRUE, auto_unbox = TRUE)
+            csv_json <- jsonlite::toJSON(csv_validation_result$data, pretty = TRUE, auto_unbox = TRUE)
           },
-          silent = TRUE
+          error = function(e) {
+            show_error_modal(
+              session,
+              "❌ Error Processing CSV Data",
+              sprintf("Failed to process CSV data: %s", conditionMessage(e))
+            )
+            log_error("CSV JSON Conversion", conditionMessage(e))
+            stop(e)
+          }
         )
       }
 
-      # Step 2: Insert into main table - FIXED COLUMN NAMES
-      #* replaced SQLite placeholders with Postgres placeholders
-      dbExecute(db_conn, "
-        INSERT INTO stressor_responses (
-          title, stressor_name, specific_stressor_metric, stressor_units,
-          species_common_name, genus_latin, species_latin, geography,
-          life_stages, activity, research_article_type, location_country,
-          location_state_province, location_watershed_lab, location_river_creek,
-          broad_stressor_name, description_overview, description_function_derivation,
-          description_transferability_of_function, description_source_of_stressor_data1,
-          vital_rate, season, activity_details, stressor_magnitude, poe_chain,
-          covariates_dependencies, citations_citation_text, citations_citation_links,
-          citation_link, revision_log, csv_data_json
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31)
-      ",
-        params = list(
-          input$title,
-          paste(input$stressor_name, collapse = ", "),
-          paste(input$specific_stressor_metric, collapse = ", "),
-          input$stressor_units,
-          paste(input$species_common_name, collapse = ", "),
-          paste(input$genus_latin, collapse = ", "),
-          paste(input$species_latin, collapse = ", "),
-          paste(input$geography, collapse = ", "),
-          paste(input$life_stage, collapse = ", "),
-          paste(input$activity, collapse = ", "),
-          paste(input$research_article_type, collapse = ", "),
-          paste(input$location_country, collapse = ", "),
-          paste(input$location_state_province, collapse = ", "),
-          paste(input$location_watershed_lab, collapse = ", "),
-          paste(input$location_river_creek, collapse = ", "),
-          paste(input$broad_stressor_name, collapse = ", "),
-          input$description_overview,
-          input$description_function_derivation,
-          input$description_transferability_of_function,
-          input$description_source_of_stressor_data1,
-          input$vital_rate,
-          input$season,
-          input$activity_details,
-          input$stressor_magnitude,
-          input$poe_chain,
-          input$key_covariates,
-          input$citation_text,
-          input$citation_link_text,
-          paste0(input$citation_link_text, " (", input$citation_url, ")"),
-          input$revision_log,
-          csv_json
-        )
+      # Step 7: Insert into main table with error handling
+      tryCatch(
+        {
+          dbExecute(db_conn, "
+            INSERT INTO stressor_responses (
+              title, stressor_name, specific_stressor_metric, stressor_units,
+              species_common_name, genus_latin, species_latin, geography,
+              life_stages, activity, research_article_type, location_country,
+              location_state_province, location_watershed_lab, location_river_creek,
+              broad_stressor_name, description_overview, description_function_derivation,
+              description_transferability_of_function, description_source_of_stressor_data1,
+              vital_rate, season, activity_details, stressor_magnitude, poe_chain,
+              covariates_dependencies, citations_citation_text, citations_citation_links,
+              citation_link, revision_log, csv_data_json
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31)
+          ",
+            params = list(
+              input$title,
+              paste(input$stressor_name, collapse = ", "),
+              paste(input$specific_stressor_metric, collapse = ", "),
+              input$stressor_units,
+              paste(input$species_common_name, collapse = ", "),
+              paste(input$genus_latin, collapse = ", "),
+              paste(input$species_latin, collapse = ", "),
+              paste(input$geography, collapse = ", "),
+              paste(input$life_stage, collapse = ", "),
+              paste(input$activity, collapse = ", "),
+              paste(input$research_article_type, collapse = ", "),
+              paste(input$location_country, collapse = ", "),
+              paste(input$location_state_province, collapse = ", "),
+              paste(input$location_watershed_lab, collapse = ", "),
+              paste(input$location_river_creek, collapse = ", "),
+              paste(input$broad_stressor_name, collapse = ", "),
+              input$description_overview,
+              input$description_function_derivation,
+              input$description_transferability_of_function,
+              input$description_source_of_stressor_data1,
+              input$vital_rate,
+              input$season,
+              input$activity_details,
+              input$stressor_magnitude,
+              input$poe_chain,
+              input$key_covariates,
+              input$citation_text,
+              input$citation_link_text,
+              paste0(input$citation_link_text, " (", input$citation_url, ")"),
+              input$revision_log,
+              csv_json
+            )
+          )
+
+          # Success message
+          show_success_modal(
+            session,
+            "✅ Success!",
+            sprintf(
+              "Your stressor response profile '<strong>%s</strong>' has been successfully saved to the database.",
+              input$title
+            )
+          )
+
+          # Log successful submission
+          log_entry <- sprintf(
+            "Title: %s | Stressor: %s | Species: %s | Geography: %s",
+            input$title,
+            paste(input$stressor_name, collapse = ", "),
+            paste(input$species_common_name, collapse = ", "),
+            paste(input$geography, collapse = ", ")
+          )
+          message(sprintf("[SUCCESS] Data submitted - %s", log_entry))
+        },
+        error = function(e) {
+          error_msg <- conditionMessage(e)
+          show_error_modal(
+            session,
+            "❌ Error Saving to Database",
+            sprintf(
+              "Failed to save your data to the database. Error: %s<br><br><strong>Please try again or contact support if the problem persists.</strong>",
+              error_msg
+            )
+          )
+          log_error("Database Insert", error_msg, list(title = input$title))
+        }
       )
-
-      # Step 3: Success modal
-      showModal(modalDialog(
-        title = "Success!",
-        "Your stressor response profile has been saved.",
-        easyClose = TRUE
-      ))
-
-      # Get the ID of the newly inserted row
-      main_id <- dbGetQuery(db_conn, "SELECT currval(pg_get_serial_sequence('stressor_responses', 'main_id')) AS id")$id
     })
 
     observeEvent(input$preview, {
       req(input$title)
 
-      # Read uploaded CSV and show head
+      # Validate CSV if uploaded before showing preview
       csv_preview <- NULL
+      csv_preview_status <- NULL
+
       if (!is.null(input$sr_csv_file)) {
-        try(
-          {
-            df_csv <- read.csv(input$sr_csv_file$datapath, stringsAsFactors = FALSE)
-            csv_preview <- paste(capture.output(head(df_csv, 5)), collapse = "\n")
-          },
-          silent = TRUE
-        )
+        csv_validation_result <- validate_csv_upload(input$sr_csv_file)
+
+        if (csv_validation_result$valid) {
+          df_csv <- csv_validation_result$data
+          csv_preview <- paste(capture.output(head(df_csv, 5)), collapse = "\n")
+          csv_preview_status <- HTML(create_alert_html(
+            type = "success",
+            message = "CSV is valid",
+            details = list(sprintf("Rows: %d", nrow(df_csv)))
+          ))
+        } else {
+          error_msg <- get_csv_error_message(csv_validation_result)
+          csv_preview_status <- HTML(create_alert_html(
+            type = "error",
+            message = error_msg$message,
+            details = error_msg$issues
+          ))
+        }
       }
 
       # Show preview modal with all fields
@@ -343,12 +467,19 @@ upload_server <- function(id, db_conn = pool) {
           h4("Citation Text:"), verbatimTextOutput(ns("preview_citation_text")),
           h4("Citation Link:"), verbatimTextOutput(ns("preview_citation_link")),
           h4("Revision Log:"), verbatimTextOutput(ns("preview_revision_log")),
-          h4("Uploaded CSV Preview (first 5 rows):"),
-          tags$pre(csv_preview %||% "No CSV uploaded or preview failed.")
+          h4("Uploaded CSV Status:"),
+          uiOutput(ns("preview_csv_status")),
+          h4("CSV Preview (first 5 rows):"),
+          tags$pre(csv_preview %||% "No CSV uploaded")
         ),
         easyClose = TRUE,
         footer = modalButton("Close")
       ))
+
+      # Output CSV validation status for preview
+      output$preview_csv_status <- renderUI({
+        csv_preview_status %||% ""
+      })
 
       # Populate text outputs
       output$preview_title <- renderText({
