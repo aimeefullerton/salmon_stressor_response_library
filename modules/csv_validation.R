@@ -9,7 +9,13 @@
 #   - UTF-8 encoding validation
 #   - MIME type verification
 #   - SQL injection pattern detection
-#   - File size limits
+#   - File size limit (no more than 2 MB)
+#
+# Domain Validation:
+#   - Exact column name matching (case-insensitive)
+#   - Single unique value validation for labels/units
+#   - Minimum data point requirements per curve
+#   - Multi-curve support
 #
 # Integrated with error_handling.R for consistent user messaging
 
@@ -19,6 +25,9 @@
 
 # Maximum file size in bytes (2 MB)
 MAX_FILE_SIZE_BYTES <- 2 * 1024 * 1024
+
+# Minimum valid data points per curve (excluding NA values)
+MIN_VALID_POINTS_PER_CURVE <- 4
 
 # Security: Dangerous prefixes that trigger formula injection in Excel/Google Sheets
 DANGEROUS_FORMULA_PREFIXES <- c("=", "+", "-", "@", "\t", "\r")
@@ -71,9 +80,7 @@ validate_mime_type <- function(file_input) {
   list(valid = TRUE, message = "")
 }
 
-#' Detect Binary Content in File
-#'
-#' Security: CSV files should be text-only. Binary content suggests malicious payload.
+#' Detect Binary Content in File: CSV files should be text-only. Binary content suggests malicious payload.
 #'
 #' @param file_path Path to uploaded file
 #' @return List with $valid (logical) and $message (character)
@@ -219,7 +226,6 @@ sanitize_csv_cells <- function(df) {
     }
     col
   })
-
   df
 }
 
@@ -239,8 +245,8 @@ check_suspicious_patterns <- function(df) {
     "(?i)<script[^>]*>", # XSS
     "(?i)javascript:", # JavaScript injection
     "(?i)eval\\s*\\(", # Code execution
-    "(?i)system\\s*\\(", # System command
     "(?i)exec\\s*\\(" # Code execution
+    "(?i)system\\s*\\(", # System command
   )
 
   for (col_name in colnames(df)) {
@@ -269,130 +275,67 @@ check_suspicious_patterns <- function(df) {
 # DOMAIN VALIDATION: COLUMN STRUCTURE
 # ============================================================================
 
-#' Identify Column by Naming Pattern
+#' Validate CSV Column Structure (exact names, case-insensitive)
 #'
-#' Finds columns matching patterns like <name>.x, <name>.label, etc.
+#' Required:
+#'   - curve.id
+#'   - stressor.label
+#'   - stressor.x
+#'   - units.x
+#'   - response.label
+#'   - response.y
+#'   - units.y
 #'
-#' @param col_names Vector of column names (lowercase)
-#' @param pattern Regex pattern to match
-#' @return Matched column name or NA
-find_column_by_pattern <- function(col_names, pattern) {
-  matches <- grep(pattern, col_names, value = TRUE, ignore.case = TRUE)
-  if (length(matches) > 0) {
-    return(matches[1]) # Return first match
-  }
-  NA_character_
-}
-
-#' Validate CSV Column Structure
-#'
-#' New requirements:
-#' Required: curve.id, <stressor>.x, <response>.y, <stressor>.label,
-#'           <response>.label, units.x, units.y
-#' Optional: lower.limit, upper.limit, sd, stressor.value
+#' Optional: (if not present in submitted csv, added with NA values)
+#'   - stressor.value
+#'   - lower.limit
+#'   - upper.limit
+#'   - sd
 #'
 #' @param df Data frame from CSV
-#' @return List with $valid, $message, $col_map, $issues
+#' @return List with $valid (logical), $message (character), $col_map (list), $issues (list)
 validate_csv_columns <- function(df) {
   col_names <- tolower(trimws(colnames(df)))
   issues <- list()
 
+  # Required column names (exact match, case-insensitive)
+  required_cols <- c("curve.id", "stressor.label", "stressor.x", "units.x", "response.label", "response.y", "units.y")
+
+  # Optional column names
+  optional_cols <- c("stressor.value", "sd", "lower.limit", "upper.limit")
+
   # Initialize column map
   col_map <- list(
     curve_id = NA_character_,
-    stressor_x = NA_character_,
-    response_y = NA_character_,
     stressor_label = NA_character_,
-    response_label = NA_character_,
+    stressor_x = NA_character_,
     units_x = NA_character_,
+    response_label = NA_character_,
+    response_y = NA_character_,
     units_y = NA_character_,
+    stressor_value = NA_character_,
     lower_limit = NA_character_,
     upper_limit = NA_character_,
-    sd = NA_character_,
-    stressor_value = NA_character_
+    sd = NA_character_
   )
 
-  # ---- Required Column 1: curve.id ----
-  curve_id_matches <- grep("^curve\\.id$", col_names, value = TRUE, ignore.case = TRUE)
-  if (length(curve_id_matches) > 0) {
-    col_map$curve_id <- curve_id_matches[1]
-  } else {
-    issues[[length(issues) + 1]] <- "Missing required column: 'curve.id'"
+  # Check for required columns
+  for (req_col in required_cols) {
+    if (req_col %in% col_names) {
+      # Map to col_map using snake_case key
+      map_key <- gsub("\\.", "_", req_col)
+      col_map[[map_key]] <- req_col
+    } else {
+      issues[[length(issues) + 1]] <- sprintf("Missing required column: '%s'", req_col)
+    }
   }
 
-  # ---- Required Column 2: <stressor>.x (any name ending in .x) ----
-  x_col <- find_column_by_pattern(col_names, "\\.x$")
-  if (!is.na(x_col)) {
-    col_map$stressor_x <- x_col
-  } else {
-    issues[[length(issues) + 1]] <- "Missing required column: <stressor-name>.x (e.g., 'temperature.x')"
-  }
-
-  # ---- Required Column 3: <response>.y (any name ending in .y) ----
-  y_col <- find_column_by_pattern(col_names, "\\.y$")
-  if (!is.na(y_col)) {
-    col_map$response_y <- y_col
-  } else {
-    issues[[length(issues) + 1]] <- "Missing required column: <response-name>.y (e.g., 'survival.y')"
-  }
-
-  # ---- Required Column 4: <stressor>.label ----
-  stressor_label_col <- find_column_by_pattern(col_names, "\\.label$")
-  if (!is.na(stressor_label_col)) {
-    # Ensure it's a stressor label (not response label)
-    # We'll accept the first .label column as stressor.label
-    col_map$stressor_label <- stressor_label_col
-  } else {
-    issues[[length(issues) + 1]] <- "Missing required column: <stressor-name>.label (e.g., 'temperature.label')"
-  }
-
-  # ---- Required Column 5: <response>.label ----
-  # Find second .label column (or if only one, we'll need explicit response.label)
-  label_cols <- grep("\\.label$", col_names, value = TRUE, ignore.case = TRUE)
-  if (length(label_cols) >= 2) {
-    col_map$response_label <- label_cols[2]
-  } else if (length(label_cols) == 1) {
-    # Only one .label column - user needs to provide both
-    issues[[length(issues) + 1]] <- "Missing required column: <response-name>.label (need both stressor.label and response.label)"
-  } else {
-    issues[[length(issues) + 1]] <- "Missing required columns: <stressor-name>.label and <response-name>.label"
-  }
-
-  # ---- Required Column 6: units.x ----
-  units_x_matches <- grep("^units\\.x$", col_names, value = TRUE, ignore.case = TRUE)
-  if (length(units_x_matches) > 0) {
-    col_map$units_x <- units_x_matches[1]
-  } else {
-    issues[[length(issues) + 1]] <- "Missing required column: 'units.x'"
-  }
-
-  # ---- Required Column 7: units.y ----
-  units_y_matches <- grep("^units\\.y$", col_names, value = TRUE, ignore.case = TRUE)
-  if (length(units_y_matches) > 0) {
-    col_map$units_y <- units_y_matches[1]
-  } else {
-    issues[[length(issues) + 1]] <- "Missing required column: 'units.y'"
-  }
-
-  # ---- Optional Columns ----
-  lower_limit_matches <- grep("^lower\\.limit$", col_names, value = TRUE, ignore.case = TRUE)
-  if (length(lower_limit_matches) > 0) {
-    col_map$lower_limit <- lower_limit_matches[1]
-  }
-
-  upper_limit_matches <- grep("^upper\\.limit$", col_names, value = TRUE, ignore.case = TRUE)
-  if (length(upper_limit_matches) > 0) {
-    col_map$upper_limit <- upper_limit_matches[1]
-  }
-
-  sd_matches <- grep("^sd$", col_names, value = TRUE, ignore.case = TRUE)
-  if (length(sd_matches) > 0) {
-    col_map$sd <- sd_matches[1]
-  }
-
-  stressor_value_matches <- grep("^stressor\\.value$", col_names, value = TRUE, ignore.case = TRUE)
-  if (length(stressor_value_matches) > 0) {
-    col_map$stressor_value <- stressor_value_matches[1]
+  # Map optional columns if present
+  for (opt_col in optional_cols) {
+    if (opt_col %in% col_names) {
+      map_key <- gsub("\\.", "_", opt_col)
+      col_map[[map_key]] <- opt_col
+    }
   }
 
   # Return validation result
@@ -422,7 +365,7 @@ validate_csv_columns <- function(df) {
 #' @param col Vector to validate
 #' @param col_name Column name for error messages
 #' @param allow_na Whether to allow NA values
-#' @return List with $valid and $issues
+#' @return List with $valid (logical) and $issues (list)
 validate_numeric_column <- function(col, col_name, allow_na = FALSE) {
   issues <- list()
 
@@ -442,9 +385,11 @@ validate_numeric_column <- function(col, col_name, allow_na = FALSE) {
 
   # Find non-numeric values
   if (allow_na) {
-    non_numeric_indices <- which(is.na(numeric_col) & !is.na(col) & col != "")
+    # non_numeric_indices <- which(is.na(numeric_col) & !is.na(col) & col != "")
+    non_numeric_indices <- which(is.na(numeric_col) & !is.na(col) & col != "" & col != "NA")
   } else {
-    non_numeric_indices <- which(is.na(numeric_col) & !is.na(col))
+    # non_numeric_indices <- which(is.na(numeric_col) & !is.na(col))
+    non_numeric_indices <- which(is.na(numeric_col) & !is.na(col) & col != "NA")
   }
 
   if (length(non_numeric_indices) > 0) {
@@ -466,12 +411,13 @@ validate_numeric_column <- function(col, col_name, allow_na = FALSE) {
 #'
 #' @param col Vector to validate
 #' @param col_name Column name
-#' @return List with $valid and $issues
+#' @return List with $valid (logical) and $issues (list)
 validate_single_unique_value <- function(col, col_name) {
   issues <- list()
 
   # Get unique non-NA values
-  unique_vals <- unique(col[!is.na(col) & col != ""])
+  # unique_vals <- unique(col[!is.na(col) & col != ""])
+  unique_vals <- unique(col[!is.na(col) & col != "" & col != "NA"])
 
   if (length(unique_vals) == 0) {
     issues[[length(issues) + 1]] <- sprintf(
@@ -489,11 +435,51 @@ validate_single_unique_value <- function(col, col_name) {
   list(valid = length(issues) == 0, issues = issues)
 }
 
+#' Validate Minimum Data Points Per Curve
+#'
+#' Each curve must have at least MIN_VALID_POINTS_PER_CURVE rows with valid (non-NA) stressor.x and response.y values
+#' @param df_normalized Data frame with normalized column names
+#' @param col_map Column mapping from validate_csv_columns
+#' @return List with $valid (logical) and $issues (list)
+validate_curve_data_points <- function(df_normalized, col_map) {
+  issues <- list()
+
+  if (is.na(col_map$curve_id) || is.na(col_map$stressor_x) || is.na(col_map$response_y)) {
+    return(list(valid = TRUE, issues = list()))  # Skip if columns missing
+  }
+
+  # Get the data
+  curve_ids <- df_normalized[[col_map$curve_id]]
+  stressor_x <- suppressWarnings(as.numeric(df_normalized[[col_map$stressor_x]]))
+  response_y <- suppressWarnings(as.numeric(df_normalized[[col_map$response_y]]))
+
+  # Count valid points per curve
+  unique_curves <- unique(curve_ids[!is.na(curve_ids) & curve_ids != ""])
+
+  for (curve in unique_curves) {
+    curve_rows <- which(curve_ids == curve)
+
+    # Count rows with BOTH valid stressor.x AND response.y
+    valid_x <- !is.na(stressor_x[curve_rows])
+    valid_y <- !is.na(response_y[curve_rows])
+    valid_points <- sum(valid_x & valid_y)
+
+    if (valid_points < MIN_VALID_POINTS_PER_CURVE) {
+      issues[[length(issues) + 1]] <- sprintf(
+        "Curve '%s' has only %d valid data point(s) with non-NA stressor.x and response.y values. Minimum required: %d",
+        curve, valid_points, MIN_VALID_POINTS_PER_CURVE
+      )
+    }
+  }
+
+  list(valid = length(issues) == 0, issues = issues)
+}
+
 #' Validate CSV Data Content
 #'
 #' @param df Data frame (with normalized lowercase column names)
 #' @param col_map Column mapping from validate_csv_columns
-#' @return List with $valid, $message, $issues
+#' @return List with $valid (logical), $message (character), $issues (list)
 validate_csv_data <- function(df, col_map) {
   issues <- list()
 
@@ -501,7 +487,7 @@ validate_csv_data <- function(df, col_map) {
   df_normalized <- df
   colnames(df_normalized) <- tolower(trimws(colnames(df)))
 
-  # ---- Validate curve.id (string, required) ----
+  # ---- Validate curve.id (string, required, no empty values) ----
   if (!is.na(col_map$curve_id)) {
     curve_id_col <- df_normalized[[col_map$curve_id]]
     empty_count <- sum(is.na(curve_id_col) | curve_id_col == "")
@@ -513,23 +499,7 @@ validate_csv_data <- function(df, col_map) {
     }
   }
 
-  # ---- Validate <stressor>.x (numeric, required) ----
-  if (!is.na(col_map$stressor_x)) {
-    x_check <- validate_numeric_column(df_normalized[[col_map$stressor_x]], col_map$stressor_x, allow_na = FALSE)
-    if (!x_check$valid) {
-      issues <- c(issues, x_check$issues)
-    }
-  }
-
-  # ---- Validate <response>.y (numeric, required) ----
-  if (!is.na(col_map$response_y)) {
-    y_check <- validate_numeric_column(df_normalized[[col_map$response_y]], col_map$response_y, allow_na = FALSE)
-    if (!y_check$valid) {
-      issues <- c(issues, y_check$issues)
-    }
-  }
-
-  # ---- Validate <stressor>.label (must have exactly 1 unique non-NA value) ----
+  # ---- Validate stressor.label (must have exactly 1 unique non-NA value) ----
   if (!is.na(col_map$stressor_label)) {
     label_check <- validate_single_unique_value(df_normalized[[col_map$stressor_label]], col_map$stressor_label)
     if (!label_check$valid) {
@@ -537,11 +507,12 @@ validate_csv_data <- function(df, col_map) {
     }
   }
 
-  # ---- Validate <response>.label (must have exactly 1 unique non-NA value) ----
-  if (!is.na(col_map$response_label)) {
-    label_check <- validate_single_unique_value(df_normalized[[col_map$response_label]], col_map$response_label)
-    if (!label_check$valid) {
-      issues <- c(issues, label_check$issues)
+  # ---- Validate stressor.x (numeric, required) ----
+  # allow NA here, but validate minimum points per curve separately
+  if (!is.na(col_map$stressor_x)) {
+    x_check <- validate_numeric_column(df_normalized[[col_map$stressor_x]], col_map$stressor_x, allow_na = TRUE)
+    if (!x_check$valid) {
+      issues <- c(issues, x_check$issues)
     }
   }
 
@@ -553,6 +524,23 @@ validate_csv_data <- function(df, col_map) {
     }
   }
 
+  # ---- Validate response.label (must have exactly 1 unique non-NA value) ----
+  if (!is.na(col_map$response_label)) {
+    label_check <- validate_single_unique_value(df_normalized[[col_map$response_label]], col_map$response_label)
+    if (!label_check$valid) {
+      issues <- c(issues, label_check$issues)
+    }
+  }
+
+  # ---- Validate response.y (numeric, required) ----
+  # allow NA here, but validate minimum points per curve separately
+  if (!is.na(col_map$response_y)) {
+    y_check <- validate_numeric_column(df_normalized[[col_map$response_y]], col_map$response_y, allow_na = TRUE)
+    if (!y_check$valid) {
+      issues <- c(issues, y_check$issues)
+    }
+  }
+
   # ---- Validate units.y (must have exactly 1 unique non-NA value) ----
   if (!is.na(col_map$units_y)) {
     units_check <- validate_single_unique_value(df_normalized[[col_map$units_y]], col_map$units_y)
@@ -560,6 +548,15 @@ validate_csv_data <- function(df, col_map) {
       issues <- c(issues, units_check$issues)
     }
   }
+
+  # ---- Validate minimum data points per curve ----
+  curve_points_check <- validate_curve_data_points(df_normalized, col_map)
+  if (!curve_points_check$valid) {
+    issues <- c(issues, curve_points_check$issues)
+  }
+
+  # ---- Validate stressor.value (string or numeric, optional) ----
+  # No strict validation needed - can be any type
 
   # ---- Validate Optional Columns (numeric, NA allowed) ----
   if (!is.na(col_map$lower_limit)) {
@@ -582,9 +579,6 @@ validate_csv_data <- function(df, col_map) {
       issues <- c(issues, sd_check$issues)
     }
   }
-
-  # ---- Validate stressor.value (string or numeric, optional) ----
-  # No strict validation needed - can be any type
 
   # ---- Check logical relationship: lower.limit <= upper.limit ----
   if (!is.na(col_map$lower_limit) && !is.na(col_map$upper_limit)) {
@@ -624,7 +618,7 @@ validate_csv_data <- function(df, col_map) {
 
 #' Comprehensive CSV Upload Validation (Security + Domain)
 #'
-#' This is the primary function called by your Shiny app.
+#' This is the primary function called by the app.
 #' Integrates with error_handling.R for consistent error messaging.
 #'
 #' @param file_input Shiny file input object
@@ -636,7 +630,7 @@ validate_csv_data <- function(df, col_map) {
 #'   - $all_issues (list): All validation issues
 #'   - $security_warnings (list): Security-specific warnings
 validate_csv_upload <- function(file_input) {
-  # ---- Check if file exists ----
+  # Check if file exists
   if (is.null(file_input)) {
     return(list(
       valid = FALSE,
@@ -660,7 +654,7 @@ validate_csv_upload <- function(file_input) {
     ))
   }
 
-  # ---- Check file size ----
+  # Check file size
   file_size <- file.info(file_path)$size
   if (file_size > MAX_FILE_SIZE_BYTES) {
     return(list(
@@ -676,7 +670,7 @@ validate_csv_upload <- function(file_input) {
     ))
   }
 
-  # ---- SECURITY LAYER 1: File-level security ----
+  # SECURITY LAYER 1: File-level security
   security_check <- validate_file_security(file_input)
   if (!security_check$valid) {
     return(list(
@@ -689,7 +683,7 @@ validate_csv_upload <- function(file_input) {
     ))
   }
 
-  # ---- Parse CSV ----
+  # Parse CSV
   df <- tryCatch(
     {
       read.csv(file_path, stringsAsFactors = FALSE, strip.white = TRUE)
@@ -714,7 +708,7 @@ validate_csv_upload <- function(file_input) {
     return(df) # Return error from tryCatch
   }
 
-  # ---- Check if empty ----
+  # Check if empty
   if (nrow(df) == 0) {
     return(list(
       valid = FALSE,
@@ -726,7 +720,7 @@ validate_csv_upload <- function(file_input) {
     ))
   }
 
-  # ---- DOMAIN VALIDATION: Column structure ----
+  # DOMAIN VALIDATION: Column structure
   col_check <- validate_csv_columns(df)
   if (!col_check$valid) {
     return(list(
@@ -741,14 +735,14 @@ validate_csv_upload <- function(file_input) {
 
   col_map <- col_check$col_map
 
-  # ---- SECURITY LAYER 2: Check for suspicious patterns ----
+  # SECURITY LAYER 2: Check for suspicious patterns
   pattern_check <- check_suspicious_patterns(df)
   security_warnings <- pattern_check$warnings
 
-  # ---- SECURITY LAYER 3: Sanitize against formula injection ----
+  # SECURITY LAYER 3: Sanitize against formula injection
   df_sanitized <- sanitize_csv_cells(df)
 
-  # ---- DOMAIN VALIDATION: Data content ----
+  # DOMAIN VALIDATION: Data content
   data_check <- validate_csv_data(df_sanitized, col_map)
 
   if (!data_check$valid) {
@@ -762,7 +756,7 @@ validate_csv_upload <- function(file_input) {
     ))
   }
 
-  # ---- SUCCESS ----
+  # SUCCESS
   return(list(
     valid = TRUE,
     message = "CSV validation passed",
@@ -780,10 +774,9 @@ validate_csv_upload <- function(file_input) {
 #' Get User-Friendly Error Message for CSV Upload
 #'
 #' Integrates with error_handling.R
-#' Enhanced version with guidance specific to new column requirements
 #'
 #' @param validation_result Result from validate_csv_upload()
-#' @return List with $message and $issues
+#' @return List with $message (character) and $issues (list)
 get_csv_error_message <- function(validation_result) {
   if (validation_result$valid) {
     return(list(
@@ -795,28 +788,37 @@ get_csv_error_message <- function(validation_result) {
   message <- validation_result$message
   issues <- validation_result$all_issues %||% list()
 
-  # Add helpful guidance based on common issues
+  # Add helpful guidance
   guidance <- ""
 
   if (length(issues) > 0) {
     if (any(grepl("Missing required column", issues, ignore.case = TRUE))) {
       guidance <- paste0(
-        "\n\n<strong>How to fix:</strong> Ensure your CSV has these required columns:\n",
-        "• curve.id (curve/group identifier)\n",
-        "• <stressor-name>.x (e.g., 'temperature.x') - numeric values\n",
-        "• <response-name>.y (e.g., 'survival.y') - numeric values\n",
-        "• <stressor-name>.label (e.g., 'temperature.label') - single unique value\n",
-        "• <response-name>.label (e.g., 'survival.label') - single unique value\n",
-        "• units.x - units for X values (single unique value)\n",
-        "• units.y - units for Y values (single unique value)\n",
-        "\nOptional columns: lower.limit, upper.limit, sd, stressor.value"
+        "\n\n<strong>How to fix:</strong> Ensure your CSV contains these column names:\n",
+        "• curve.id\n",
+        "• stressor.label\n",
+        "• stressor.x\n",
+        "• units.x\n",
+        "• response.label\n",
+        "• response.y\n",
+        "• units.y\n",
+        "\n<strong>Note:</strong> The following columns are optional:\n",
+        "• stressor.value\n",
+        "• lower.limit\n",
+        "• upper.limit\n",
+        "• sd"
       )
     } else if (any(grepl("non-numeric", issues, ignore.case = TRUE))) {
-      guidance <- "\n\n<strong>How to fix:</strong> Ensure .x and .y columns contain only numbers (no text or special characters except decimals)"
+      guidance <- "\n\n<strong>How to fix:</strong> Ensure stressor.x and response.y columns contain only numbers (no text or special characters except decimals, NA is allowed)"
     } else if (any(grepl("exactly 1 unique", issues, ignore.case = TRUE))) {
-      guidance <- "\n\n<strong>How to fix:</strong> Label and unit columns must have the same value in every row (exactly 1 unique non-NA value)"
+      guidance <- "\n\n<strong>How to fix:</strong> The stressor.label, response.label, units.x, and units.y columns must have the same value in every row (exactly 1 unique non-NA value)"
     } else if (any(grepl("empty", issues, ignore.case = TRUE))) {
       guidance <- "\n\n<strong>How to fix:</strong> Fill in all required fields. curve.id and numeric columns cannot have empty values."
+    } else if (any(grepl("valid data point", issues, ignore.case = TRUE))) {
+      guidance <- sprintf(
+        "\n\n<strong>How to fix:</strong> Each curve must have at least %d rows where BOTH stressor.x and response.y are non-NA numbers",
+        MIN_VALID_POINTS_PER_CURVE
+      )
     }
   }
 
