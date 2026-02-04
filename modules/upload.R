@@ -1,7 +1,9 @@
 # nolint start
 
-# Compact Upload UI (Updated + Centered & Spacing Reduced)
+source("modules/csv_validation.R")
+source("modules/error_handling.R")
 
+# Compact Upload UI (Updated + Centered & Spacing Reduced)
 upload_ui <- function(id) {
   ns <- NS(id)
 
