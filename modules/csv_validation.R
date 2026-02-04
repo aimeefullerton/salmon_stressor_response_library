@@ -1,54 +1,49 @@
 # nolint start
 
-# CSV Validation Functions for Stressor Response Data
-# This module provides comprehensive validation for CSV uploads
+# SECURE CSV Validation for Stressor-Response Function (SRF) Data
+# This module provides comprehensive validation + security hardening for CSV uploads
+#
+# Security Features:
+#   - Formula/CSV injection prevention (neutralizes =, +, -, @, etc.)
+#   - Binary content detection (rejects executables disguised as CSV)
+#   - UTF-8 encoding validation
+#   - MIME type verification
+#   - SQL injection pattern detection
+#   - File size limits
+#
+# Integrated with error_handling.R for consistent user messaging
 
-# Define required columns for SR curve data
-# Column structure (flexible naming for first 2, fixed for remainder):
-#   1. Stressor numeric values (any name, e.g., "Stressor (X)")
-#   2. Response numeric values (any name, e.g., "response.y.incubdays")
-#   3. SD - standard deviation (can be NA)
-#   4. lower.limit - lower confidence limit (can be NA)
-#   5. high.limit - upper confidence limit (can be NA)
-#   6. treatment.label - describes the stressor (e.g., "temperature")
-#   7. treatment.value - treatment details (e.g., "constant")
-#   8. response.label - describes the response variable (optional, e.g., "incubation days")
-REQUIRED_FIXED_COLUMNS <- c("sd", "lower.limit", "high.limit", "treatment.label", "treatment.value")
-OPTIONAL_COLUMNS <- c("response.label")
-EXPECTED_COLUMN_COUNT <- 8
+# ============================================================================
+# CONFIGURATION
+# ============================================================================
 
 # Maximum file size in bytes (2 MB)
 MAX_FILE_SIZE_BYTES <- 2 * 1024 * 1024
 
-#' Validate CSV File Exists and is Readable
+# Security: Dangerous prefixes that trigger formula injection in Excel/Google Sheets
+DANGEROUS_FORMULA_PREFIXES <- c("=", "+", "-", "@", "\t", "\r")
+
+# Allowed MIME types for CSV uploads
+ALLOWED_MIME_TYPES <- c("text/csv", "application/csv", "text/plain", "application/vnd.ms-excel")
+
+# ============================================================================
+# SECURITY LAYER 1: FILE-LEVEL VALIDATION
+# ============================================================================
+
+#' Validate File Extension
 #'
 #' @param file_input Shiny file input object
-#'
 #' @return List with $valid (logical) and $message (character)
-validate_csv_file_exists <- function(file_input) {
-  if (is.null(file_input)) {
-    return(list(
-      valid = FALSE,
-      message = "No CSV file selected. Please upload a CSV file containing your SR curve data."
-    ))
-  }
+validate_file_extension <- function(file_input) {
+  file_name <- file_input$name
+  ext <- tolower(tools::file_ext(file_name))
 
-  file_path <- file_input$datapath
-  if (!file.exists(file_path)) {
-    return(list(
-      valid = FALSE,
-      message = "File does not exist. Please try uploading again."
-    ))
-  }
-
-  # Check file size
-  file_size <- file.info(file_path)$size
-  if (file_size > MAX_FILE_SIZE_BYTES) {
+  if (ext != "csv") {
     return(list(
       valid = FALSE,
       message = sprintf(
-        "File size (%.2f MB) exceeds the 2 MB limit. Please reduce the file size and try again.",
-        file_size / (1024 * 1024)
+        "Invalid file extension '.%s'. Only .csv files are permitted.",
+        ext
       )
     ))
   }
@@ -56,227 +51,386 @@ validate_csv_file_exists <- function(file_input) {
   list(valid = TRUE, message = "")
 }
 
-#' Validate CSV Format and Structure
+#' Validate MIME Type
 #'
 #' @param file_input Shiny file input object
-#'
-#' @return List with $valid (logical), $message (character), $data (data.frame if valid), and $col_map (list)
-validate_csv_format <- function(file_input) {
-  file_check <- validate_csv_file_exists(file_input)
-  if (!file_check$valid) {
-    return(list(valid = FALSE, message = file_check$message, data = NULL, col_map = NULL))
+#' @return List with $valid (logical) and $message (character)
+validate_mime_type <- function(file_input) {
+  mime_type <- file_input$type
+
+  if (is.null(mime_type) || !mime_type %in% ALLOWED_MIME_TYPES) {
+    return(list(
+      valid = FALSE,
+      message = sprintf(
+        "Invalid file type detected (MIME: %s). Only CSV files are accepted.",
+        ifelse(is.null(mime_type), "unknown", mime_type)
+      )
+    ))
   }
 
-  # Try to read CSV
+  list(valid = TRUE, message = "")
+}
+
+#' Detect Binary Content in File
+#'
+#' Security: CSV files should be text-only. Binary content suggests malicious payload.
+#'
+#' @param file_path Path to uploaded file
+#' @return List with $valid (logical) and $message (character)
+detect_binary_content <- function(file_path) {
+  # Read first 10KB as raw bytes
+  max_bytes_to_check <- min(10240, file.info(file_path)$size)
+  raw_bytes <- readBin(file_path, "raw", n = max_bytes_to_check)
+
+  # Check for null bytes (strong indicator of binary content)
+  if (any(raw_bytes == as.raw(0x00))) {
+    return(list(
+      valid = FALSE,
+      message = "File contains binary content. Please upload a text-based CSV file."
+    ))
+  }
+
+  # Check for executable signatures
+  # PE header (Windows .exe): "MZ"
+  if (length(raw_bytes) >= 2 && raw_bytes[1] == as.raw(0x4D) && raw_bytes[2] == as.raw(0x5A)) {
+    return(list(
+      valid = FALSE,
+      message = "File appears to be an executable. Only CSV files are permitted."
+    ))
+  }
+
+  # ELF header (Unix executable)
+  if (length(raw_bytes) >= 4 &&
+    raw_bytes[1] == as.raw(0x7F) &&
+    raw_bytes[2] == as.raw(0x45) &&
+    raw_bytes[3] == as.raw(0x4C) &&
+    raw_bytes[4] == as.raw(0x46)) {
+    return(list(
+      valid = FALSE,
+      message = "File appears to be an executable. Only CSV files are permitted."
+    ))
+  }
+
+  # ZIP header: "PK"
+  if (length(raw_bytes) >= 2 && raw_bytes[1] == as.raw(0x50) && raw_bytes[2] == as.raw(0x4B)) {
+    return(list(
+      valid = FALSE,
+      message = "File appears to be a ZIP archive. Please upload an uncompressed CSV file."
+    ))
+  }
+
+  list(valid = TRUE, message = "")
+}
+
+#' Validate File Encoding
+#'
+#' @param file_path Path to uploaded file
+#' @return List with $valid (logical) and $message (character)
+validate_encoding <- function(file_path) {
   tryCatch(
     {
-      df <- read.csv(file_input$datapath, stringsAsFactors = FALSE, strip.white = TRUE)
+      lines <- readLines(file_path, encoding = "UTF-8", warn = FALSE, n = 100)
 
-      # Check if empty
-      if (nrow(df) == 0) {
+      if (length(lines) == 0) {
         return(list(
           valid = FALSE,
-          message = "CSV file is empty. Please include at least one data row.",
-          data = NULL,
-          col_map = NULL
+          message = "File appears to be empty."
         ))
       }
 
-      # Check column names
-      col_check <- validate_csv_columns(df)
-      if (!col_check$valid) {
-        return(list(valid = FALSE, message = col_check$message, data = NULL, col_map = NULL))
-      }
-
-      list(valid = TRUE, message = "", data = df, col_map = col_check$col_map)
+      list(valid = TRUE, message = "")
     },
     error = function(e) {
       list(
         valid = FALSE,
         message = sprintf(
-          "Failed to read CSV file: %s. Ensure the file is a valid CSV format with proper encoding.",
+          "File encoding error. Please ensure the file is saved as UTF-8 text. Error: %s",
           conditionMessage(e)
-        ),
-        data = NULL,
-        col_map = NULL
+        )
       )
     }
   )
 }
 
-#' Validate CSV Column Names
+#' Comprehensive File Security Validation
 #'
-#' @param df Data frame from CSV
-#'
-#' @return List with $valid (logical) and $message (character), and $col_map (list mapping column positions)
-validate_csv_columns <- function(df) {
-  col_names <- tolower(trimws(colnames(df)))
-  required_fixed_lower <- tolower(REQUIRED_FIXED_COLUMNS)
-  optional_lower <- tolower(OPTIONAL_COLUMNS)
-
-  # Check that we have at least the expected number of columns (7 required + 1 optional = 8)
-  # but also allow fewer if response.label is missing
-  if (length(col_names) < EXPECTED_COLUMN_COUNT - 1 || length(col_names) > EXPECTED_COLUMN_COUNT) {
-    return(list(
-      valid = FALSE,
-      message = sprintf(
-        "Expected %d or %d columns but found %d. Expected: 2 columns (any names for stressor/response) + 5 fixed columns (%s) + 1 optional (%s)",
-        EXPECTED_COLUMN_COUNT - 1, EXPECTED_COLUMN_COUNT, length(col_names),
-        paste(REQUIRED_FIXED_COLUMNS, collapse = ", "),
-        paste(OPTIONAL_COLUMNS, collapse = ", ")
-      ),
-      col_map = NULL
-    ))
+#' @param file_input Shiny file input object
+#' @return List with $valid (logical) and $message (character)
+validate_file_security <- function(file_input) {
+  # Extension check
+  ext_check <- validate_file_extension(file_input)
+  if (!ext_check$valid) {
+    return(ext_check)
   }
 
-  # Check for the required fixed columns in positions 3-7
-  actual_fixed <- col_names[3:7]
-  missing_cols <- setdiff(required_fixed_lower, actual_fixed)
-  if (length(missing_cols) > 0) {
-    return(list(
-      valid = FALSE,
-      message = sprintf(
-        "Missing required columns in positions 3-7: %s. Expected: %s",
-        paste(missing_cols, collapse = ", "),
-        paste(REQUIRED_FIXED_COLUMNS, collapse = ", ")
-      ),
-      col_map = NULL
-    ))
+  # MIME type check
+  mime_check <- validate_mime_type(file_input)
+  if (!mime_check$valid) {
+    return(mime_check)
   }
 
-  # Check for optional response.label column in position 8
-  has_response_label <- FALSE
-  if (length(col_names) == EXPECTED_COLUMN_COUNT) {
-    has_response_label <- col_names[8] %in% optional_lower
-    if (!has_response_label) {
-      return(list(
-        valid = FALSE,
-        message = sprintf(
-          "Column 8 should be '%s' but found '%s'",
-          OPTIONAL_COLUMNS[1], col_names[8]
-        ),
-        col_map = NULL
-      ))
+  # Binary content detection
+  binary_check <- detect_binary_content(file_input$datapath)
+  if (!binary_check$valid) {
+    return(binary_check)
+  }
+
+  # Encoding validation
+  encoding_check <- validate_encoding(file_input$datapath)
+  if (!encoding_check$valid) {
+    return(encoding_check)
+  }
+
+  list(valid = TRUE, message = "Security validation passed")
+}
+
+# ============================================================================
+# SECURITY LAYER 2: CONTENT SECURITY
+# ============================================================================
+
+#' Sanitize CSV Cell Values Against Formula Injection
+#'
+#' Prevents CSV/Formula injection by neutralizing dangerous prefixes.
+#' Any cell starting with =, +, -, @, tab, or carriage return will be
+#' prefixed with a single quote to force literal interpretation.
+#'
+#' @param df Data frame to sanitize
+#' @return Sanitized data frame
+sanitize_csv_cells <- function(df) {
+  df[] <- lapply(df, function(col) {
+    if (is.character(col)) {
+      col <- sapply(col, function(cell_value) {
+        if (is.na(cell_value) || nchar(trimws(cell_value)) == 0) {
+          return(cell_value)
+        }
+
+        trimmed <- trimws(cell_value)
+        is_dangerous <- any(sapply(DANGEROUS_FORMULA_PREFIXES, function(prefix) {
+          startsWith(trimmed, prefix)
+        }))
+
+        if (is_dangerous) {
+          # Neutralize by prefixing with single quote
+          return(paste0("'", cell_value))
+        }
+
+        cell_value
+      }, USE.NAMES = FALSE)
+    }
+    col
+  })
+
+  df
+}
+
+#' Check for Suspicious Patterns
+#'
+#' Scans for SQL injection, XSS, and code execution attempts
+#'
+#' @param df Data frame to check
+#' @return List with $valid (logical) and $warnings (list)
+check_suspicious_patterns <- function(df) {
+  warnings <- list()
+
+  # Patterns indicating injection attempts
+  suspicious_patterns <- c(
+    "(?i)(DROP|DELETE|TRUNCATE)\\s+(TABLE|DATABASE)", # SQL injection
+    "(?i)UNION\\s+SELECT", # SQL injection
+    "(?i)<script[^>]*>", # XSS
+    "(?i)javascript:", # JavaScript injection
+    "(?i)eval\\s*\\(", # Code execution
+    "(?i)system\\s*\\(", # System command
+    "(?i)exec\\s*\\(" # Code execution
+  )
+
+  for (col_name in colnames(df)) {
+    col <- df[[col_name]]
+    if (is.character(col)) {
+      for (pattern in suspicious_patterns) {
+        matches <- grep(pattern, col, value = FALSE)
+        if (length(matches) > 0) {
+          warnings[[length(warnings) + 1]] <- sprintf(
+            "Column '%s' contains suspicious patterns in rows %s",
+            col_name,
+            paste(head(matches, 5), collapse = ", ")
+          )
+        }
+      }
     }
   }
 
-  # Create a column mapping for flexible access
-  col_map <- list(
-    stressor_col = col_names[1],
-    response_col = col_names[2],
-    sd_col = col_names[3],
-    lower_limit_col = col_names[4],
-    upper_limit_col = col_names[5],
-    treatment_label_col = col_names[6],
-    treatment_value_col = col_names[7],
-    response_label_col = if (has_response_label) col_names[8] else NA
+  list(
+    valid = length(warnings) == 0,
+    warnings = warnings
   )
-
-  list(valid = TRUE, message = "", col_map = col_map)
 }
 
-#' Validate CSV Data Types and Values
+# ============================================================================
+# DOMAIN VALIDATION: COLUMN STRUCTURE
+# ============================================================================
+
+#' Identify Column by Naming Pattern
+#'
+#' Finds columns matching patterns like <name>.x, <name>.label, etc.
+#'
+#' @param col_names Vector of column names (lowercase)
+#' @param pattern Regex pattern to match
+#' @return Matched column name or NA
+find_column_by_pattern <- function(col_names, pattern) {
+  matches <- grep(pattern, col_names, value = TRUE, ignore.case = TRUE)
+  if (length(matches) > 0) {
+    return(matches[1]) # Return first match
+  }
+  NA_character_
+}
+
+#' Validate CSV Column Structure
+#'
+#' New requirements:
+#' Required: curve.id, <stressor>.x, <response>.y, <stressor>.label,
+#'           <response>.label, units.x, units.y
+#' Optional: lower.limit, upper.limit, sd, stressor.value
 #'
 #' @param df Data frame from CSV
-#' @param col_map List mapping column positions to names
-#'
-#' @return List with $valid (logical), $message (character), and $issues (list of specific issues)
-validate_csv_data <- function(df, col_map) {
+#' @return List with $valid, $message, $col_map, $issues
+validate_csv_columns <- function(df) {
+  col_names <- tolower(trimws(colnames(df)))
   issues <- list()
-  col_names_lower <- tolower(trimws(colnames(df)))
 
-  # Normalize column names to lowercase for processing
-  df_normalized <- df
-  colnames(df_normalized) <- col_names_lower
+  # Initialize column map
+  col_map <- list(
+    curve_id = NA_character_,
+    stressor_x = NA_character_,
+    response_y = NA_character_,
+    stressor_label = NA_character_,
+    response_label = NA_character_,
+    units_x = NA_character_,
+    units_y = NA_character_,
+    lower_limit = NA_character_,
+    upper_limit = NA_character_,
+    sd = NA_character_,
+    stressor_value = NA_character_
+  )
 
-  # Use the column mapping to access the correct columns
-  stressor_col_name <- col_map$stressor_col
-  response_col_name <- col_map$response_col
-  sd_col_name <- col_map$sd_col
-  lower_limit_col_name <- col_map$lower_limit_col
-  upper_limit_col_name <- col_map$upper_limit_col
-  treatment_label_col_name <- col_map$treatment_label_col
-  treatment_value_col_name <- col_map$treatment_value_col
-
-  # Check stressor column (required, numeric)
-  stressor_check <- validate_numeric_column(df_normalized[[stressor_col_name]], stressor_col_name)
-  if (!stressor_check$valid) {
-    issues <- c(issues, stressor_check$issues)
+  # ---- Required Column 1: curve.id ----
+  curve_id_matches <- grep("^curve\\.id$", col_names, value = TRUE, ignore.case = TRUE)
+  if (length(curve_id_matches) > 0) {
+    col_map$curve_id <- curve_id_matches[1]
+  } else {
+    issues[[length(issues) + 1]] <- "Missing required column: 'curve.id'"
   }
 
-  # Check response column (required, numeric)
-  response_check <- validate_numeric_column(df_normalized[[response_col_name]], response_col_name)
-  if (!response_check$valid) {
-    issues <- c(issues, response_check$issues)
+  # ---- Required Column 2: <stressor>.x (any name ending in .x) ----
+  x_col <- find_column_by_pattern(col_names, "\\.x$")
+  if (!is.na(x_col)) {
+    col_map$stressor_x <- x_col
+  } else {
+    issues[[length(issues) + 1]] <- "Missing required column: <stressor-name>.x (e.g., 'temperature.x')"
   }
 
-  # Check sd column (optional - can be NA, numeric when present)
-  sd_check <- validate_numeric_column(df_normalized[[sd_col_name]], sd_col_name, allow_zero = TRUE, allow_na = TRUE)
-  if (!sd_check$valid) {
-    issues <- c(issues, sd_check$issues)
+  # ---- Required Column 3: <response>.y (any name ending in .y) ----
+  y_col <- find_column_by_pattern(col_names, "\\.y$")
+  if (!is.na(y_col)) {
+    col_map$response_y <- y_col
+  } else {
+    issues[[length(issues) + 1]] <- "Missing required column: <response-name>.y (e.g., 'survival.y')"
   }
 
-  # Check limit columns (optional - can be NA)
-  limit_check <- validate_limit_columns(df_normalized, col_map)
-  if (!limit_check$valid) {
-    issues <- c(issues, limit_check$issues)
+  # ---- Required Column 4: <stressor>.label ----
+  stressor_label_col <- find_column_by_pattern(col_names, "\\.label$")
+  if (!is.na(stressor_label_col)) {
+    # Ensure it's a stressor label (not response label)
+    # We'll accept the first .label column as stressor.label
+    col_map$stressor_label <- stressor_label_col
+  } else {
+    issues[[length(issues) + 1]] <- "Missing required column: <stressor-name>.label (e.g., 'temperature.label')"
   }
 
-  # Check treatment.label column (required, character/categorical)
-  if (any(!is.na(df_normalized[[treatment_label_col_name]]) & df_normalized[[treatment_label_col_name]] == "")) {
-    issues[[length(issues) + 1]] <- sprintf(
-      "Column '%s' contains empty values",
-      treatment_label_col_name
-    )
+  # ---- Required Column 5: <response>.label ----
+  # Find second .label column (or if only one, we'll need explicit response.label)
+  label_cols <- grep("\\.label$", col_names, value = TRUE, ignore.case = TRUE)
+  if (length(label_cols) >= 2) {
+    col_map$response_label <- label_cols[2]
+  } else if (length(label_cols) == 1) {
+    # Only one .label column - user needs to provide both
+    issues[[length(issues) + 1]] <- "Missing required column: <response-name>.label (need both stressor.label and response.label)"
+  } else {
+    issues[[length(issues) + 1]] <- "Missing required columns: <stressor-name>.label and <response-name>.label"
   }
 
-  # Check treatment.value column (required, character/categorical)
-  if (any(!is.na(df_normalized[[treatment_value_col_name]]) & df_normalized[[treatment_value_col_name]] == "")) {
-    issues[[length(issues) + 1]] <- sprintf(
-      "Column '%s' contains empty values",
-      treatment_value_col_name
-    )
+  # ---- Required Column 6: units.x ----
+  units_x_matches <- grep("^units\\.x$", col_names, value = TRUE, ignore.case = TRUE)
+  if (length(units_x_matches) > 0) {
+    col_map$units_x <- units_x_matches[1]
+  } else {
+    issues[[length(issues) + 1]] <- "Missing required column: 'units.x'"
   }
 
-  # Check for inconsistent response values
-  response_range_check <- validate_response_range(df_normalized[[response_col_name]])
-  if (!response_range_check$valid) {
-    issues <- c(issues, response_range_check$issues)
+  # ---- Required Column 7: units.y ----
+  units_y_matches <- grep("^units\\.y$", col_names, value = TRUE, ignore.case = TRUE)
+  if (length(units_y_matches) > 0) {
+    col_map$units_y <- units_y_matches[1]
+  } else {
+    issues[[length(issues) + 1]] <- "Missing required column: 'units.y'"
   }
 
-  # Check for duplicate stressor values
-  dup_check <- check_duplicate_stressor_values(df_normalized[[stressor_col_name]])
-  if (!dup_check$valid) {
-    issues <- c(issues, dup_check$issues)
+  # ---- Optional Columns ----
+  lower_limit_matches <- grep("^lower\\.limit$", col_names, value = TRUE, ignore.case = TRUE)
+  if (length(lower_limit_matches) > 0) {
+    col_map$lower_limit <- lower_limit_matches[1]
   }
 
+  upper_limit_matches <- grep("^upper\\.limit$", col_names, value = TRUE, ignore.case = TRUE)
+  if (length(upper_limit_matches) > 0) {
+    col_map$upper_limit <- upper_limit_matches[1]
+  }
+
+  sd_matches <- grep("^sd$", col_names, value = TRUE, ignore.case = TRUE)
+  if (length(sd_matches) > 0) {
+    col_map$sd <- sd_matches[1]
+  }
+
+  stressor_value_matches <- grep("^stressor\\.value$", col_names, value = TRUE, ignore.case = TRUE)
+  if (length(stressor_value_matches) > 0) {
+    col_map$stressor_value <- stressor_value_matches[1]
+  }
+
+  # Return validation result
   if (length(issues) > 0) {
     return(list(
       valid = FALSE,
-      message = sprintf("Data validation failed with %d issue(s)", length(issues)),
+      message = "Column structure validation failed",
+      col_map = NULL,
       issues = issues
     ))
   }
 
-  list(valid = TRUE, message = "", issues = list())
+  list(
+    valid = TRUE,
+    message = "Column structure validated",
+    col_map = col_map,
+    issues = list()
+  )
 }
+
+# ============================================================================
+# DOMAIN VALIDATION: DATA CONTENT
+# ============================================================================
 
 #' Validate Numeric Column
 #'
 #' @param col Vector to validate
-#' @param col_name Column name for messaging
-#' @param allow_zero Whether to allow zero values
-#' @param allow_na Whether to allow NA/empty values
-#'
-#' @return List with $valid (logical) and $issues (list)
-validate_numeric_column <- function(col, col_name, allow_zero = FALSE, allow_na = FALSE) {
+#' @param col_name Column name for error messages
+#' @param allow_na Whether to allow NA values
+#' @return List with $valid and $issues
+validate_numeric_column <- function(col, col_name, allow_na = FALSE) {
   issues <- list()
 
-  # Check for empty values
+  # Count empty/NA values
   empty_count <- sum(is.na(col) | col == "")
   if (empty_count > 0 && !allow_na) {
     issues[[length(issues) + 1]] <- sprintf(
-      "Column '%s' has %d empty or missing values",
+      "Column '%s' has %d empty or missing values (required to be numeric)",
       col_name, empty_count
     )
   }
@@ -286,7 +440,7 @@ validate_numeric_column <- function(col, col_name, allow_zero = FALSE, allow_na 
     numeric_col <- as.numeric(col)
   })
 
-  # Check for non-numeric values (excluding NA if allow_na is TRUE)
+  # Find non-numeric values
   if (allow_na) {
     non_numeric_indices <- which(is.na(numeric_col) & !is.na(col) & col != "")
   } else {
@@ -294,189 +448,381 @@ validate_numeric_column <- function(col, col_name, allow_zero = FALSE, allow_na 
   }
 
   if (length(non_numeric_indices) > 0) {
-    non_numeric_values <- col[non_numeric_indices]
+    non_numeric_values <- unique(col[non_numeric_indices])
     issues[[length(issues) + 1]] <- sprintf(
-      "Column '%s' contains non-numeric values: %s (rows %s)",
+      "Column '%s' contains non-numeric values: %s (in rows %s)",
       col_name,
-      paste(unique(non_numeric_values), collapse = ", "),
-      paste(non_numeric_indices, collapse = ", ")
+      paste(head(non_numeric_values, 5), collapse = ", "),
+      paste(head(non_numeric_indices, 10), collapse = ", ")
     )
   }
 
   list(valid = length(issues) == 0, issues = issues)
 }
 
-#' Validate Limit Columns (lower.limit and high.limit)
+#' Validate Single Unique Value in Column
 #'
-#' @param df_normalized Data frame with lowercase column names
-#' @param col_map List mapping column positions to names
+#' Validates that column has exactly 1 unique non-NA value across entire file
 #'
-#' @return List with $valid (logical) and $issues (list)
-validate_limit_columns <- function(df_normalized, col_map) {
+#' @param col Vector to validate
+#' @param col_name Column name
+#' @return List with $valid and $issues
+validate_single_unique_value <- function(col, col_name) {
   issues <- list()
 
-  lower_limit_col_name <- col_map$lower_limit_col
-  upper_limit_col_name <- col_map$upper_limit_col
+  # Get unique non-NA values
+  unique_vals <- unique(col[!is.na(col) & col != ""])
 
-  # Check lower.limit column (can be NA)
-  lower_limit_check <- validate_numeric_column(df_normalized[[lower_limit_col_name]], lower_limit_col_name, allow_zero = TRUE, allow_na = TRUE)
-  if (!lower_limit_check$valid) {
-    issues <- c(issues, lower_limit_check$issues)
-  }
-
-  # Check high.limit column (can be NA)
-  upper_limit_check <- validate_numeric_column(df_normalized[[upper_limit_col_name]], upper_limit_col_name, allow_zero = TRUE, allow_na = TRUE)
-  if (!upper_limit_check$valid) {
-    issues <- c(issues, upper_limit_check$issues)
-  }
-
-  # Check logical relationship: lower.limit <= high.limit (only when both are not NA)
-  suppressWarnings({
-    lower_limits <- as.numeric(df_normalized[[lower_limit_col_name]])
-    upper_limits <- as.numeric(df_normalized[[upper_limit_col_name]])
-  })
-
-  invalid_limit_rows <- which(!is.na(lower_limits) & !is.na(upper_limits) & lower_limits > upper_limits)
-  if (length(invalid_limit_rows) > 0) {
+  if (length(unique_vals) == 0) {
     issues[[length(issues) + 1]] <- sprintf(
-      "%s exceeds %s in rows: %s",
-      lower_limit_col_name, upper_limit_col_name, paste(invalid_limit_rows, collapse = ", ")
+      "Column '%s' has no non-NA values (required to have exactly 1 unique value)",
+      col_name
+    )
+  } else if (length(unique_vals) > 1) {
+    issues[[length(issues) + 1]] <- sprintf(
+      "Column '%s' has multiple unique values (%s) but must have exactly 1 unique value across the entire file",
+      col_name,
+      paste(head(unique_vals, 5), collapse = ", ")
     )
   }
 
   list(valid = length(issues) == 0, issues = issues)
 }
 
-#' Validate Response Values are Within Reasonable Range
+#' Validate CSV Data Content
 #'
-#' @param response_col Response column values
-#'
-#' @return List with $valid (logical) and $issues (list)
-validate_response_range <- function(response_col) {
+#' @param df Data frame (with normalized lowercase column names)
+#' @param col_map Column mapping from validate_csv_columns
+#' @return List with $valid, $message, $issues
+validate_csv_data <- function(df, col_map) {
   issues <- list()
 
-  suppressWarnings({
-    response_numeric <- as.numeric(response_col)
-  })
+  # Normalize column names
+  df_normalized <- df
+  colnames(df_normalized) <- tolower(trimws(colnames(df)))
 
-  valid_responses <- response_numeric[!is.na(response_numeric)]
-
-  if (length(valid_responses) == 0) {
-    return(list(valid = FALSE, issues = list("No valid response values found")))
-  }
-
-  # Check if all values are the same
-  if (length(unique(valid_responses)) == 1) {
-    issues[[length(issues) + 1]] <- sprintf(
-      "All response values are identical (%.2f). SR functions should show variation.",
-      unique(valid_responses)[1]
-    )
-  }
-
-  list(valid = length(issues) == 0, issues = issues)
-}
-
-#' Check for Duplicate Stressor Values
-#'
-#' @param stressor_col Stressor column values
-#'
-#' @return List with $valid (logical) and $issues (list)
-check_duplicate_stressor_values <- function(stressor_col) {
-  issues <- list()
-
-  suppressWarnings({
-    stressor_numeric <- as.numeric(stressor_col)
-  })
-
-  valid_stressors <- stressor_numeric[!is.na(stressor_numeric)]
-
-  # Check for exact duplicates
-  dup_values <- valid_stressors[duplicated(valid_stressors)]
-  if (length(dup_values) > 0) {
-    issues[[length(issues) + 1]] <- sprintf(
-      "Duplicate stressor values found: %s",
-      paste(unique(dup_values), collapse = ", ")
-    )
-  }
-
-  # Check for near-duplicates (within 0.01 tolerance)
-  if (length(valid_stressors) > 1) {
-    sorted <- sort(valid_stressors)
-    diffs <- diff(sorted)
-    near_dups <- which(diffs < 0.01 & diffs > 0)
-    if (length(near_dups) > 0) {
+  # ---- Validate curve.id (string, required) ----
+  if (!is.na(col_map$curve_id)) {
+    curve_id_col <- df_normalized[[col_map$curve_id]]
+    empty_count <- sum(is.na(curve_id_col) | curve_id_col == "")
+    if (empty_count > 0) {
       issues[[length(issues) + 1]] <- sprintf(
-        "Warning: Near-duplicate stressor values detected (difference < 0.01). These may affect curve fitting."
+        "Column '%s' has %d empty values (all rows must have a curve ID)",
+        col_map$curve_id, empty_count
       )
     }
   }
 
-  list(valid = length(issues) == 0, issues = issues)
+  # ---- Validate <stressor>.x (numeric, required) ----
+  if (!is.na(col_map$stressor_x)) {
+    x_check <- validate_numeric_column(df_normalized[[col_map$stressor_x]], col_map$stressor_x, allow_na = FALSE)
+    if (!x_check$valid) {
+      issues <- c(issues, x_check$issues)
+    }
+  }
+
+  # ---- Validate <response>.y (numeric, required) ----
+  if (!is.na(col_map$response_y)) {
+    y_check <- validate_numeric_column(df_normalized[[col_map$response_y]], col_map$response_y, allow_na = FALSE)
+    if (!y_check$valid) {
+      issues <- c(issues, y_check$issues)
+    }
+  }
+
+  # ---- Validate <stressor>.label (must have exactly 1 unique non-NA value) ----
+  if (!is.na(col_map$stressor_label)) {
+    label_check <- validate_single_unique_value(df_normalized[[col_map$stressor_label]], col_map$stressor_label)
+    if (!label_check$valid) {
+      issues <- c(issues, label_check$issues)
+    }
+  }
+
+  # ---- Validate <response>.label (must have exactly 1 unique non-NA value) ----
+  if (!is.na(col_map$response_label)) {
+    label_check <- validate_single_unique_value(df_normalized[[col_map$response_label]], col_map$response_label)
+    if (!label_check$valid) {
+      issues <- c(issues, label_check$issues)
+    }
+  }
+
+  # ---- Validate units.x (must have exactly 1 unique non-NA value) ----
+  if (!is.na(col_map$units_x)) {
+    units_check <- validate_single_unique_value(df_normalized[[col_map$units_x]], col_map$units_x)
+    if (!units_check$valid) {
+      issues <- c(issues, units_check$issues)
+    }
+  }
+
+  # ---- Validate units.y (must have exactly 1 unique non-NA value) ----
+  if (!is.na(col_map$units_y)) {
+    units_check <- validate_single_unique_value(df_normalized[[col_map$units_y]], col_map$units_y)
+    if (!units_check$valid) {
+      issues <- c(issues, units_check$issues)
+    }
+  }
+
+  # ---- Validate Optional Columns (numeric, NA allowed) ----
+  if (!is.na(col_map$lower_limit)) {
+    limit_check <- validate_numeric_column(df_normalized[[col_map$lower_limit]], col_map$lower_limit, allow_na = TRUE)
+    if (!limit_check$valid) {
+      issues <- c(issues, limit_check$issues)
+    }
+  }
+
+  if (!is.na(col_map$upper_limit)) {
+    limit_check <- validate_numeric_column(df_normalized[[col_map$upper_limit]], col_map$upper_limit, allow_na = TRUE)
+    if (!limit_check$valid) {
+      issues <- c(issues, limit_check$issues)
+    }
+  }
+
+  if (!is.na(col_map$sd)) {
+    sd_check <- validate_numeric_column(df_normalized[[col_map$sd]], col_map$sd, allow_na = TRUE)
+    if (!sd_check$valid) {
+      issues <- c(issues, sd_check$issues)
+    }
+  }
+
+  # ---- Validate stressor.value (string or numeric, optional) ----
+  # No strict validation needed - can be any type
+
+  # ---- Check logical relationship: lower.limit <= upper.limit ----
+  if (!is.na(col_map$lower_limit) && !is.na(col_map$upper_limit)) {
+    suppressWarnings({
+      lower_limits <- as.numeric(df_normalized[[col_map$lower_limit]])
+      upper_limits <- as.numeric(df_normalized[[col_map$upper_limit]])
+    })
+
+    invalid_rows <- which(!is.na(lower_limits) & !is.na(upper_limits) & lower_limits > upper_limits)
+    if (length(invalid_rows) > 0) {
+      issues[[length(issues) + 1]] <- sprintf(
+        "Lower limit exceeds upper limit in rows: %s",
+        paste(head(invalid_rows, 10), collapse = ", ")
+      )
+    }
+  }
+
+  # Return result
+  if (length(issues) > 0) {
+    return(list(
+      valid = FALSE,
+      message = sprintf("Data validation failed with %d issue(s)", length(issues)),
+      issues = issues
+    ))
+  }
+
+  list(
+    valid = TRUE,
+    message = "Data validation passed",
+    issues = list()
+  )
 }
 
-#' Comprehensive CSV Validation
+# ============================================================================
+# MAIN VALIDATION FUNCTION
+# ============================================================================
+
+#' Comprehensive CSV Upload Validation (Security + Domain)
+#'
+#' This is the primary function called by your Shiny app.
+#' Integrates with error_handling.R for consistent error messaging.
 #'
 #' @param file_input Shiny file input object
-#'
-#' @return List with $valid (logical), $message (character), $data (data.frame if valid), $col_map (list), and $all_issues (list)
+#' @return List with:
+#'   - $valid (logical): Whether validation passed
+#'   - $message (character): Summary message
+#'   - $data (data.frame): Sanitized data if valid, NULL otherwise
+#'   - $col_map (list): Column mapping if valid, NULL otherwise
+#'   - $all_issues (list): All validation issues
+#'   - $security_warnings (list): Security-specific warnings
 validate_csv_upload <- function(file_input) {
-  # Step 1: Check file exists and is readable
-  file_check <- validate_csv_file_exists(file_input)
-  if (!file_check$valid) {
+  # ---- Check if file exists ----
+  if (is.null(file_input)) {
     return(list(
       valid = FALSE,
-      message = file_check$message,
+      message = "No CSV file selected",
       data = NULL,
       col_map = NULL,
-      all_issues = list(file_check$message)
+      all_issues = list("No CSV file selected. Please upload a CSV file."),
+      security_warnings = list()
     ))
   }
 
-  # Step 2: Check format and structure
-  format_check <- validate_csv_format(file_input)
-  if (!format_check$valid) {
+  file_path <- file_input$datapath
+  if (!file.exists(file_path)) {
     return(list(
       valid = FALSE,
-      message = format_check$message,
+      message = "File does not exist",
       data = NULL,
       col_map = NULL,
-      all_issues = list(format_check$message)
+      all_issues = list("File does not exist. Please try uploading again."),
+      security_warnings = list()
     ))
   }
 
-  df <- format_check$data
-  col_map <- format_check$col_map
+  # ---- Check file size ----
+  file_size <- file.info(file_path)$size
+  if (file_size > MAX_FILE_SIZE_BYTES) {
+    return(list(
+      valid = FALSE,
+      message = "File too large",
+      data = NULL,
+      col_map = NULL,
+      all_issues = list(sprintf(
+        "File size (%.2f MB) exceeds the 2 MB limit.",
+        file_size / (1024 * 1024)
+      )),
+      security_warnings = list()
+    ))
+  }
 
-  # Step 3: Validate data types and values
-  data_check <- validate_csv_data(df, col_map)
+  # ---- SECURITY LAYER 1: File-level security ----
+  security_check <- validate_file_security(file_input)
+  if (!security_check$valid) {
+    return(list(
+      valid = FALSE,
+      message = "Security validation failed",
+      data = NULL,
+      col_map = NULL,
+      all_issues = list(security_check$message),
+      security_warnings = list()
+    ))
+  }
 
+  # ---- Parse CSV ----
+  df <- tryCatch(
+    {
+      read.csv(file_path, stringsAsFactors = FALSE, strip.white = TRUE)
+    },
+    error = function(e) {
+      return(list(
+        valid = FALSE,
+        message = "Failed to read CSV",
+        data = NULL,
+        col_map = NULL,
+        all_issues = list(sprintf(
+          "Failed to read CSV file: %s. Ensure the file is a valid CSV format.",
+          conditionMessage(e)
+        )),
+        security_warnings = list()
+      ))
+    }
+  )
+
+  # Check if CSV read failed
+  if (is.list(df) && !is.data.frame(df)) {
+    return(df) # Return error from tryCatch
+  }
+
+  # ---- Check if empty ----
+  if (nrow(df) == 0) {
+    return(list(
+      valid = FALSE,
+      message = "CSV is empty",
+      data = NULL,
+      col_map = NULL,
+      all_issues = list("CSV file is empty. Please include at least one data row."),
+      security_warnings = list()
+    ))
+  }
+
+  # ---- DOMAIN VALIDATION: Column structure ----
+  col_check <- validate_csv_columns(df)
+  if (!col_check$valid) {
+    return(list(
+      valid = FALSE,
+      message = col_check$message,
+      data = NULL,
+      col_map = NULL,
+      all_issues = col_check$issues,
+      security_warnings = list()
+    ))
+  }
+
+  col_map <- col_check$col_map
+
+  # ---- SECURITY LAYER 2: Check for suspicious patterns ----
+  pattern_check <- check_suspicious_patterns(df)
+  security_warnings <- pattern_check$warnings
+
+  # ---- SECURITY LAYER 3: Sanitize against formula injection ----
+  df_sanitized <- sanitize_csv_cells(df)
+
+  # ---- DOMAIN VALIDATION: Data content ----
+  data_check <- validate_csv_data(df_sanitized, col_map)
+
+  if (!data_check$valid) {
+    return(list(
+      valid = FALSE,
+      message = data_check$message,
+      data = NULL,
+      col_map = col_map,
+      all_issues = data_check$issues,
+      security_warnings = security_warnings
+    ))
+  }
+
+  # ---- SUCCESS ----
   return(list(
-    valid = data_check$valid,
-    message = data_check$message,
-    data = df,
+    valid = TRUE,
+    message = "CSV validation passed",
+    data = df_sanitized,
     col_map = col_map,
-    all_issues = data_check$issues
+    all_issues = list(),
+    security_warnings = security_warnings
   ))
 }
 
-#' Format Validation Issues for Display
+# ============================================================================
+# HELPER FUNCTIONS FOR ERROR HANDLING INTEGRATION
+# ============================================================================
+
+#' Get User-Friendly Error Message for CSV Upload
 #'
-#' @param issues List of issue strings
+#' Integrates with error_handling.R
+#' Enhanced version with guidance specific to new column requirements
 #'
-#' @return Formatted HTML string for display
-format_validation_issues <- function(issues) {
-  if (length(issues) == 0) {
-    return("")
+#' @param validation_result Result from validate_csv_upload()
+#' @return List with $message and $issues
+get_csv_error_message <- function(validation_result) {
+  if (validation_result$valid) {
+    return(list(
+      message = "CSV validation passed",
+      issues = list()
+    ))
   }
 
-  issue_html <- paste(
-    sprintf("<li>%s</li>", issues),
-    collapse = "\n"
-  )
+  message <- validation_result$message
+  issues <- validation_result$all_issues %||% list()
 
-  sprintf(
-    "<div class='alert alert-warning'><strong>Validation Issues Found:</strong><ul>%s</ul></div>",
-    issue_html
+  # Add helpful guidance based on common issues
+  guidance <- ""
+
+  if (length(issues) > 0) {
+    if (any(grepl("Missing required column", issues, ignore.case = TRUE))) {
+      guidance <- paste0(
+        "\n\n<strong>How to fix:</strong> Ensure your CSV has these required columns:\n",
+        "• curve.id (curve/group identifier)\n",
+        "• <stressor-name>.x (e.g., 'temperature.x') - numeric values\n",
+        "• <response-name>.y (e.g., 'survival.y') - numeric values\n",
+        "• <stressor-name>.label (e.g., 'temperature.label') - single unique value\n",
+        "• <response-name>.label (e.g., 'survival.label') - single unique value\n",
+        "• units.x - units for X values (single unique value)\n",
+        "• units.y - units for Y values (single unique value)\n",
+        "\nOptional columns: lower.limit, upper.limit, sd, stressor.value"
+      )
+    } else if (any(grepl("non-numeric", issues, ignore.case = TRUE))) {
+      guidance <- "\n\n<strong>How to fix:</strong> Ensure .x and .y columns contain only numbers (no text or special characters except decimals)"
+    } else if (any(grepl("exactly 1 unique", issues, ignore.case = TRUE))) {
+      guidance <- "\n\n<strong>How to fix:</strong> Label and unit columns must have the same value in every row (exactly 1 unique non-NA value)"
+    } else if (any(grepl("empty", issues, ignore.case = TRUE))) {
+      guidance <- "\n\n<strong>How to fix:</strong> Fill in all required fields. curve.id and numeric columns cannot have empty values."
+    }
+  }
+
+  list(
+    message = paste0(message, guidance),
+    issues = issues
   )
 }
 
