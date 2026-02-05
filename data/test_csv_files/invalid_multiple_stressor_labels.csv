@@ -1,0 +1,3 @@
+curve.id,stressor.x,response.y,stressor.label,response.label,units.x,units.y
+c1,0.5,92,temperature,survival,degC,percent
+c1,1.0,85,flow,survival,degC,percent

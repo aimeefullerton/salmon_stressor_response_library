@@ -1,6 +1,8 @@
 # nolint start
 
 # Load required modules
+source("modules/csv_validation.R", local = TRUE)
+source("modules/error_handling.R", local = TRUE)
 source("modules/about_us.R", local = TRUE) # Restored
 source("modules/acknowledgement.R", local = TRUE) # Restored
 source("modules/filters.R", local = TRUE)
