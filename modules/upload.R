@@ -28,6 +28,28 @@ upload_ui <- function(id) {
       fluidRow(
         column(6, offset = 3, textInput(ns("title"), "Title *", placeholder = "Add a short descriptive title such as Coho Fry and Stream Temperature", width = "800px"))
       ),
+
+      # CSV Upload
+      fluidRow(
+        column(6, offset = 3, wellPanel(
+          style = "background-color: #f9f9f9; border-color: #ccc;",
+          strong("SR Curve Data CSV"),
+          uiOutput(ns("sr_csv_file_ui")),
+          helpText(
+            "Upload a CSV data file for the SR relationship.",
+            br(),
+            "Required columns: curve.id, stressor.label, stressor.x, units.x, response.label, response.y, units.y.",
+            br(),
+            "Optional columns: stressor.value, lower.limit, upper.limit, sd.",
+            br(),
+            "Each curve must have at least 4 rows with valid (non-NA) stressor.x and response.y values.",
+            br(),
+            "2 MB limit. Allowed type: .csv"
+          ),
+          downloadButton(ns("download_csv_template"), "Download CSV Template", class = "btn btn-info mb-2"),
+          uiOutput(ns("csv_validation_status"))
+        ))
+      ),
       fluidRow(
         column(3, offset = 3, pickerInput(ns("stressor_name"), "Stressor Name", NULL,
           multiple = TRUE, options = picker_opts,
@@ -102,31 +124,6 @@ upload_ui <- function(id) {
       fluidRow(
         column(6, offset = 3, textAreaInput(ns("description_source_of_stressor_data1"), "Source of Stressor Data",
           placeholder = "Describe the source of stressor data needed to apply the function", height = "200px", width = "800px"
-        ))
-      ),
-
-      # CSV Upload
-      fluidRow(
-        column(6, offset = 3, wellPanel(
-          style = "background-color: #f9f9f9; border-color: #ccc;",
-          strong("SR Curve Data CSV"),
-          # CSV file input (rendered via server so it can be reset)
-          uiOutput(ns("sr_csv_file_ui")),
-          helpText(
-            "Upload a CSV data file for the SR relationship.",
-            br(),
-            "Required columns: curve.id, stressor.label, stressor.x, units.x, response.label, response.y, units.y.",
-            br(),
-            "Optional columns: stressor.value, lower.limit, upper.limit, sd.",
-            br(),
-            "Each curve must have at least 4 rows with valid (non-NA) stressor.x and response.y values.",
-            br(),
-            "2 MB limit. Allowed type: .csv"
-          ),
-          # CSV template download button for SRF_template_
-          downloadButton(ns("download_csv_template"), "Download CSV Template", class = "btn btn-info mb-2"),
-          # Validation status display
-          uiOutput(ns("csv_validation_status"))
         ))
       ),
 
