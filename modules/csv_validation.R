@@ -245,8 +245,8 @@ check_suspicious_patterns <- function(df) {
     "(?i)<script[^>]*>", # XSS
     "(?i)javascript:", # JavaScript injection
     "(?i)eval\\s*\\(", # Code execution
-    "(?i)exec\\s*\\(" # Code execution
-    "(?i)system\\s*\\(", # System command
+    "(?i)exec\\s*\\(", # Code execution
+    "(?i)system\\s*\\(" # System command
   )
 
   for (col_name in colnames(df)) {
@@ -445,7 +445,7 @@ validate_curve_data_points <- function(df_normalized, col_map) {
   issues <- list()
 
   if (is.na(col_map$curve_id) || is.na(col_map$stressor_x) || is.na(col_map$response_y)) {
-    return(list(valid = TRUE, issues = list()))  # Skip if columns missing
+    return(list(valid = TRUE, issues = list())) # Skip if columns missing
   }
 
   # Get the data
