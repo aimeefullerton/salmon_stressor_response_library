@@ -1,0 +1,9 @@
+curve.id,stressor.x,response.y,sd,lower.limit,upper.limit,stressor.label,stressor.value,response.label,units.x,units.y
+temp.14,0.5,92,NA,NA,NA,temperature,14,survival,degC,percent
+temp.14,0.7,90,NA,NA,NA,temperature,14,survival,degC,percent
+temp.14,0.9,87,NA,NA,NA,temperature,14,survival,degC,percent
+temp.14,1.0,85,NA,NA,NA,temperature,14,survival,degC,percent
+temp.18,0.5,75,NA,NA,NA,temperature,18,survival,degC,percent
+temp.18,0.6,72,NA,NA,NA,temperature,18,survival,degC,percent
+temp.18,0.8,68,NA,NA,NA,temperature,18,survival,degC,percent
+temp.18,1.0,60,NA,NA,NA,temperature,18,survival,degC,percent
