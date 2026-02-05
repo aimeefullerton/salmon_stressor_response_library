@@ -1,0 +1,6 @@
+curve.id,stressor.x,response.y,lower.limit,upper.limit,sd,stressor.label,stressor.value,response.label,units.x,units.y
+temp_14,14,1,response-14.y,NA,NA,NA,stressor-14,low,response-14,F,F
+temp_14,14,1,response-14.y,NA,NA,NA,stressor-14,low,response-14,F,F
+temp_14,14,1,response-14.y,NA,NA,NA,stressor-14,low,response-14,F,F
+temp_14,14,1,response-14.y,NA,NA,NA,stressor-14,low,response-14,F,F
+temp_14,14,1,response-14.y,NA,NA,NA,stressor-14,low,response-14,F,F
