@@ -30,14 +30,15 @@ get_env <- function(key, required = FALSE) {
 
 host <- get_env("DB_HOST", required = TRUE)
 port <- as.integer(get_env("DB_PORT", required = TRUE))
+dbname <- get_env("DB_NAME", required = TRUE)
 user <- get_env("DB_USER", required = TRUE)
 password <- get_env("DB_PASSWORD", required = TRUE)
-dbname <- get_env("DB_DATABASE", required = TRUE)
+schema <- get_env("DB_SCHEMA", required = TRUE)
 
 conn <- NULL
 tryCatch(
   {
-    conn <- dbConnect(RPostgres::Postgres(), host = host, port = port, user = user, password = password, dbname = dbname)
+    conn <- dbConnect(RPostgres::Postgres(), host = host, port = port, user = user, password = password, dbname = dbname, schema = schema)
   },
   error = function(e) {
     stop("Failed to connect to the database: ", conditionMessage(e))
