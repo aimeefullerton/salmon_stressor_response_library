@@ -329,12 +329,10 @@ upload_server <- function(id, db_conn = pool) {
           return()
         }
 
-        # CSV is valid - convert sanitized data to text for storage
+        # CSV is valid - convert sanitized data to JSON for storage (jsonb)
         df_csv <- csv_validation_result$data
-        csv_text <- paste(
-          capture.output(write.csv(df_csv, file = "", row.names = FALSE)),
-          collapse = "\n"
-        )
+        # Preserve NA as JSON null, use rows-as-objects
+        csv_json <- jsonlite::toJSON(df_csv, dataframe = "rows", auto_unbox = TRUE, na = "null")
         csv_validation_passed <- TRUE
       } else {
         # No CSV uploaded
@@ -379,7 +377,7 @@ upload_server <- function(id, db_conn = pool) {
               vital_rate, season, activity_details, stressor_magnitude, poe_chain,
               covariates_dependencies, citations_citation_text, citations_citation_links,
               citation_link, revision_log, csv_data_json
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31)",
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31::jsonb)",
             params = list(
               input$title,
               paste(input$stressor_name, collapse = ", "),
@@ -411,7 +409,7 @@ upload_server <- function(id, db_conn = pool) {
               input$citation_link_text,
               paste0(input$citation_link_text, " (", input$citation_url, ")"),
               input$revision_log,
-              csv_text
+              csv_json
             )
           )
 
