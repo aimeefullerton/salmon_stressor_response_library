@@ -1,16 +1,16 @@
-| Column         | Description                                                             | Type    | Rules                                                                      |
-| -------------- | ----------------------------------------------------------------------- | ------- | -------------------------------------------------------------------------- |
-| curve.id       | Curve/group identifier                                                  | string  | REQUIRED; Required for single-curve files (can use a single value like c1) |
-| stressor.label | Stressor name/label for this SRF entry                                  | string  | REQUIRED; Must have exactly 1 unique non-NA value across the entire file   |
-| stressor.x     | Numeric value of the stressor (x-axis)                                  | numeric | REQUIRED; X-values only; Must be numeric                                   |
-| units.x        | Units/Metrics for stressor.x                                            | string  | REQUIRED; Must have exactly 1 unique non-NA value across the entire file   |
-| response.label | Response variable name/label (e.g., embryo_survival, temperature, etc.) | string  | REQUIRED; Must have exactly 1 unique non-NA value across the entire file   |
-| response.y     | Numeric value of the biological response (y-axis)                       | numeric | REQUIRED; Y-values only; Must be numeric                                   |
-| units.y        | Units/Metrics for response.y                                            | string  | REQUIRED; Must have exactly 1 unique non-NA value across the entire file   |
-| stressor.value | Curve-level descriptor (e.g.: 14, 18, 'low', 'high', 'flow \* temp')    | any     | OPTIONAL; Can be any type, preferably a string or number                   |
-| lower.limit    | description                                                             | numeric | OPTIONAL; NA allowed                                                       |
-| upper.limit    | description                                                             | numeric | OPTIONAL; NA allowed                                                       |
-| sd             | standard deviation                                                      | numeric | OPTIONAL; NA allowed                                                       |
+| Column         | Description                                                                    | Type    | Rules                                                                      |
+| -------------- | ------------------------------------------------------------------------------ | ------- | -------------------------------------------------------------------------- |
+| curve.id       | Unique curve identifier; one id per curve                                      | string  | REQUIRED; Required for single-curve files (can use a single value like c1) |
+| stressor.label | Name of the stressor for the entire file                                       | string  | REQUIRED; Must have exactly 1 unique non-NA value across the entire file   |
+| stressor.x     | Numeric value of the stressor (x-axis)                                         | numeric | REQUIRED; X-values only; Must be numeric                                   |
+| units.x        | Units for stressor.x                                                           | string  | REQUIRED; Must have exactly 1 unique non-NA value across the entire file   |
+| response.label | Name of the response variable (y-axis)                                         | string  | REQUIRED; Must have exactly 1 unique non-NA value across the entire file   |
+| response.y     | Numeric value of the biological response (y-axis)                              | numeric | REQUIRED; Y-values only; Must be numeric                                   |
+| units.y        | Units for response.y                                                           | string  | REQUIRED; Must have exactly 1 unique non-NA value across the entire file   |
+| stressor.value | Optional curve-level descriptor (e.g., temperature 14, "low", replicate label) | any     | OPTIONAL; Can be any type, preferably a string or number                   |
+| lower.limit    | Optional lower confidence/uncertainty bound for response.y                     | numeric | OPTIONAL; NA allowed                                                       |
+| upper.limit    | Optional upper confidence/uncertainty bound for response.y                     | numeric | OPTIONAL; NA allowed                                                       |
+| sd             | Optional standard deviation for response.y                                     | numeric | OPTIONAL; NA allowed                                                       |
 
 ### Examples of valid `.csv` files:
 
