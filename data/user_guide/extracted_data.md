@@ -12,9 +12,9 @@
 | upper.limit    | Optional upper confidence/uncertainty bound for response.y                     | numeric | OPTIONAL; NA allowed                                                       |
 | sd             | Optional standard deviation for response.y                                     | numeric | OPTIONAL; NA allowed                                                       |
 
-### Examples of valid `.csv` files:
+### Examples of valid CSV files:
 
-_Note: the minimum number of data rows per curve for a valid `.csv` file is 4._
+_Note: the minimum number of data rows **per curve** for a valid csv file is **4**._
 
 #### Valid CSV File with No Optional Columns and a Single Curve
 
