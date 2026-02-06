@@ -503,7 +503,7 @@ c1,40,0.6,temperature,survival,degC,percent,normal
 1. Upload each file
 2. Verify the validation result matches expected outcome
 3. Check error messages are clear and actionable
-4. For valid files, verify data is stored correctly in database
+4. For valid files, verify data is stored correctly in database with any added optional columns showing with NA values
 
 ### Automated Testing
 
@@ -532,6 +532,7 @@ for (file in test_files) {
 
 - ✅ Required columns validation
 - ✅ Optional columns validation
+- ✅ Optional columns added to files uploaded without them containing NA values
 - ✅ Data type validation (numeric)
 - ✅ Single unique value validation (labels, units)
 - ✅ Minimum data points per curve
@@ -541,10 +542,10 @@ for (file in test_files) {
 - ✅ Limit logic validation
 - ✅ Formula injection prevention
 - ✅ SQL injection detection
-- ✅ Boundary tests (exactly 2 points)
+- ✅ Boundary tests (exactly 4 points)
 - ✅ Complex naming (underscores, dots)
 - ✅ NA value handling
 
 ---
 
-**Last Updated:** 2025-02-04
+**Last Updated:** 2025-02-06

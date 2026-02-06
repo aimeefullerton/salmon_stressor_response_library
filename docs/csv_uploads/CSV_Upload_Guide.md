@@ -6,30 +6,32 @@
 
 ## Overview
 
-This implementation provides **security-hardened CSV validation** for the Stressor-Response Function (SRF) data upload system. The validation has been designed and tested against 15 comprehensive test CSV files, located in `data/test_csv_files/`, covering all validation scenarios.
+This implementation provides **security-hardened CSV validation** for the Stressor-Response Function (SRF) data upload system. The validation has been designed and tested against 14 comprehensive test CSV files, located in `data/test_csv_files/`, covering all validation scenarios.
 
 ---
 
-A complete set of **15 test CSV files** is provided in the `/data/test_csv_files/` directory:
+A complete set of **14 test CSV files** is provided in the `/data/test_csv_files/` directory:
 
-### ✅ Valid Files (5) - Should PASS
-- `valid_single_curve_minimal.csv` - Basic structure
-- `valid_multi_curve_with_stressor_value.csv` - Multi-curve support
-- `valid_uncertainty_populated.csv` - Optional columns populated
+### ✅ Valid Files (4) - Should PASS
+
 - `valid_complex_multi_curve.csv` - Complex 3-curve scenario
-- `valid_minimum_two_points.csv` - Boundary test (exactly 2 points)
+- `valid_multi_curve_with_stressor_value.csv` - Multi-curve support
+- `valid_single_curve_minimal.csv` - Basic structure
+- `valid_uncertainty_populated.csv` - Optional columns populated
 
 ### ❌ Invalid Files (8) - Should FAIL
-- `invalid_multiple_stressor_labels.csv` - Multiple label values
+
 - `invalid_curve_too_few_points.csv` - Too few valid points
-- `invalid_missing_units_x_column.csv` - Missing required column
-- `invalid_non_numeric_stressor_x.csv` - Non-numeric values
-- `invalid_multiple_units_x.csv` - Inconsistent units
 - `invalid_empty_curve_id.csv` - Empty required field
-- `invalid_limit_logic.csv` - Invalid limit relationship
 - `invalid_empty_file.csv` - No data rows
+- `invalid_limit_logic.csv` - Invalid limit relationship
+- `invalid_missing_units_x_column.csv` - Missing required column
+- `invalid_multiple_stressor_labels.csv` - Multiple label values
+- `invalid_multiple_units_x.csv` - Inconsistent units
+- `invalid_non_numeric_stressor_x.csv` - Non-numeric values
 
 ### 🛡️ Security Test Files (2)
+
 - `security_formula_injection.csv` - Formula injection test
 - `security_sql_injection.csv` - SQL injection pattern test
 
@@ -42,7 +44,7 @@ A complete set of **15 test CSV files** is provided in the `/data/test_csv_files
 ### Required Columns (exact names, case-insensitive)
 
 ```
-curve.id       - String identifier for the curve/group
+curve.id       - String identifier for the curve
 stressor.label - Single unique value across entire file (e.g., "temperature")
 stressor.x     - Numeric X values (NA allowed in individual rows)
 units.x        - Single unique value across entire file (e.g., "degC")
@@ -94,6 +96,7 @@ curve.id,stressor.x,response.y,stressor.label,...
 c1,10,0.9,temperature,...
 c1,20,0.8,temperature,...  ← Same label ✓
 c2,30,0.7,temperature,...  ← Same label ✓
+c2,40,0.6,temperature,...  ← Same label ✓
 ```
 
 **Example - INVALID:**
@@ -149,6 +152,50 @@ Note: `stressor.value` can differ between curves, but `stressor.label` must be t
 ### 6. Limit Logic Validation
 
 If both `lower.limit` and `upper.limit` are present and non-NA, then `lower.limit ≤ upper.limit` must be true.
+
+### 7. Addition of Optional Columns for Data Consistency
+
+When a file is uploaded with no or less than all of the optional columns, the missing optional columns are added with NA values. The columns are then reordered to ensure consistent order, with all optional columns on the right.
+
+Uploaded file with no optional columns:
+
+```csv
+curve.id,stressor.x,response.y,stressor.label,response.label,units.x,units.y
+c1,0.5,92,temperature,survival,degC,percent
+c1,1.0,85,temperature,survival,degC,percent
+c1,1.5,70,temperature,survival,degC,percent
+c1,2.0,66,temperature,survival,degC,percent
+```
+
+What is added to the database:
+
+```csv
+curve.id,stressor.label,stressor.x,units.x,response.label,response.y,units.y,stressor.value,lower.limit,upper.limit,sd
+c1,temperature,0.5,degC,survival,92,percent,NA,NA,NA,NA
+c1,temperature,1.0,degC,survival,85,percent,NA,NA,NA,NA
+c1,temperature,1.5,degC,survival,70,percent,NA,NA,NA,NA
+c1,temperature,2.0,degC,survival,66,percent,NA,NA,NA,NA
+```
+
+Uploaded file with partial optional columns:
+
+```csv
+curve.id,stressor.x,response.y,sd,stressor.label,response.label,units.x,units.y
+c1,10,0.9,0.05,temperature,survival,degC,percent
+c1,20,0.8,0.06,temperature,survival,degC,percent
+c1,30,0.7,0.07,temperature,survival,degC,percent
+c1,40,0.6,0.08,temperature,survival,degC,percent
+```
+
+What is added to the database:
+
+```csv
+curve.id,stressor.label,stressor.x,units.x,response.label,response.y,units.y,stressor.value,lower.limit,upper.limit,sd
+c1,temperature,10,degC,survival,0.9,percent,NA,NA,NA,0.05
+c1,temperature,20,degC,survival,0.8,percent,NA,NA,NA,0.06
+c1,temperature,30,degC,survival,0.7,percent,NA,NA,NA,0.07
+c1,temperature,40,degC,survival,0.6,percent,NA,NA,NA,0.08
+```
 
 ---
 
@@ -296,7 +343,7 @@ for (file in test_files) {
     type = "text/csv",
     size = file.info(file)$size
   )
-  
+
   result <- validate_csv_upload(file_input)
   cat(sprintf("%s: %s\n", basename(file), ifelse(result$valid, "PASS", "FAIL")))
 }
@@ -304,20 +351,21 @@ for (file in test_files) {
 
 ### Expected Test Results
 
-| Test | Expected | Description |
-|------|----------|-------------|
-| valid | ✅ PASS | Valid scenarios |
-| invalid | ❌ FAIL | Invalid scenarios |
-| security | ❌ FAIL | Formula injection (fails due to multiple labels) |
-| security | ⚠️ PASS + WARN | SQL injection (safe with parameterized queries) |
+| Test     | Expected       | Description                                      |
+| -------- | -------------- | ------------------------------------------------ |
+| valid    | ✅ PASS        | Valid scenarios                                  |
+| invalid  | ❌ FAIL        | Invalid scenarios                                |
+| security | ❌ FAIL        | Formula injection (fails due to multiple labels) |
+| security | ⚠️ PASS + WARN | SQL injection (safe with parameterized queries)  |
 
 ---
 
 ## Test Coverage
 
 The test suite covers:
+
 - ✅ All required columns
-- ✅ All optional columns  
+- ✅ All optional columns
 - ✅ Single & multi-curve scenarios
 - ✅ Data type validation
 - ✅ Single unique value validation
@@ -342,5 +390,5 @@ If validation is rejecting a file you believe should be valid:
 
 ---
 
-**Last Updated:** 2025-02-04  
-**Test Files:** 15 comprehensive test cases included
+**Last Updated:** 2025-02-06
+**Test Files:** 14 comprehensive test cases included
