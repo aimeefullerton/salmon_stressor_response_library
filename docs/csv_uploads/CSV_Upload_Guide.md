@@ -6,38 +6,34 @@
 
 ## Overview
 
-This implementation provides **security-hardened CSV validation** tailored to the test files located in `data/test_csv_files/`. All test files have been analyzed and the validation logic has been designed to handle them correctly.
+This implementation provides **security-hardened CSV validation** for the Stressor-Response Function (SRF) data upload system. The validation has been designed and tested against 15 comprehensive test CSV files, located in `data/test_csv_files/`, covering all validation scenarios.
 
 ---
 
-## Test File Validation Results
+A complete set of **15 test CSV files** is provided in the `/data/test_csv_files/` directory:
 
-### 1. `valid_single_curve_minimal.csv` - ✓ PASSES
+### ✅ Valid Files (5) - Should PASS
+- `valid_single_curve_minimal.csv` - Basic structure
+- `valid_multi_curve_with_stressor_value.csv` - Multi-curve support
+- `valid_uncertainty_populated.csv` - Optional columns populated
+- `valid_complex_multi_curve.csv` - Complex 3-curve scenario
+- `valid_minimum_two_points.csv` - Boundary test (exactly 2 points)
 
-**Content:** Single curve (c1) with 4 data points, minimal columns only.
-**Validation:** All 7 required columns present, single unique values for labels/units, 3 valid points (≥4 required).
+### ❌ Invalid Files (8) - Should FAIL
+- `invalid_multiple_stressor_labels.csv` - Multiple label values
+- `invalid_curve_too_few_points.csv` - Too few valid points
+- `invalid_missing_units_x_column.csv` - Missing required column
+- `invalid_non_numeric_stressor_x.csv` - Non-numeric values
+- `invalid_multiple_units_x.csv` - Inconsistent units
+- `invalid_empty_curve_id.csv` - Empty required field
+- `invalid_limit_logic.csv` - Invalid limit relationship
+- `invalid_empty_file.csv` - No data rows
 
-### 2. `valid_multi_curve_with_stressor_value.csv` - ✓ PASSES
+### 🛡️ Security Test Files (2)
+- `security_formula_injection.csv` - Formula injection test
+- `security_sql_injection.csv` - SQL injection pattern test
 
-**Content:** Two curves (temp.14, temp.18) with 4 points each, includes the optional stressor.value column.
-**Validation:** Multiple curves supported, each has ≥4 valid points, stressor.value can vary per curve.
-
-### 3. `valid_uncertainty_populated.csv` - ✓ PASSES
-
-**Content:** Single curve with all optional columns populated (sd, lower.limit, upper.limit).
-**Validation:** Optional numeric columns validated, limit logic checked (lower ≤ upper).
-
-### 4. `invalid_multiple_stressor_labels.csv` - ✗ FAILS (CORRECT)
-
-**Content:** Two rows with different stressor.label values ("temperature" vs "flow").
-**Validation:** Correctly rejects - stressor.label must have exactly 1 unique value across entire file.
-**Error:** "Column 'stressor.label' has multiple unique values (temperature, flow) but must have exactly 1 unique value"
-
-### 5. `invalid_curve_too_few_points.csv` - ✗ FAILS (CORRECT)
-
-**Content:** Curve with 3 rows but only 1 has both stressor.x AND response.y non-NA.
-**Validation:** Correctly rejects - each curve needs ≥4 rows with valid (non-NA) values in BOTH columns.
-**Error:** "Curve 'c1' has only 1 valid data point(s) with non-NA stressor.x and response.y values. Minimum required: 4"
+**📖 See `/docs/csv_uploads/CSV_Testing_Guide.md` for complete details on each test file.**
 
 ---
 
@@ -273,20 +269,64 @@ ALLOWED_MIME_TYPES <- c("text/csv", "application/csv", "text/plain", "applicatio
 
 ## Testing
 
-1. **Upload each test file** to verify behavior:
-   - `valid_single_curve_minimal.csv` → Should accept
-   - `valid_multi_curve_with_stressor_value.csv` → Should accept
-   - `valid_uncertainty_populated.csv` → Should accept
-   - `invalid_multiple_stressor_labels.csv` → Should reject with clear error
-   - `invalid_curve_too_few_points.csv` → Should reject with clear error
+### Manual Testing Steps
 
-2. **Check error messages** are user-friendly and actionable
+1. **Upload each test file** from `/data/test_csv_files/` directory
+2. **Verify expected behavior:**
+   - Valid files → ✓ Success with metadata
+   - Invalid files → ❌ Clear error messages
+   - Security files → Appropriate handling
+3. **Check error messages** are actionable
+4. **Verify database storage** - sanitized CSV in `csv_json` column
+5. **Review security features:**
+   - Formula injection → Neutralized (prefix with ')
+   - SQL injection → Detected and warned (safe with parameterized queries)
 
-3. **Verify database storage** - check that sanitized CSV is stored in `csv_data` column
+### Automated Testing (Optional)
 
-4. **Test security features:**
-   - Try uploading a file with `=2+2` in a cell → Should be neutralized to `'=2+2`
-   - Try uploading a binary file renamed to .csv → Should be rejected
+```r
+source("csv_validation.R")
+
+test_files <- list.files("/data/test_csv_files", full.names = TRUE, pattern = "\\.csv$")
+
+for (file in test_files) {
+  file_input <- list(
+    datapath = file,
+    name = basename(file),
+    type = "text/csv",
+    size = file.info(file)$size
+  )
+  
+  result <- validate_csv_upload(file_input)
+  cat(sprintf("%s: %s\n", basename(file), ifelse(result$valid, "PASS", "FAIL")))
+}
+```
+
+### Expected Test Results
+
+| Test | Expected | Description |
+|------|----------|-------------|
+| valid | ✅ PASS | Valid scenarios |
+| invalid | ❌ FAIL | Invalid scenarios |
+| security | ❌ FAIL | Formula injection (fails due to multiple labels) |
+| security | ⚠️ PASS + WARN | SQL injection (safe with parameterized queries) |
+
+---
+
+## Test Coverage
+
+The test suite covers:
+- ✅ All required columns
+- ✅ All optional columns  
+- ✅ Single & multi-curve scenarios
+- ✅ Data type validation
+- ✅ Single unique value validation
+- ✅ Minimum point requirements
+- ✅ Limit logic validation
+- ✅ Security features
+- ✅ Boundary conditions
+- ✅ Empty file detection
+- ✅ Complex naming patterns
 
 ---
 
@@ -294,12 +334,13 @@ ALLOWED_MIME_TYPES <- c("text/csv", "application/csv", "text/plain", "applicatio
 
 If validation is rejecting a file you believe should be valid:
 
-1. Check column names match exactly (case-insensitive but must be exact)
-2. Verify each curve has ≥4 rows with valid stressor.x AND response.y
+1. Check column names match exactly (case-insensitive but exact)
+2. Verify each curve has ≥2 rows with valid stressor.x AND response.y
 3. Confirm label/unit columns have only 1 unique value across entire file
 4. Check for NA values in required numeric columns
+5. Review test files for examples
 
 ---
 
-**Last Updated:** 2025-02-03
-**Test Files:** All 5 test cases verified ✅
+**Last Updated:** 2025-02-04  
+**Test Files:** 15 comprehensive test cases included
