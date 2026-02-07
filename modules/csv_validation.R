@@ -9,10 +9,11 @@
 #   - UTF-8 encoding validation
 #   - MIME type verification
 #   - SQL injection pattern detection
-#   - File size limit (no more than 2 MB)
+#   - File size limit
 #
 # Domain Validation:
 #   - Exact column name matching (case-insensitive)
+#   - Consistent data structure by adding missing optional columns with NA values
 #   - Single unique value validation for labels/units
 #   - Minimum data point requirements per curve
 #   - Multi-curve support
@@ -198,7 +199,7 @@ validate_file_security <- function(file_input) {
 #' Sanitize CSV Cell Values Against Formula Injection
 #'
 #' Prevents CSV/Formula injection by neutralizing dangerous prefixes.
-#' Any cell starting with =, +, -, @, tab, or carriage return will be
+#' Any cell starting with =, +, -, @, tab (\t), or carriage return (\r) will be
 #' prefixed with a single quote to force literal interpretation.
 #'
 #' @param df Data frame to sanitize
@@ -302,7 +303,7 @@ validate_csv_columns <- function(df) {
   required_cols <- c("curve.id", "stressor.label", "stressor.x", "units.x", "response.label", "response.y", "units.y")
 
   # Optional column names
-  optional_cols <- c("stressor.value", "sd", "lower.limit", "upper.limit")
+  optional_cols <- c("stressor.value", "lower.limit", "upper.limit", "sd")
 
   # Initialize column map
   col_map <- list(
@@ -612,6 +613,49 @@ validate_csv_data <- function(df, col_map) {
   )
 }
 
+#' Add Missing Optional Columns
+#'
+#' Appends any missing optional columns to the right of the data frame with NA values.
+#' This ensures all CSV files have a consistent column structure when stored in the database.
+#'
+#' @param df Data frame (sanitized)
+#' @param col_map Column mapping from validation
+#' @return Data frame with all optional columns present
+add_missing_optional_columns <- function(df, col_map) {
+  # Normalize column names to lowercase for consistent handling
+  colnames(df) <- tolower(trimws(colnames(df)))
+
+  # Define all optional columns
+  optional_columns <- c("stressor.value", "lower.limit", "upper.limit", "sd")
+
+  # Check which optional columns are missing and add them
+  for (opt_col in optional_columns) {
+    col_map_key <- gsub("\\.", "_", opt_col) # Convert to col_map key format
+
+    # If column doesn't exist in the data frame, add it with NA values
+    if (is.na(col_map[[col_map_key]]) || !opt_col %in% colnames(df)) {
+      df[[opt_col]] <- NA
+      message(sprintf("Added missing optional column '%s' with NA values", opt_col))
+    }
+  }
+
+  # Reorder columns: required first, then optional
+  required_columns <- c(
+    "curve.id", "stressor.label", "stressor.x", "units.x", "response.label", "response.y", "units.y"
+  )
+
+  # Get existing required columns
+  existing_required <- required_columns[required_columns %in% colnames(df)]
+
+  # Get existing optional columns (in consistent order)
+  existing_optional <- optional_columns[optional_columns %in% colnames(df)]
+
+  # Reorder: required columns first, then optional columns
+  df <- df[, c(existing_required, existing_optional)]
+
+  return(df)
+}
+
 # ============================================================================
 # MAIN VALIDATION FUNCTION
 # ============================================================================
@@ -756,11 +800,14 @@ validate_csv_upload <- function(file_input) {
     ))
   }
 
-  # SUCCESS
+  # ADD MISSING OPTIONAL COLUMNS (append to right with NA values)
+  df_complete <- add_missing_optional_columns(df_sanitized, col_map)
+
+  # SUCCESS - return the completed dataframe (with optional columns appended)
   return(list(
     valid = TRUE,
     message = "CSV validation passed",
-    data = df_sanitized,
+    data = df_complete,
     col_map = col_map,
     all_issues = list(),
     security_warnings = security_warnings

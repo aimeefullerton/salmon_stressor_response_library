@@ -331,8 +331,16 @@ upload_server <- function(id, db_conn = pool) {
 
         # CSV is valid - convert sanitized data to JSON for storage (jsonb)
         df_csv <- csv_validation_result$data
-        # Preserve NA as JSON null, use rows-as-objects
-        csv_json <- jsonlite::toJSON(df_csv, dataframe = "rows", auto_unbox = TRUE, na = "null")
+
+        # Store column order explicitly to preserve it during retrieval
+        csv_data_with_schema <- list(
+          columns = names(df_csv), # Preserve column order from csv
+          data = df_csv            # Actual data as array of objects (rows)
+        )
+
+        # Convert to JSON to preserve NA as null
+        csv_json <- jsonlite::toJSON(csv_data_with_schema, dataframe = "rows", auto_unbox = TRUE, na = "null")
+
         csv_validation_passed <- TRUE
       } else {
         # No CSV uploaded
