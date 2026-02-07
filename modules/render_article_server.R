@@ -172,6 +172,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
 
   # Render images
   output$article_images <- renderUI({
+    # Log the raw images data for debugging
     cat("\n image raw:\n")
     print(paper$images)
 
@@ -193,7 +194,9 @@ render_article_server <- function(input, output, session, paper_id, db) {
     }
   })
 
-  # Parse stressor response data directly from JSON column
+  # ===========================================================
+  # PARSE CSV DATA
+  # ===========================================================
   csv_data_raw <- safe_fromJSON(paper$csv_data_json)
 
   if (!is.null(csv_data_raw)) {
@@ -243,14 +246,12 @@ render_article_server <- function(input, output, session, paper_id, db) {
           col_order <- c(col_order, names(df_raw)[match_idx])
         }
       }
-
-      # Add optional columns if present in df_raw or create them as NA
       for (oc in optional_cols) {
         match_idx <- which(nm_lower == oc)
         if (length(match_idx) == 1) {
           col_order <- c(col_order, names(df_raw)[match_idx])
         } else {
-          # create missing optional column with NA
+          # Add NA column for missing optional column
           df_raw[[oc]] <- NA
           col_order <- c(col_order, oc)
         }
@@ -275,11 +276,15 @@ render_article_server <- function(input, output, session, paper_id, db) {
         y_i <- which(nm_lower_df == "response.y")
         keep_rows <- !is.na(df[[x_i]]) & !is.na(df[[y_i]])
         df <- df[keep_rows, , drop = FALSE]
-        # Order by curve.id first, then stressor.x
+
+        # Sort by curve.id first, then by stressor.x, within each curve
+        # This ensures each curve's points are in the correct order for plotting
         if ("curve.id" %in% nm_lower_df) {
           curve_i <- which(nm_lower_df == "curve.id")
+          # Use order() with two columns to sort by curve.id, then stressor.x
           df <- df[order(df[[curve_i]], df[[x_i]]), , drop = FALSE]
         } else {
+          # Single curve case: just sort by stressor.x
           df <- df[order(df[[x_i]]), , drop = FALSE]
         }
       }
@@ -288,73 +293,155 @@ render_article_server <- function(input, output, session, paper_id, db) {
       df <- df_raw
       numeric_counts <- sapply(df, function(col) sum(!is.na(suppressWarnings(as.numeric(col)))))
       if (length(numeric_counts) < 2 || max(numeric_counts) == 0) {
-        df <- data.frame()
+        # Cannot proceed - no numeric data
+        df <- data.frame(
+          Error = "CSV data does not contain sufficient numeric columns for plotting."
+        )
       } else {
-        x_idx <- which.max(numeric_counts)
-        numeric_counts[x_idx] <- 0
-        y_idx <- which.max(numeric_counts)
+        # Sort by descending numeric content
+        top2_idx <- order(numeric_counts, decreasing = TRUE)[1:2]
+        x_idx <- top2_idx[1]
+        y_idx <- top2_idx[2]
 
-        # convert chosen columns to numeric and filter rows
         df[[x_idx]] <- suppressWarnings(as.numeric(df[[x_idx]]))
         df[[y_idx]] <- suppressWarnings(as.numeric(df[[y_idx]]))
+
+        # Remove rows with NA in either column
         keep_rows <- !is.na(df[[x_idx]]) & !is.na(df[[y_idx]])
         df <- df[keep_rows, , drop = FALSE]
+
+        # Sort by X values
         df <- df[order(df[[x_idx]]), , drop = FALSE]
+
+        # Rename top2 columns to standard names
+        colnames(df)[x_idx] <- "stressor.x"
+        colnames(df)[y_idx] <- "response.y"
       }
     }
   } else {
-    df <- data.frame()
+    # No CSV data
+    df <- data.frame(Message = "No CSV data available for this article")
   }
 
-  # Extract label values from the data
-  get_label_value <- function(df, column_name) {
+  # ===========================================================
+  # EXTRACT METADATA FROM CSV
+  # ===========================================================
+  stressor_name <- safe_get(paper, "stressor_name")
+  response_name <- "Mean System Capacity"
+
+  # Initialize label variables
+  stressor_label <- stressor_name
+  response_label <- response_name
+  units_x <- ""
+  units_y <- ""
+
+  # Extract labels from CSV if available
+  if (nrow(df) > 0 && !"Message" %in% names(df) && !"Error" %in% names(df)) {
     nm_lower <- tolower(names(df))
-    col_idx <- which(nm_lower == tolower(column_name))
 
-    if (length(col_idx) == 1) {
-      # Get unique non-NA values from the column
-      unique_vals <- unique(as.character(df[[col_idx]]))
+    # stressor.label
+    stressor_label_idx <- which(nm_lower == "stressor.label")
+    if (length(stressor_label_idx) == 1) {
+      unique_vals <- unique(df[[stressor_label_idx]])
       unique_vals <- unique_vals[!is.na(unique_vals) & nzchar(unique_vals)]
-      if (length(unique_vals) >= 1) {
-        return(unique_vals[1])
+      if (length(unique_vals) > 0) {
+        stressor_name <- unique_vals[1]
+        stressor_label <- unique_vals[1]
       }
     }
-    return(NULL)
-  }
 
-  # Get the actual label values from the data, adding the units from the corresponding `units.x` and `units.y` columns if they exist
-  stressor_name <- get_label_value(df, "stressor.label")
-  response_name <- get_label_value(df, "response.label")
-  stressor_label <- if (!is.null(stressor_name)) {
-    units_x <- get_label_value(df, "units.x")
-    if (!is.null(units_x)) {
-      paste0(stressor_name, " (", units_x, ")")
-    } else {
-      stressor_name
+    # response.label
+    response_label_idx <- which(nm_lower == "response.label")
+    if (length(response_label_idx) == 1) {
+      unique_vals <- unique(df[[response_label_idx]])
+      unique_vals <- unique_vals[!is.na(unique_vals) & nzchar(unique_vals)]
+      if (length(unique_vals) > 0) {
+        response_name <- unique_vals[1]
+        response_label <- unique_vals[1]
+      }
     }
-  } else {
-    NULL
-  }
-  response_label <- if (!is.null(response_name)) {
-    units_y <- get_label_value(df, "units.y")
-    if (!is.null(units_y)) {
-      paste0(response_name, " (", units_y, ")")
-    } else {
-      response_name
+
+    # units.x
+    units_x_idx <- which(nm_lower == "units.x")
+    if (length(units_x_idx) == 1) {
+      unique_vals <- unique(df[[units_x_idx]])
+      unique_vals <- unique_vals[!is.na(unique_vals) & nzchar(unique_vals)]
+      if (length(unique_vals) > 0) {
+        units_x <- unique_vals[1]
+      }
     }
-  } else {
-    NULL
+
+    # units.y
+    units_y_idx <- which(nm_lower == "units.y")
+    if (length(units_y_idx) == 1) {
+      unique_vals <- unique(df[[units_y_idx]])
+      unique_vals <- unique_vals[!is.na(unique_vals) & nzchar(unique_vals)]
+      if (length(unique_vals) > 0) {
+        units_y <- unique_vals[1]
+      }
+    }
+
+    # Append units to labels
+    if (nzchar(units_x)) {
+      stressor_label <- paste0(stressor_label, " (", units_x, ")")
+    }
+    if (nzchar(units_y)) {
+      response_label <- paste0(response_label, " (", units_y, ")")
+    }
   }
 
-  # Fallback to metadata if labels not in data
-  if (is.null(stressor_label)) {
-    stressor_label <- safe_get(paper, "stressor_name")
-  }
-  if (is.null(response_label)) {
-    response_label <- "Response"
+  # ===========================================================
+  # MULTI-CURVE DETECTION & CURVE INFO
+  # ===========================================================
+  has_multiple_curves <- FALSE
+  curve_info <- NULL
+
+  if (nrow(df) > 0 && !"Message" %in% names(df) && !"Error" %in% names(df)) {
+    nm_lower <- tolower(names(df))
+    curve_id_idx <- which(nm_lower == "curve.id")
+    stressor_value_idx <- which(nm_lower == "stressor.value")
+
+    if (length(curve_id_idx) == 1) {
+      curve_ids <- df[[curve_id_idx]]
+      unique_curve_ids <- unique(curve_ids[!is.na(curve_ids) & nzchar(curve_ids)])
+
+      if (length(unique_curve_ids) > 1) {
+        has_multiple_curves <- TRUE
+      }
+
+      # Get curves in order of first appearance
+      curve_ids_in_order <- unique(curve_ids[!is.na(curve_ids) & nzchar(curve_ids)])
+    } else {
+      curve_ids_in_order <- "default"
+    }
+
+    # Build curve info dataframe
+    curve_info <- data.frame(
+      curve.id = curve_ids_in_order,
+      stringsAsFactors = FALSE
+    )
+
+    if (length(stressor_value_idx) == 1) {
+      # Get stressor.value for each curve
+      curve_info$label <- vapply(curve_info$curve.id, function(cid) {
+        curve_rows <- df[[curve_id_idx]] == cid
+        stressor_val <- df[[stressor_value_idx]][curve_rows]
+        stressor_val <- stressor_val[!is.na(stressor_val) & nzchar(stressor_val)]
+
+        if (length(stressor_val) > 0) {
+          paste0(cid, " (", stressor_val[1], ")")
+        } else {
+          as.character(cid)
+        }
+      }, character(1))
+    } else {
+      curve_info$label <- as.character(curve_info$curve.id)
+    }
   }
 
-  # Table
+  # ======================================
+  # RENDER TABLE - Stressor Response Data
+  # ======================================
   output$csv_table <- renderTable({
     if (nrow(df) == 0) {
       return(data.frame(Message = "No data available for this article"))
@@ -400,46 +487,6 @@ render_article_server <- function(input, output, session, paper_id, db) {
     display_df
   })
 
-  # ============================================================================
-  # MULTI-CURVE PLOTTING SUPPORT
-  # ============================================================================
-
-  # Check if we have multiple curves
-  nm_lower <- tolower(names(df))
-  has_curve_id <- "curve.id" %in% nm_lower
-
-  # Get unique curve IDs and their labels
-  curve_info <- NULL
-  if (has_curve_id && nrow(df) > 0) {
-    curve_id_idx <- which(nm_lower == "curve.id")
-    stressor_value_idx <- which(nm_lower == "stressor.value")
-
-    # Get unique curve IDs
-    unique_curves <- unique(df[[curve_id_idx]])
-
-    # Create curve labels (curve.id with stressor.value if available)
-    curve_info <- data.frame(
-      curve.id = unique_curves,
-      stringsAsFactors = FALSE
-    )
-
-    if (length(stressor_value_idx) == 1) {
-      # Get stressor.value for each curve
-      curve_info$label <- sapply(unique_curves, function(cid) {
-        curve_rows <- df[[curve_id_idx]] == cid
-        stressor_val <- unique(df[[stressor_value_idx]][curve_rows])
-        stressor_val <- stressor_val[!is.na(stressor_val) & nzchar(stressor_val)]
-        if (length(stressor_val) > 0) {
-          paste0(cid, " (", stressor_val[1], ")")
-        } else {
-          as.character(cid)
-        }
-      })
-    } else {
-      curve_info$label <- as.character(curve_info$curve.id)
-    }
-  }
-
   # Static Plot with Multi-Curve Support
   output$stressor_plot <- renderPlot({
     if (nrow(df) == 0) {
@@ -448,7 +495,6 @@ render_article_server <- function(input, output, session, paper_id, db) {
       return()
     }
 
-    # Identify X and Y columns
     nm_lower <- tolower(names(df))
     x_idx <- grep("^stressor\\.x$", nm_lower)
     y_idx <- grep("^response\\.y$", nm_lower)
@@ -472,7 +518,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
     )
 
     # Plot each curve
-    if (has_curve_id && !is.null(curve_info)) {
+    if (has_multiple_curves && !is.null(curve_info)) {
       # Multiple curves - use different colors
       colors <- rainbow(nrow(curve_info))
       curve_id_idx <- which(nm_lower == "curve.id")
@@ -481,9 +527,19 @@ render_article_server <- function(input, output, session, paper_id, db) {
         cid <- curve_info$curve.id[i]
         curve_rows <- df[[curve_id_idx]] == cid
 
+        # Extract x and y values for this curve
+        x_curve <- df[[x_idx]][curve_rows]
+        y_curve <- df[[y_idx]][curve_rows]
+
+        # Sort this curve's data by x values before plotting
+        # This ensures the line connects points in the correct order
+        sort_order <- order(x_curve)
+        x_curve <- x_curve[sort_order]
+        y_curve <- y_curve[sort_order]
+
         lines(
-          df[[x_idx]][curve_rows],
-          df[[y_idx]][curve_rows],
+          x_curve,
+          y_curve,
           type = "o",
           col = colors[i],
           pch = 16,
@@ -507,7 +563,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
   })
 
   # Interactive Plot with Multi-Curve Support
-  output$interactive_plot <- renderPlotly({
+  output$interactive_plot <- renderPlotly({    
     if (nrow(df) == 0) {
       return(plot_ly(type = "scatter", mode = "markers", height = 200) %>%
         layout(
@@ -541,7 +597,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
     }
 
     # Create plotly figure
-    if (has_curve_id && !is.null(curve_info)) {
+    if (has_multiple_curves && !is.null(curve_info)) {
       # Multiple curves - add each as a separate trace
       p <- plot_ly()
       curve_id_idx <- which(nm_lower == "curve.id")
@@ -549,12 +605,19 @@ render_article_server <- function(input, output, session, paper_id, db) {
       for (i in seq_len(nrow(curve_info))) {
         cid <- curve_info$curve.id[i]
         curve_rows <- df[[curve_id_idx]] == cid
-        curve_data <- df[curve_rows, ]
+
+        # Extract data for this curve
+        x_curve <- df[[x_idx]][curve_rows]
+        y_curve <- df[[y_idx]][curve_rows]
+
+        # Sort this curve's data by x values before plotting
+        sort_order <- order(x_curve)
+        x_curve <- x_curve[sort_order]
+        y_curve <- y_curve[sort_order]
 
         p <- p %>% add_trace(
-          data = curve_data,
-          x = ~ curve_data[[x_idx]],
-          y = ~ curve_data[[y_idx]],
+          x = x_curve,
+          y = y_curve,
           type = "scatter",
           mode = "lines+markers",
           name = curve_info$label[i],
