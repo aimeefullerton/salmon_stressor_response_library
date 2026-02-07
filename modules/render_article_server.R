@@ -14,12 +14,11 @@ render_article_server <- function(input, output, session, paper_id, db) {
     stop("Database connection (db) is missing!")
   }
 
-  # Fetch article data from SQLite
+  # Fetch article data from db
   paper <- dbGetQuery(db,
     "SELECT * FROM stressor_responses WHERE main_id = $1",
     params = list(paper_id)
   )
-
 
   # Check if article data exists
   if (nrow(paper) == 0) {
@@ -76,9 +75,6 @@ render_article_server <- function(input, output, session, paper_id, db) {
     }
   })
 
-  ##  End expand/collapse code
-
-
   # Function to safely parse JSON fields
   safe_fromJSON <- function(x) {
     # bail early on NULL, NA, empty, or literal "NULL"/"[]"
@@ -90,13 +86,25 @@ render_article_server <- function(input, output, session, paper_id, db) {
     }
     # else try to parse
     parsed <- tryCatch(jsonlite::fromJSON(x), error = function(e) NULL)
+
+    # Handle double-encoded JSON where the DB stored a JSON string literal
+    # (e.g., '"[{...}]"') — jsonlite::fromJSON will return an atomic
+    # character scalar containing the JSON; detect that and parse again.
+    if (!is.null(parsed) && is.character(parsed) && length(parsed) == 1) {
+      trimmed <- trimws(parsed)
+      if (nzchar(trimmed) && (startsWith(trimmed, "[") || startsWith(trimmed, "{"))) {
+        parsed2 <- tryCatch(jsonlite::fromJSON(trimmed), error = function(e) NULL)
+        if (!is.null(parsed2)) parsed <- parsed2
+      }
+    }
+
     # if it ends up being atomic, wrap as list
     if (!is.null(parsed) && !is.list(parsed)) {
       parsed <- list(parsed)
     }
+
     parsed
   }
-
 
   paper$citations <- safe_fromJSON(paper$citations_citation_text)
   paper$citation_links <- safe_fromJSON(paper$citations_citation_links)
@@ -185,26 +193,160 @@ render_article_server <- function(input, output, session, paper_id, db) {
     }
   })
 
-
-  # # Fetch stressor response data from csv_numeric + csv_meta
-  # stressor_data <- dbGetQuery(db,
-  #                             "SELECT n.*, m.article_stressor_label, m.scaled_response_label
-  #    FROM csv_numeric n
-  #    JOIN csv_meta    m ON n.csv_id = m.csv_id
-  #   WHERE m.main_id = ?",
-  #                             params = list(paper_id)
-  # )
-
   # Parse stressor response data directly from JSON column
-  csv_data <- safe_fromJSON(paper$csv_data_json)
-  if (!is.null(csv_data)) {
-    df <- as.data.frame(csv_data, stringsAsFactors = FALSE)
-    names(df) <- make.names(names(df)) # Make names syntactically valid
-    df[] <- lapply(df, function(x) suppressWarnings(as.numeric(x)))
-    df <- df[complete.cases(df), ]
-    df <- df[order(df[[1]]), ] # Sort by X
+  csv_data_raw <- safe_fromJSON(paper$csv_data_json)
+
+  if (!is.null(csv_data_raw)) {
+    # Check if this is the NEW format with column metadata
+    # Must be a list, have both 'columns' and 'data' fields, and 'data' should not be NULL
+    if (is.list(csv_data_raw) &&
+      !is.null(csv_data_raw$columns) &&
+      !is.null(csv_data_raw$data) &&
+      "columns" %in% names(csv_data_raw) &&
+      "data" %in% names(csv_data_raw)) {
+      # NEW FORMAT: Extract data and preserve original column order
+      csv_data <- csv_data_raw$data
+      original_column_order <- csv_data_raw$columns
+
+      # Convert to dataframe
+      df_raw <- as.data.frame(csv_data, stringsAsFactors = FALSE)
+
+      # Apply the preserved column order if valid
+      if (!is.null(original_column_order) &&
+        is.character(original_column_order) &&
+        length(original_column_order) > 0 &&
+        all(original_column_order %in% names(df_raw))) {
+        df_raw <- df_raw[, original_column_order, drop = FALSE]
+      }
+    } else {
+      # OLD FORMAT: Data is directly in csv_data_raw (backwards compatible)
+      # This handles both data frames and lists that can be converted to data frames
+      df_raw <- as.data.frame(csv_data_raw, stringsAsFactors = FALSE)
+    }
+    # preserve original names but make them safe for R indexing
+    names(df_raw) <- make.names(names(df_raw))
+
+    # Define canonical required/optional column names (lowercase)
+    required_cols <- c("curve.id", "stressor.label", "stressor.x", "units.x", "response.label", "response.y", "units.y")
+    optional_cols <- c("stressor.value", "lower.limit", "upper.limit", "sd")
+
+    nm_lower <- tolower(names(df_raw))
+
+    # If this looks like a 'new' csv (contains at least one required canonical name),
+    # normalize to the canonical order and ensure optional columns exist.
+    if (any(required_cols %in% nm_lower)) {
+      # Build mapping of canonical -> actual column name (if present)
+      col_order <- c()
+      for (rc in required_cols) {
+        match_idx <- which(nm_lower == rc)
+        if (length(match_idx) == 1) {
+          col_order <- c(col_order, names(df_raw)[match_idx])
+        }
+      }
+
+      # Add optional columns if present in df_raw or create them as NA
+      for (oc in optional_cols) {
+        match_idx <- which(nm_lower == oc)
+        if (length(match_idx) == 1) {
+          col_order <- c(col_order, names(df_raw)[match_idx])
+        } else {
+          # create missing optional column with NA
+          df_raw[[oc]] <- NA
+          col_order <- c(col_order, oc)
+        }
+      }
+
+      # Reorder dataframe to canonical order (only include columns we have)
+      existing_cols <- intersect(col_order, names(df_raw))
+      df <- df_raw[, existing_cols, drop = FALSE]
+
+      # Convert stressor.x and response.y to numeric (if present by canonical names)
+      nm_lower_df <- tolower(names(df))
+      if ("stressor.x" %in% nm_lower_df) {
+        df[[which(nm_lower_df == "stressor.x")]] <- suppressWarnings(as.numeric(df[[which(nm_lower_df == "stressor.x")]]))
+      }
+      if ("response.y" %in% nm_lower_df) {
+        df[[which(nm_lower_df == "response.y")]] <- suppressWarnings(as.numeric(df[[which(nm_lower_df == "response.y")]]))
+      }
+
+      # Keep rows where both X and Y are numeric (if both exist)
+      if ("stressor.x" %in% nm_lower_df && "response.y" %in% nm_lower_df) {
+        x_i <- which(nm_lower_df == "stressor.x")
+        y_i <- which(nm_lower_df == "response.y")
+        keep_rows <- !is.na(df[[x_i]]) & !is.na(df[[y_i]])
+        df <- df[keep_rows, , drop = FALSE]
+        # Order by stressor.x
+        df <- df[order(df[[x_i]]), , drop = FALSE]
+      }
+    } else {
+      # Fallback historical behavior: find the two most-numeric columns and use them as X/Y
+      df <- df_raw
+      numeric_counts <- sapply(df, function(col) sum(!is.na(suppressWarnings(as.numeric(col)))))
+      if (length(numeric_counts) < 2 || max(numeric_counts) == 0) {
+        df <- data.frame()
+      } else {
+        x_idx <- which.max(numeric_counts)
+        numeric_counts[x_idx] <- 0
+        y_idx <- which.max(numeric_counts)
+
+        # convert chosen columns to numeric and filter rows
+        df[[x_idx]] <- suppressWarnings(as.numeric(df[[x_idx]]))
+        df[[y_idx]] <- suppressWarnings(as.numeric(df[[y_idx]]))
+        keep_rows <- !is.na(df[[x_idx]]) & !is.na(df[[y_idx]])
+        df <- df[keep_rows, , drop = FALSE]
+        df <- df[order(df[[x_idx]]), , drop = FALSE]
+      }
+    }
   } else {
     df <- data.frame()
+  }
+
+  # Extract label values from the data
+  get_label_value <- function(df, column_name) {
+    nm_lower <- tolower(names(df))
+    col_idx <- which(nm_lower == tolower(column_name))
+
+    if (length(col_idx) == 1) {
+      # Get unique non-NA values from the column
+      unique_vals <- unique(as.character(df[[col_idx]]))
+      unique_vals <- unique_vals[!is.na(unique_vals) & nzchar(unique_vals)]
+      if (length(unique_vals) >= 1) {
+        return(unique_vals[1])
+      }
+    }
+    return(NULL)
+  }
+
+  # Get the actual label values from the data, adding the units from the corresponding `units.x` and `units.y` columns if they exist
+  stressor_name <- get_label_value(df, "stressor.label")
+  response_name <- get_label_value(df, "response.label")
+  stressor_label <- if (!is.null(stressor_name)) {
+    units_x <- get_label_value(df, "units.x")
+    if (!is.null(units_x)) {
+      paste0(stressor_name, " (", units_x, ")")
+    } else {
+      stressor_name
+    }
+  } else {
+    NULL
+  }
+  response_label <- if (!is.null(response_name)) {
+    units_y <- get_label_value(df, "units.y")
+    if (!is.null(units_y)) {
+      paste0(response_name, " (", units_y, ")")
+    } else {
+      response_name
+    }
+  } else {
+    NULL
+  }
+
+  # Fallback to metadata if labels not in data
+  if (is.null(stressor_label)) {
+    stressor_label <- safe_get(paper, "stressor_name")
+  }
+  if (is.null(response_label)) {
+    response_label <- "Response"
   }
 
   # Table
@@ -213,11 +355,45 @@ render_article_server <- function(input, output, session, paper_id, db) {
       return(data.frame(Message = "No data available for this article"))
     }
 
-    colnames(df) <- gsub("\\.", " ", colnames(df)) # Replace dots with spaces
-    colnames(df)[1] <- safe_get(paper, "stressor_name")
-    df
-  })
+    display_df <- df
 
+    # Hide stressor.label, response.label, units.x, and units.y columns since their values are extracted for labeling
+    # Step 1: Find columns to hide
+    nm_lower <- tolower(names(display_df))
+    cols_to_hide <- c(
+      which(nm_lower == "stressor.label"),
+      which(nm_lower == "response.label"),
+      which(nm_lower == "units.x"),
+      which(nm_lower == "units.y")
+    )
+
+    # Step 2: Actually remove those columns
+    if (length(cols_to_hide) > 0) {
+      display_df <- display_df[, -cols_to_hide, drop = FALSE]
+    }
+
+    # Step 3: Replace dots with spaces
+    colnames(display_df) <- gsub("\\.", " ", colnames(display_df))
+
+    # Step 4: Rename stressor.x → actual stressor label
+    nm_lower_display <- tolower(names(display_df))
+    stressor_x_idx <- which(nm_lower_display == "stressor x")
+    if (length(stressor_x_idx) == 1) {
+      colnames(display_df)[stressor_x_idx] <- stressor_label
+    }
+
+    # Step 5: Rename response.y → actual response label
+    response_y_idx <- which(nm_lower_display == "response y")
+    if (length(response_y_idx) == 1) {
+      colnames(display_df)[response_y_idx] <- response_label
+    }
+
+    # Hide columns that are entirely NA or empty
+    non_empty_cols <- sapply(display_df, function(col) any(!is.na(col) & nzchar(as.character(col))))
+    display_df <- display_df[, non_empty_cols, drop = FALSE]
+
+    display_df
+  })
 
   # Static Plot
   output$stressor_plot <- renderPlot({
@@ -227,15 +403,29 @@ render_article_server <- function(input, output, session, paper_id, db) {
       return()
     }
 
+    # Identify X and Y columns
+    nm_lower <- tolower(names(df))
+    x_idx <- grep("^stressor\\.x$", nm_lower)
+    y_idx <- grep("^response\\.y$", nm_lower)
+
+    if (length(x_idx) == 0 || length(y_idx) == 0) {
+      plot(1, type = "n", axes = FALSE, xlab = "", ylab = "")
+      text(1, 1, "Invalid data structure", col = "red", cex = 1.5, font = 2)
+      return()
+    }
+
+    x_vals <- df[[x_idx]]
+    y_vals <- df[[y_idx]]
+
+    # Use the actual label values from the data
     plot(
-      df[[1]], df[[2]],
+      x_vals, y_vals,
       type = "o", col = "blue", pch = 16, lwd = 2,
-      xlab = safe_get(paper, "stressor_name"),
-      ylab = gsub("\\.", " ", names(df)[2]),
-      main = paste("Stressor Response for", safe_get(paper, "stressor_name"))
+      xlab = stressor_label,
+      ylab = response_label,
+      main = paste("Stressor Response for", response_name, "vs", stressor_name)
     )
   })
-
 
   # Interactive Plot
   output$interactive_plot <- renderPlotly({
@@ -253,15 +443,34 @@ render_article_server <- function(input, output, session, paper_id, db) {
         ))
     }
 
+    nm_lower <- tolower(names(df))
+    x_idx <- grep("^stressor\\.x$", nm_lower)
+    y_idx <- grep("^response\\.y$", nm_lower)
+
+    if (length(x_idx) == 0 || length(y_idx) == 0) {
+      return(plot_ly(type = "scatter", mode = "markers", height = 200) %>%
+        layout(
+          margin = list(t = 20, b = 20),
+          xaxis = list(visible = FALSE), yaxis = list(visible = FALSE),
+          annotations = list(list(
+            text = "Invalid data structure",
+            xref = "paper", yref = "paper",
+            x = 0.5, y = 0.5, showarrow = FALSE,
+            font = list(size = 16, color = "red")
+          ))
+        ))
+    }
+
+    # Use the actual label values from the data
     plot_ly(df,
-      x = ~ df[[1]], y = ~ df[[2]],
+      x = ~ df[[x_idx]], y = ~ df[[y_idx]],
       type = "scatter", mode = "lines+markers",
       line = list(color = "blue"), marker = list(size = 6)
     ) %>%
       layout(
-        title = paste("Interactive Plot for", safe_get(paper, "stressor_name")),
-        xaxis = list(title = safe_get(paper, "stressor_name")),
-        yaxis = list(title = gsub("\\.", " ", names(df)[2]))
+        title = paste("Interactive Plot for", response_name, "vs", stressor_name),
+        xaxis = list(title = stressor_label),
+        yaxis = list(title = response_label)
       )
   })
 }
