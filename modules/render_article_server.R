@@ -275,8 +275,13 @@ render_article_server <- function(input, output, session, paper_id, db) {
         y_i <- which(nm_lower_df == "response.y")
         keep_rows <- !is.na(df[[x_i]]) & !is.na(df[[y_i]])
         df <- df[keep_rows, , drop = FALSE]
-        # Order by stressor.x
-        df <- df[order(df[[x_i]]), , drop = FALSE]
+        # Order by curve.id first, then stressor.x
+        if ("curve.id" %in% nm_lower_df) {
+          curve_i <- which(nm_lower_df == "curve.id")
+          df <- df[order(df[[curve_i]], df[[x_i]]), , drop = FALSE]
+        } else {
+          df <- df[order(df[[x_i]]), , drop = FALSE]
+        }
       }
     } else {
       # Fallback historical behavior: find the two most-numeric columns and use them as X/Y
@@ -395,7 +400,47 @@ render_article_server <- function(input, output, session, paper_id, db) {
     display_df
   })
 
-  # Static Plot
+  # ============================================================================
+  # MULTI-CURVE PLOTTING SUPPORT
+  # ============================================================================
+
+  # Check if we have multiple curves
+  nm_lower <- tolower(names(df))
+  has_curve_id <- "curve.id" %in% nm_lower
+
+  # Get unique curve IDs and their labels
+  curve_info <- NULL
+  if (has_curve_id && nrow(df) > 0) {
+    curve_id_idx <- which(nm_lower == "curve.id")
+    stressor_value_idx <- which(nm_lower == "stressor.value")
+
+    # Get unique curve IDs
+    unique_curves <- unique(df[[curve_id_idx]])
+
+    # Create curve labels (curve.id with stressor.value if available)
+    curve_info <- data.frame(
+      curve.id = unique_curves,
+      stringsAsFactors = FALSE
+    )
+
+    if (length(stressor_value_idx) == 1) {
+      # Get stressor.value for each curve
+      curve_info$label <- sapply(unique_curves, function(cid) {
+        curve_rows <- df[[curve_id_idx]] == cid
+        stressor_val <- unique(df[[stressor_value_idx]][curve_rows])
+        stressor_val <- stressor_val[!is.na(stressor_val) & nzchar(stressor_val)]
+        if (length(stressor_val) > 0) {
+          paste0(cid, " (", stressor_val[1], ")")
+        } else {
+          as.character(cid)
+        }
+      })
+    } else {
+      curve_info$label <- as.character(curve_info$curve.id)
+    }
+  }
+
+  # Static Plot with Multi-Curve Support
   output$stressor_plot <- renderPlot({
     if (nrow(df) == 0) {
       plot(1, type = "n", axes = FALSE, xlab = "", ylab = "")
@@ -417,17 +462,51 @@ render_article_server <- function(input, output, session, paper_id, db) {
     x_vals <- df[[x_idx]]
     y_vals <- df[[y_idx]]
 
-    # Use the actual label values from the data
+    # Set up plot with appropriate range
     plot(
-      x_vals, y_vals,
-      type = "o", col = "blue", pch = 16, lwd = 2,
+      range(x_vals, na.rm = TRUE), range(y_vals, na.rm = TRUE),
+      type = "n",
       xlab = stressor_label,
       ylab = response_label,
       main = paste("Stressor Response for", response_name, "vs", stressor_name)
     )
+
+    # Plot each curve
+    if (has_curve_id && !is.null(curve_info)) {
+      # Multiple curves - use different colors
+      colors <- rainbow(nrow(curve_info))
+      curve_id_idx <- which(nm_lower == "curve.id")
+
+      for (i in seq_len(nrow(curve_info))) {
+        cid <- curve_info$curve.id[i]
+        curve_rows <- df[[curve_id_idx]] == cid
+
+        lines(
+          df[[x_idx]][curve_rows],
+          df[[y_idx]][curve_rows],
+          type = "o",
+          col = colors[i],
+          pch = 16,
+          lwd = 2
+        )
+      }
+
+      # Add legend
+      legend(
+        "topright",
+        legend = curve_info$label,
+        col = colors,
+        lwd = 2,
+        pch = 16,
+        bty = "n"
+      )
+    } else {
+      # Single curve - use blue
+      lines(x_vals, y_vals, type = "o", col = "blue", pch = 16, lwd = 2)
+    }
   })
 
-  # Interactive Plot
+  # Interactive Plot with Multi-Curve Support
   output$interactive_plot <- renderPlotly({
     if (nrow(df) == 0) {
       return(plot_ly(type = "scatter", mode = "markers", height = 200) %>%
@@ -461,17 +540,52 @@ render_article_server <- function(input, output, session, paper_id, db) {
         ))
     }
 
-    # Use the actual label values from the data
-    plot_ly(df,
-      x = ~ df[[x_idx]], y = ~ df[[y_idx]],
-      type = "scatter", mode = "lines+markers",
-      line = list(color = "blue"), marker = list(size = 6)
-    ) %>%
-      layout(
+    # Create plotly figure
+    if (has_curve_id && !is.null(curve_info)) {
+      # Multiple curves - add each as a separate trace
+      p <- plot_ly()
+      curve_id_idx <- which(nm_lower == "curve.id")
+
+      for (i in seq_len(nrow(curve_info))) {
+        cid <- curve_info$curve.id[i]
+        curve_rows <- df[[curve_id_idx]] == cid
+        curve_data <- df[curve_rows, ]
+
+        p <- p %>% add_trace(
+          data = curve_data,
+          x = ~ curve_data[[x_idx]],
+          y = ~ curve_data[[y_idx]],
+          type = "scatter",
+          mode = "lines+markers",
+          name = curve_info$label[i],
+          marker = list(size = 6),
+          line = list(width = 2)
+        )
+      }
+
+      p <- p %>% layout(
         title = paste("Interactive Plot for", response_name, "vs", stressor_name),
         xaxis = list(title = stressor_label),
-        yaxis = list(title = response_label)
+        yaxis = list(title = response_label),
+        hovermode = "closest"
       )
+
+      return(p)
+    } else {
+      # Single curve
+      return(
+        plot_ly(df,
+          x = ~ df[[x_idx]], y = ~ df[[y_idx]],
+          type = "scatter", mode = "lines+markers",
+          line = list(color = "blue"), marker = list(size = 6)
+        ) %>%
+          layout(
+            title = paste("Interactive Plot for", response_name, "vs", stressor_name),
+            xaxis = list(title = stressor_label),
+            yaxis = list(title = response_label)
+          )
+      )
+    }
   })
 }
 
