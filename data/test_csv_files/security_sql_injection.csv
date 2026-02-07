@@ -1,0 +1,5 @@
+curve.id,stressor.x,response.y,stressor.label,response.label,units.x,units.y,stressor.value
+c1,10,0.9,temperature,survival,degC,percent,'; DROP TABLE users; --
+c1,20,0.8,temperature,survival,degC,percent,normal
+c1,30,0.7,temperature,survival,degC,percent,normal
+c1,40,0.6,temperature,survival,degC,percent,normal
