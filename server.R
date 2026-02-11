@@ -3,8 +3,8 @@
 # Load required modules
 source("modules/csv_validation.R", local = TRUE)
 source("modules/error_handling.R", local = TRUE)
-source("modules/about_us.R", local = TRUE) # Restored
-source("modules/acknowledgement.R", local = TRUE) # Restored
+source("modules/about_us.R", local = TRUE)
+source("modules/acknowledgement.R", local = TRUE)
 source("modules/filters.R", local = TRUE)
 source("modules/pagination.R", local = TRUE)
 source("modules/render_papers.R", local = TRUE)
@@ -18,6 +18,7 @@ source("modules/upload.R", local = TRUE)
 source("modules/admin_auth.R", local = TRUE)
 source("modules/manage_categories.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
+source("modules/submit_relationship.R", local = TRUE)
 
 server <- function(input, output, session) {
   observeEvent(input$main_navbar,

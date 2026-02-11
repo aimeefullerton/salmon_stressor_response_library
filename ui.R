@@ -10,6 +10,7 @@ source("modules/about_us.R", local = TRUE)
 source("modules/acknowledgement.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
 source("modules/user_guide.R", local = TRUE)
+source("modules/submit_relationship.R", local = TRUE)
 
 # Static resource for team images
 addResourcePath("teamimg", "modules/images")
@@ -230,21 +231,21 @@ ui <- navbarPage(
           });
         "))
       ),
-
-      # conditionalPanel(
-      #   condition = "window.location.search.includes('main_id')",
-      #   fluidRow(
-      #     column(8, offset = 2, uiOutput("article_content"))
-      #   )
-      # )
     )
   ),
 
   # Upload Tab
+  # tabPanel(
+  #   title = "Upload Data",
+  #   value = "upload_data",
+  #   upload_ui("upload")
+  # ),
+
+  # Submit a Relationship Tab
   tabPanel(
-    title = "Upload Data",
-    value = "upload_data",
-    upload_ui("upload")
+    title = "Submit a Relationship",
+    value = "submit_relationship",
+    submit_relationship_ui("submit_relationship")
   ),
 
   # Admin Tab
