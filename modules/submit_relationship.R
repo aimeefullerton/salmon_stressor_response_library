@@ -95,18 +95,92 @@ submit_relationship_server <- function(id) {
       req(input$sr_csv_file)
       file <- input$sr_csv_file
 
-      # Validate the uploaded CSV
-      validation_result <- validate_csv_upload(file$datapath)
+      # Validate the uploaded CSV using the full Shiny file input object
+      validation_result <- tryCatch(
+        validate_csv_upload(file),
+        error = function(e) {
+          output$csv_validation_status <- renderUI({
+            tags$div(class = "alert alert-danger", paste("CSV validation error:", conditionMessage(e)))
+          })
+          list(valid = FALSE, message = conditionMessage(e))
+        }
+      )
 
-      if (validation_result$valid) {
-        uploaded_csv_data(validation_result$data)
+      if (isTRUE(validation_result$valid)) {
+        df <- validation_result$data
+        col_map <- validation_result$col_map
+
+        # Extract metadata for display
+        stressor_label <- if (!is.na(col_map$stressor_label)) {
+          unique(df[[col_map$stressor_label]])[1]
+        } else {
+          "N/A"
+        }
+
+        response_label <- if (!is.na(col_map$response_label)) {
+          unique(df[[col_map$response_label]])[1]
+        } else {
+          "N/A"
+        }
+
+        units_x <- if (!is.na(col_map$units_x)) {
+          unique(df[[col_map$units_x]])[1]
+        } else {
+          "N/A"
+        }
+
+        units_y <- if (!is.na(col_map$units_y)) {
+          unique(df[[col_map$units_y]])[1]
+        } else {
+          "N/A"
+        }
+
+        # Count unique curves
+        unique_curves <- length(unique(df[[col_map$curve_id]]))
+
+        details <- list(
+          sprintf("Total rows: %d", nrow(df)),
+          sprintf("Number of curves: %d", unique_curves),
+          sprintf("Stressor: %s (%s)", stressor_label, units_x),
+          sprintf("Response: %s (%s)", response_label, units_y)
+        )
+
+        if (length(validation_result$security_warnings) > 0) {
+          details <- c(
+            details,
+            "⚠️ Security Notice: Suspicious patterns detected and neutralized"
+          )
+        }
+
+        uploaded_csv_data(df)
+
         output$csv_validation_status <- renderUI({
-          tags$div(class = "alert alert-success", "CSV file is valid and has been uploaded.")
+          HTML(create_alert_html(
+            type = "success",
+            message = "CSV is valid and ready to submit",
+            details = details
+          ))
         })
+
+        # Show security warnings in modal if present
+        if (length(validation_result$security_warnings) > 0) {
+          show_warning_modal(
+            session,
+            "🛡️ Security Notice",
+            "Your CSV file contained suspicious patterns that were automatically neutralized for safety.",
+            details = validation_result$security_warnings
+          )
+        }
       } else {
         uploaded_csv_data(NULL)
+        error_msg <- get_csv_error_message(validation_result)
+
         output$csv_validation_status <- renderUI({
-          tags$div(class = "alert alert-danger", paste("CSV validation failed:", validation_result$message))
+          HTML(create_alert_html(
+            type = "error",
+            message = error_msg$message,
+            details = error_msg$issues
+          ))
         })
       }
     })
