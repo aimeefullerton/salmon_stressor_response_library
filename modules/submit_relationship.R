@@ -3,7 +3,7 @@
 # Load required modules
 source("modules/csv_validation.R")
 source("modules/error_handling.R")
-source("modules/upload.R")
+source("modules/csv_template.R")
 
 submit_relationship_ui <- function(id) {
   ns <- NS(id)
@@ -76,6 +76,51 @@ submit_relationship_ui <- function(id) {
       )
     )
   )
+}
+
+submit_relationship_server <- function(id) {
+  moduleServer(id, function(input, output, session) {
+    ns <- session$ns
+
+    # Reactive value to store the uploaded CSV data
+    uploaded_csv_data <- reactiveVal(NULL)
+
+    # UI for file upload
+    output$sr_csv_file_ui <- renderUI({
+      fileInput(ns("sr_csv_file"), NULL, accept = ".csv", buttonLabel = "Choose File", placeholder = "No file chosen")
+    })
+
+    # Handle CSV file upload and validation
+    observeEvent(input$sr_csv_file, {
+      req(input$sr_csv_file)
+      file <- input$sr_csv_file
+
+      # Validate the uploaded CSV
+      validation_result <- validate_csv_upload(file$datapath)
+
+      if (validation_result$valid) {
+        uploaded_csv_data(validation_result$data)
+        output$csv_validation_status <- renderUI({
+          tags$div(class = "alert alert-success", "CSV file is valid and has been uploaded.")
+        })
+      } else {
+        uploaded_csv_data(NULL)
+        output$csv_validation_status <- renderUI({
+          tags$div(class = "alert alert-danger", paste("CSV validation failed:", validation_result$message))
+        })
+      }
+    })
+
+    # Handle CSV template download
+    output$download_csv_template <- downloadHandler(
+      filename = function() {
+        paste0("SRF_template_", Sys.Date(), ".csv")
+      },
+      content = function(file) {
+        write_csv_template(file)
+      }
+    )
+  })
 }
 
 # nolint end
