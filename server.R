@@ -116,7 +116,7 @@ server <- function(input, output, session) {
   toggle_filters_server(input, session)
   reset_filters_server(input, session)
 
-  upload_server("upload")
+  submit_relationship_server("submit_relationship")
 
   edaServer("eda")
 
