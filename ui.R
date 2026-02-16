@@ -234,25 +234,11 @@ ui <- navbarPage(
     )
   ),
 
-  # Upload Tab
-  # tabPanel(
-  #   title = "Upload Data",
-  #   value = "upload_data",
-  #   upload_ui("upload")
-  # ),
-
   # Submit a Relationship Tab
   tabPanel(
     title = "Submit a Relationship",
     value = "submit_relationship",
     submit_relationship_ui("submit_relationship")
-  ),
-
-  # Admin Tab
-  tabPanel(
-    title = "Admin",
-    value = "manage_categories",
-    uiOutput("categories_auth_ui")
   )
 )
 # nolint end

@@ -2658,9 +2658,6 @@
     "modules/acknowledgement.R": {
       "checksum": "938353d383ffdc254380b6f09ddcb298"
     },
-    "modules/admin_auth.R": {
-      "checksum": "da5cc6f01a560175fad1f4ab56ea0e65"
-    },
     "modules/downloads.R": {
       "checksum": "cd1bf3179ac550af0779dc60a0c4d959"
     },
