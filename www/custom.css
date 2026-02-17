@@ -269,3 +269,26 @@ td {
 table {
   max-width: 80vw;
 }
+
+.link-primary {
+  color: var(--primary-color);
+  font-weight: 500;
+  margin: 4px 0;
+  text-decoration: underline;
+}
+
+.link-primary:hover {
+  color: var(--primary-hover);
+}
+
+.link-primary::after {
+  display: inline-block;
+  font-variant: normal;
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  line-height: 1;
+  content: '\f35d';
+  font-size: 14px;
+  margin-left: 4px;
+  vertical-align: 0;
+}
