@@ -6,6 +6,13 @@ library(markdown)
 library(RPostgres)
 library(pool)
 
+# Configure future plan for background async tasks (emails, etc.)
+if (requireNamespace("future", quietly = TRUE)) {
+  future::plan("multisession")
+} else {
+  warning("Package 'future' not installed; async tasks will not run in background. Install 'future' to enable async behaviors.")
+}
+
 # Connect to Postgres database
 db_config <- list(
   host = Sys.getenv("DB_HOST", "localhost"),

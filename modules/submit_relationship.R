@@ -5,6 +5,13 @@ source("modules/csv_validation.R")
 source("modules/error_handling.R")
 source("modules/csv_template.R")
 source("modules/file_validation.R")
+# Use namespaced package calls; check optional email/future support
+# (avoid attaching packages inside modules)
+.email_support <- (
+  requireNamespace("future", quietly = TRUE)
+  && requireNamespace("promises", quietly = TRUE)
+  && requireNamespace("emayili", quietly = TRUE)
+)
 
 submit_relationship_ui <- function(id) {
   ns <- NS(id)
@@ -274,6 +281,71 @@ submit_relationship_server <- function(id) {
       # At this point all validations passed.
       # Show success and store metadata or temp paths if needed.
       show_success_modal(session, "Submission Accepted", sprintf("Thank you %s — your submission titled '%s' was received.", input$name, input$title))
+
+      # Prepare to send notification email asynchronously using blastula
+      smtp_host <- Sys.getenv("SMTP_HOST")
+      smtp_port <- as.integer(Sys.getenv("SMTP_PORT"))
+      smtp_user <- Sys.getenv("SMTP_USER")
+      smtp_pass <- Sys.getenv("SMTP_PASS")
+      smtp_from <- Sys.getenv("SMTP_FROM")
+      admin_to  <- Sys.getenv("ADMIN_EMAIL")
+
+      if (nzchar(smtp_host) && nzchar(smtp_user) && nzchar(smtp_pass) && nzchar(smtp_from) && nzchar(admin_to)) {
+        if (.email_support) {
+          attachments <- character(0)
+          if (!is.null(saved_files$csv)) attachments <- c(attachments, saved_files$csv)
+          if (!is.null(saved_files$pdf)) attachments <- c(attachments, saved_files$pdf)
+
+          email_text <- paste0(
+            "New Relationship Submission\n\n",
+            "Name: ", input$name, "\n",
+            "Email: ", input$email, "\n",
+            "Title: ", input$title, "\n",
+            "Citation: ", input$citation, "\n\n",
+            "Notes:\n", input$notes, "\n\n",
+            "Attachments: ", paste(basename(attachments), collapse = ", ")
+          )
+
+          # Build emayili envelope
+          email_env <- emayili::envelope() %>%
+            emayili::from(smtp_from) %>%
+            emayili::to(admin_to) %>%
+            emayili::subject(paste("New relationship submission:", input$title)) %>%
+            emayili::text(email_text)
+
+          # Attach files if present
+          if (length(attachments) > 0) {
+            for (att in attachments) {
+              email_env <- email_env %>% emayili::attachment(att)
+            }
+          }
+
+          promises::future_promise({
+            tryCatch({
+              smtp <- emayili::server(host = smtp_host, port = smtp_port, username = smtp_user, password = smtp_pass)
+              smtp(email_env)
+            }, error = function(e) {
+              stop(sprintf("SMTP send error: %s", conditionMessage(e)))
+            })
+          }, seed = TRUE) %...>%
+            (function(res) {
+              message(sprintf("[EMAIL SENT] Submission notification sent for '%s'", input$title))
+              invisible(NULL)
+            }) %...!%
+            (function(e) {
+              err_msg <- conditionMessage(e)
+              message(sprintf("[EMAIL ERROR] Failed to send submission email: %s", err_msg))
+              try({
+                show_error_modal(session, "Email Send Failed", sprintf("Notification email failed to send: %s", err_msg))
+              }, silent = TRUE)
+              invisible(NULL)
+            })
+        } else {
+          message("[EMAIL SKIPPED] required packages (future/promises/emayili) not installed; not sending submission email.")
+        }
+      } else {
+        message("[EMAIL SKIPPED] SMTP config missing; not sending submission email.")
+      }
 
       # Clear cached upload state and reset the form UI
       try(
