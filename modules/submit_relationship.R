@@ -8,9 +8,9 @@ source("modules/file_validation.R")
 # Use namespaced package calls; check optional email/future support
 # (avoid attaching packages inside modules)
 .email_support <- (
-  requireNamespace("future", quietly = TRUE)
-  && requireNamespace("promises", quietly = TRUE)
-  && requireNamespace("emayili", quietly = TRUE)
+  requireNamespace("future", quietly = TRUE) &&
+    requireNamespace("promises", quietly = TRUE) &&
+    requireNamespace("emayili", quietly = TRUE)
 )
 
 submit_relationship_ui <- function(id) {
@@ -37,13 +37,19 @@ submit_relationship_ui <- function(id) {
             offset = 3,
             textInput(ns("name"), "Name *", placeholder = "Your full name"),
             textInput(ns("email"), "Email *", placeholder = "you@example.com"),
-            textInput(ns("citation"), "Citation *", placeholder = "APA or other citation")
+            textInput(ns("citation"), "Citation *", placeholder = "Full citation of the primary research article")
           ),
           column(
             6,
             offset = 3,
-            textInput(ns("title"), "Title *", placeholder = "Title of relationship"),
-            textAreaInput(ns("notes"), "Notes *", rows = 3, placeholder = "Any additional notes")
+            shiny::tagAppendAttributes(
+              textInput(ns("title"), "Title *", placeholder = "Title of the SR function"),
+              title = "Format: Author et al. Year: Function description. Example: Honea et al. 2016: Chinook egg-to-fry survival vs incubation temperature",
+              `data-toggle` = "tooltip",
+              `data-placement` = "right",
+              `data-trigger` = "focus"
+            ),
+            textAreaInput(ns("notes"), "Notes *", rows = 3, placeholder = "Use this section to describe the stressor-response relationship you are submitting, why it should be included, and any additional details that you believe would be useful to us.")
           )
         ),
         # optional csv upload for supporting data + optional PDF
@@ -51,9 +57,17 @@ submit_relationship_ui <- function(id) {
           column(6, offset = 3, wellPanel(
             strong("Optional File Uploads"),
             div(id = ns("pdf_wrapper"), fileInput(ns("supporting_pdf"), "Optional: PDF from which the relationship comes", accept = c(".pdf", "application/pdf"))),
-            tags$br(),
+            # uiOutput(ns("pdf_validation_status")),
             div(id = ns("csv_wrapper"), fileInput(ns("sr_csv_file"), "Optional: CSV data for relationship curve(s)", accept = ".csv")),
-            tags$br(),
+            uiOutput(ns("csv_validation_status")),
+            tags$div(
+              style = "margin-top:8px;",
+              tags$a(
+                href = "#", class = "link-primary",
+                onclick = "var clickEl = document.querySelector('a[data-value=\"User Guide\"]'); if (clickEl) { clickEl.click(); setTimeout(function(){ var el = document.getElementById('examples-of-valid-csv-files'); if (el) { el.setAttribute('tabindex', '-1'); el.scrollIntoView({behavior: 'smooth', block: 'start'}); } }, 200); } return false;",
+                "Read the User Guide for CSV formatting and examples"
+              )
+            ),
             helpText(
               "Upload a CSV data file for the SR relationship.",
               br(),
@@ -65,14 +79,7 @@ submit_relationship_ui <- function(id) {
               br(),
               "2 MB limit. Allowed type: .csv"
             ),
-            downloadButton(ns("download_csv_template"), "Download CSV Template", class = "btn btn-info mb-2"),
-            uiOutput(ns("csv_validation_status")),
-            tags$div(style = "margin-top:8px;",
-              tags$a(href = "#", class = "link-primary",
-                onclick = "document.querySelector('a[data-value=\"User Guide\"]').click(); return false;",
-                "Read the User Guide for CSV formatting and examples"
-              )
-            )
+            downloadButton(ns("download_csv_template"), "Download CSV Template", class = "btn btn-info mb-2")
           ))
         ),
         fluidRow(
@@ -294,7 +301,7 @@ submit_relationship_server <- function(id) {
       smtp_user <- Sys.getenv("SMTP_USER")
       smtp_pass <- Sys.getenv("SMTP_PASS")
       smtp_from <- Sys.getenv("SMTP_FROM")
-      admin_to  <- Sys.getenv("ADMIN_EMAIL")
+      admin_to <- Sys.getenv("ADMIN_EMAIL")
 
       if (nzchar(smtp_host) && nzchar(smtp_user) && nzchar(smtp_pass) && nzchar(smtp_from) && nzchar(admin_to)) {
         if (.email_support) {
@@ -326,14 +333,20 @@ submit_relationship_server <- function(id) {
             }
           }
 
-          promises::future_promise({
-            tryCatch({
-              smtp <- emayili::server(host = smtp_host, port = smtp_port, username = smtp_user, password = smtp_pass)
-              smtp(email_env)
-            }, error = function(e) {
-              stop(sprintf("SMTP send error: %s", conditionMessage(e)))
-            })
-          }, seed = TRUE) %...>%
+          promises::future_promise(
+            {
+              tryCatch(
+                {
+                  smtp <- emayili::server(host = smtp_host, port = smtp_port, username = smtp_user, password = smtp_pass)
+                  smtp(email_env)
+                },
+                error = function(e) {
+                  stop(sprintf("SMTP send error: %s", conditionMessage(e)))
+                }
+              )
+            },
+            seed = TRUE
+          ) %...>%
             (function(res) {
               message(sprintf("[EMAIL SENT] Submission notification sent for '%s'", input$title))
               invisible(NULL)
@@ -341,9 +354,12 @@ submit_relationship_server <- function(id) {
             (function(e) {
               err_msg <- conditionMessage(e)
               message(sprintf("[EMAIL ERROR] Failed to send submission email: %s", err_msg))
-              try({
-                show_error_modal(session, "Email Send Failed", sprintf("Notification email failed to send: %s", err_msg))
-              }, silent = TRUE)
+              try(
+                {
+                  show_error_modal(session, "Email Send Failed", sprintf("Notification email failed to send: %s", err_msg))
+                },
+                silent = TRUE
+              )
               invisible(NULL)
             })
         } else {
