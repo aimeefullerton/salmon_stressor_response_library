@@ -4,6 +4,7 @@
 source("modules/csv_validation.R")
 source("modules/error_handling.R")
 source("modules/csv_template.R")
+source("modules/file_validation.R")
 
 submit_relationship_ui <- function(id) {
   ns <- NS(id)
@@ -12,16 +13,8 @@ submit_relationship_ui <- function(id) {
     fluidPage(
       tags$head(
         includeCSS("www/custom.css"),
-        tags$script(HTML("
-          Shiny.addCustomMessageHandler('relationship_submission_status', function(data) {
-            var statusDiv = document.getElementById('submission_status');
-            if (data.success) {
-              statusDiv.innerHTML = '<div class=\"alert alert-success\" role=\"alert\">' + data.message + '</div>'
-            } else {
-              statusDiv.innerHTML = '<div class=\"alert alert-danger\" role=\"alert\">' + data.message + '</div>'
-            }
-          }"))
       ),
+      shinyjs::useShinyjs(),
       fluidRow(
         column(8,
           offset = 2,
@@ -35,21 +28,25 @@ submit_relationship_ui <- function(id) {
           column(
             6,
             offset = 3,
-            textInput(ns("your_name"), "Your Name"),
-            textInput(ns("your_email"), "Your Email"),
+            textInput(ns("name"), "Name *", placeholder = "Your full name"),
+            textInput(ns("email"), "Email *", placeholder = "you@example.com"),
+            textInput(ns("citation"), "Citation *", placeholder = "APA or other citation")
           ),
           column(
             6,
             offset = 3,
-            textInput(ns("relationship"), "Relationship Title", placeholder = "Stressor A causes Response B"),
-            textAreaInput(ns("relationship_description"), "Relationship Description", rows = 3)
+            textInput(ns("title"), "Title *", placeholder = "Title of relationship"),
+            textAreaInput(ns("notes"), "Notes *", rows = 3, placeholder = "Any additional notes")
           )
         ),
-        # optional csv upload for supporting data
+        # optional csv upload for supporting data + optional PDF
         fluidRow(
           column(6, offset = 3, wellPanel(
-            strong("SR Curve Data CSV"),
-            uiOutput(ns("sr_csv_file_ui")),
+            strong("Optional File Uploads"),
+            div(id = ns("pdf_wrapper"), fileInput(ns("supporting_pdf"), "Optional: PDF from which the relationship comes", accept = c(".pdf", "application/pdf"))),
+            tags$br(),
+            div(id = ns("csv_wrapper"), fileInput(ns("sr_csv_file"), "Optional: CSV data for relationship curve(s)", accept = ".csv")),
+            tags$br(),
             helpText(
               "Upload a CSV data file for the SR relationship.",
               br(),
@@ -82,13 +79,9 @@ submit_relationship_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    # Reactive value to store the uploaded CSV data
+    # Reactive values to store the uploaded CSV data and its validation result
     uploaded_csv_data <- reactiveVal(NULL)
-
-    # UI for file upload
-    output$sr_csv_file_ui <- renderUI({
-      fileInput(ns("sr_csv_file"), NULL, accept = ".csv", buttonLabel = "Choose File", placeholder = "No file chosen")
-    })
+    uploaded_csv_validation <- reactiveVal(NULL)
 
     # Handle CSV file upload and validation
     observeEvent(input$sr_csv_file, {
@@ -153,6 +146,7 @@ submit_relationship_server <- function(id) {
         }
 
         uploaded_csv_data(df)
+        uploaded_csv_validation(validation_result)
 
         output$csv_validation_status <- renderUI({
           HTML(create_alert_html(
@@ -173,6 +167,7 @@ submit_relationship_server <- function(id) {
         }
       } else {
         uploaded_csv_data(NULL)
+        uploaded_csv_validation(NULL)
         error_msg <- get_csv_error_message(validation_result)
 
         output$csv_validation_status <- renderUI({
@@ -194,6 +189,110 @@ submit_relationship_server <- function(id) {
         write_csv_template(file)
       }
     )
+
+    # Handle form submission (required fields + optional files)
+    observeEvent(input$submit_relationship, {
+      # Basic required field checks
+      req(input$name, input$email, input$citation, input$title, input$notes)
+
+      errs <- character()
+      if (is.null(input$name) || trimws(input$name) == "") errs <- c(errs, "Name is required")
+      if (is.null(input$email) || trimws(input$email) == "") errs <- c(errs, "Email is required")
+      if (is.null(input$citation) || trimws(input$citation) == "") errs <- c(errs, "Citation is required")
+      if (is.null(input$title) || trimws(input$title) == "") errs <- c(errs, "Title is required")
+      if (is.null(input$notes) || trimws(input$notes) == "") errs <- c(errs, "Notes are required")
+
+      # Basic email format check
+      if (!is.null(input$email) && nzchar(trimws(input$email))) {
+        if (!grepl("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", trimws(input$email))) {
+          errs <- c(errs, "Email format appears invalid")
+        }
+      }
+
+      if (length(errs) > 0) {
+        show_error_modal(session, "Missing required fields", paste(errs, collapse = "<br>"))
+        return()
+      }
+
+      # Require that CSV (if provided) was validated on upload — reuse cached result
+      if (!is.null(input$sr_csv_file)) {
+        csv_cached <- uploaded_csv_validation()
+        if (is.null(csv_cached)) {
+          show_error_modal(session, "CSV Not Validated", "Please upload and validate your CSV file before submitting (use the file chooser to re-upload).")
+          return()
+        }
+        if (!isTRUE(csv_cached$valid)) {
+          emsg <- get_csv_error_message(csv_cached)
+          show_error_modal(session, "CSV Validation Failed", emsg$message)
+          return()
+        }
+      }
+
+      # Validate PDF if provided
+      if (!is.null(input$supporting_pdf)) {
+        pdf_check <- validate_pdf_upload(input$supporting_pdf)
+        if (!isTRUE(pdf_check$valid)) {
+          show_error_modal(session, "PDF Validation Failed", pdf_check$message)
+          return()
+        }
+      }
+
+      # If files passed validation, copy them to a secure temp dir with sanitized names
+      saved_files <- list()
+      safe_name <- function(n) gsub("[^A-Za-z0-9_.-]", "_", n)
+
+      if (!is.null(input$sr_csv_file)) {
+        src <- input$sr_csv_file$datapath
+        dest <- file.path(tempdir(), paste0(format(Sys.time(), "%Y%m%d%H%M%S"), "_", safe_name(input$sr_csv_file$name)))
+        tryCatch(
+          {
+            file.copy(src, dest)
+            saved_files$csv <- dest
+          },
+          error = function(e) {
+            show_error_modal(session, "File Save Error", "Failed to save uploaded CSV file temporarily.")
+            return()
+          }
+        )
+      }
+
+      if (!is.null(input$supporting_pdf)) {
+        src <- input$supporting_pdf$datapath
+        dest <- file.path(tempdir(), paste0(format(Sys.time(), "%Y%m%d%H%M%S"), "_", safe_name(input$supporting_pdf$name)))
+        tryCatch(
+          {
+            file.copy(src, dest)
+            saved_files$pdf <- dest
+          },
+          error = function(e) {
+            show_error_modal(session, "File Save Error", "Failed to save uploaded PDF file temporarily.")
+            return()
+          }
+        )
+      }
+
+      # At this point all validations passed.
+      # Show success and store metadata or temp paths if needed.
+      show_success_modal(session, "Submission Accepted", sprintf("Thank you %s — your submission titled '%s' was received.", input$name, input$title))
+
+      # Clear cached upload state and reset the form UI
+      try(
+        {
+          uploaded_csv_data(NULL)
+          uploaded_csv_validation(NULL)
+          shinyjs::reset(ns("submit_relationship_form"))
+        },
+        silent = TRUE
+      )
+
+      # Log minimal info (avoid logging raw file contents)
+      message(sprintf(
+        "[RELATIONSHIP SUBMIT] Name=%s, Email=%s, Title=%s, CSV=%s, PDF=%s",
+        input$name, input$email, input$title,
+        ifelse(!is.null(saved_files$csv), saved_files$csv, ""),
+        ifelse(!is.null(saved_files$pdf), saved_files$pdf, "")
+      ))
+    })
   })
 }
 
