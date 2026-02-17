@@ -25,6 +25,12 @@ userGuideUI <- function(id) {
       ),
       p("The extracted CSV data have two to four standardized columns:"),
       includeMarkdown("data/user_guide/extracted_data.md"),
+      tags$div(style = "margin-top:10px;",
+        tags$a(href = "#", class = "link-primary",
+          onclick = "document.querySelector('a[data-value=\"submit_relationship\"]').click(); return false;",
+          "Suggest a Relationship — open the submission form"
+        )
+      ),
       p(
         style = "font-style: italic;",
         "Note: All extracted data entries include numeric Stressor (x) and Response (y) values and are associated with a single stressor per SRF entry. Each entry is fully labeled with a Stressor Label, Response Label, and corresponding units to ensure interpretability. Where multiple curves are present for the same stressor, they are distinguished using a curve identifier and, when applicable, a stressor value describing the curve. Early entries contributed by Canadian partners (e.g., CEMPRA, Joe Model) reported the biological response as Mean System Capacity, which scaled response values from 0% to 100%. Since NOAA assumed responsibility for stewardship of the library and expanded its scope, response values have been retained in the original units and formats reported in each source study, rather than standardized across entries. Extracted data may originate from reported tables, supplemental datasets, or digitized figures. When data are digitized from figures, small uncertainties may be introduced; these are documented where possible."

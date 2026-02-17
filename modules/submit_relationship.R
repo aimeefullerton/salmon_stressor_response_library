@@ -66,7 +66,13 @@ submit_relationship_ui <- function(id) {
               "2 MB limit. Allowed type: .csv"
             ),
             downloadButton(ns("download_csv_template"), "Download CSV Template", class = "btn btn-info mb-2"),
-            uiOutput(ns("csv_validation_status"))
+            uiOutput(ns("csv_validation_status")),
+            tags$div(style = "margin-top:8px;",
+              tags$a(href = "#", class = "link-primary",
+                onclick = "document.querySelector('a[data-value=\"User Guide\"]').click(); return false;",
+                "Read the User Guide for CSV formatting and examples"
+              )
+            )
           ))
         ),
         fluidRow(
