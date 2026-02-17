@@ -23,12 +23,14 @@ userGuideUI <- function(id) {
         tags$li("Metadata (all fields above), and"),
         tags$li("Extracted data table - numerical data pulled from figures, tables, or supplementary files.")
       ),
-      p("The extracted CSV data have two to four standardized columns:"),
+      p("The extracted CSV data have the following standardized columns:"),
       includeMarkdown("data/user_guide/extracted_data.md"),
-      tags$div(style = "margin-top:10px;",
-        tags$a(href = "#", class = "link-primary",
+      tags$div(
+        style = "margin: 16px 0;",
+        tags$a(
+          href = "#", class = "link-primary",
           onclick = "document.querySelector('a[data-value=\"submit_relationship\"]').click(); return false;",
-          "Suggest a Relationship — open the submission form"
+          "Suggest a Relationship — go to the submission form"
         )
       ),
       p(
