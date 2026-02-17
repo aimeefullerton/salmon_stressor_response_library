@@ -5,6 +5,7 @@ library(DBI)
 library(markdown)
 library(RPostgres)
 library(pool)
+library(promises)
 
 # Configure future plan for background async tasks (emails, etc.)
 if (requireNamespace("future", quietly = TRUE)) {
