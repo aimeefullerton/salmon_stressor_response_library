@@ -2,9 +2,9 @@
 
 # Load required modules
 source("modules/csv_validation.R")
-source("modules/error_handling.R")
 source("modules/csv_template.R")
 source("modules/file_validation.R")
+source("modules/error_handling.R")
 source("modules/customFileInput.R")
 
 # Use namespaced package calls; check optional email/future support
@@ -28,7 +28,13 @@ submit_relationship_ui <- function(id) {
         column(8,
           offset = 2,
           h2("Submit a Relationship"),
-          p("Use the form below to suggest a new relationship between a stressor and a response. Please provide as much detail as possible to help us evaluate your submission.")
+          p("
+            Use the form below to suggest a new relationship between a stressor and a response.
+            Please provide as much detail as possible to help us evaluate your submission.
+            We also encourage you to upload any relevant data (in CSV format) or source PDFs that can help us understand and verify the relationship you're submitting.
+            After you submit, our team will review the information and get back to you if we have any questions.
+            We appreciate your contribution to making this library more comprehensive and useful for everyone!
+          ")
         )
       ),
       div(
@@ -38,12 +44,11 @@ submit_relationship_ui <- function(id) {
             6,
             offset = 3,
             textInput(ns("name"), "Name *", placeholder = "Your full name"),
+            uiOutput(ns("error_name")),
             textInput(ns("email"), "Email *", placeholder = "you@example.com"),
-            textInput(ns("citation"), "Citation *", placeholder = "Full citation of the primary research article")
-          ),
-          column(
-            6,
-            offset = 3,
+            uiOutput(ns("error_email")),
+            textInput(ns("citation"), "Citation *", placeholder = "Full citation of the primary research article"),
+            uiOutput(ns("error_citation")),
             shiny::tagAppendAttributes(
               textInput(ns("title"), "Title *", placeholder = "Title of the SR function"),
               title = "Format: Author et al. Year: Function description. Example: Honea et al. 2016: Chinook egg-to-fry survival vs incubation temperature",
@@ -51,7 +56,15 @@ submit_relationship_ui <- function(id) {
               `data-placement` = "right",
               `data-trigger` = "focus"
             ),
-            textAreaInput(ns("notes"), "Notes *", rows = 3, placeholder = "Use this section to describe the stressor-response relationship you are submitting, why it should be included, and any additional details that you believe would be useful to us.")
+            uiOutput(ns("error_title"))
+          )
+        ),
+        fluidRow(
+          column(
+            6,
+            offset = 3,
+            textAreaInput(ns("notes"), "Notes *", rows = 5, placeholder = "Use this section to describe the stressor-response relationship you are submitting, why it should be included, and any additional details that you believe would be useful to us."),
+            uiOutput(ns("error_notes"))
           )
         ),
         # optional csv upload for supporting data + optional PDF
@@ -59,11 +72,23 @@ submit_relationship_ui <- function(id) {
           column(6, offset = 3, wellPanel(
             strong("Optional File Uploads"),
             div(id = ns("pdf_wrapper"), customFileInput(ns("supporting_pdf"), "Optional: PDF from which the relationship comes", accept = c(".pdf", "application/pdf"))),
+            shinyjs::hidden(
+              actionButton(ns("remove_pdf"), "Remove PDF",
+                icon = icon("times-circle"),
+                class = "btn btn-sm btn-outline-danger mb-2"
+              )
+            ),
             uiOutput(ns("pdf_validation_status")),
             div(id = ns("csv_wrapper"), customFileInput(ns("sr_csv_file"), "Optional: CSV data for relationship curve(s)", accept = ".csv")),
+            shinyjs::hidden(
+              actionButton(ns("remove_csv"), "Remove CSV",
+                icon = icon("times-circle"),
+                class = "btn btn-sm btn-outline-danger mb-2"
+              )
+            ),
             uiOutput(ns("csv_validation_status")),
             tags$div(
-              style = "margin-top:8px;",
+              # style = "margin-top:8px;",
               tags$a(
                 href = "#", class = "link-primary",
                 onclick = "var clickEl = document.querySelector('a[data-value=\"User Guide\"]'); if (clickEl) { clickEl.click(); setTimeout(function(){ var el = document.getElementById('examples-of-valid-csv-files'); if (el) { el.setAttribute('tabindex', '-1'); el.scrollIntoView({behavior: 'smooth', block: 'start'}); } }, 200); } return false;",
@@ -89,6 +114,7 @@ submit_relationship_ui <- function(id) {
             offset = 3,
             actionButton(ns("submit_relationship"), "Submit Relationship", class = "btn btn-primary btn-block"),
             tags$br(), tags$br(),
+            uiOutput(ns("error_files")),
             div(id = ns("submission_status"))
           )
         )
@@ -109,6 +135,7 @@ submit_relationship_server <- function(id) {
     # Handle CSV file upload and validation
     observeEvent(input$sr_csv_file, {
       req(input$sr_csv_file)
+      shinyjs::show("remove_csv")
       file <- input$sr_csv_file
 
       # Validate the uploaded CSV using the full Shiny file input object
@@ -206,6 +233,7 @@ submit_relationship_server <- function(id) {
     # Handle PDF file upload and validation (inline)
     observeEvent(input$supporting_pdf, {
       req(input$supporting_pdf)
+      shinyjs::show("remove_pdf")
       file <- input$supporting_pdf
 
       validation_result <- tryCatch(
@@ -249,6 +277,23 @@ submit_relationship_server <- function(id) {
           ))
         })
       }
+    })
+
+    # Handle removal of uploaded CSV
+    observeEvent(input$remove_csv, {
+      shinyjs::reset("csv_wrapper")
+      shinyjs::hide("remove_csv")
+      uploaded_csv_data(NULL)
+      uploaded_csv_validation(NULL)
+      output$csv_validation_status <- renderUI(NULL)
+    })
+
+    # Handle removal of uploaded PDF
+    observeEvent(input$remove_pdf, {
+      shinyjs::reset("pdf_wrapper")
+      shinyjs::hide("remove_pdf")
+      uploaded_pdf_validation(NULL)
+      output$pdf_validation_status <- renderUI(NULL)
     })
 
     # Handle CSV template download
@@ -430,6 +475,8 @@ submit_relationship_server <- function(id) {
       uploaded_pdf_validation(NULL)
       output$csv_validation_status <- renderUI(NULL)
       output$pdf_validation_status <- renderUI(NULL)
+      shinyjs::hide("remove_csv")
+      shinyjs::hide("remove_pdf")
       reset("submit_relationship_form")
 
       # Log minimal info (avoid logging raw file contents)

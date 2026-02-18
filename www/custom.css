@@ -294,3 +294,12 @@ table {
   margin-left: 4px;
   vertical-align: 0;
 }
+
+/* shiny styling overrides */
+.shiny-input-container {
+  padding: 0;
+}
+
+.progress {
+  margin-bottom: 0;
+}

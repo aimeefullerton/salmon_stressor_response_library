@@ -229,10 +229,10 @@ server <- function(input, output, session) {
   })
 
   # only close connection pool when app is shut down
-  onStop(function() {
-    poolClose(pool)
-    cat("db connection pool closed.\n")
-  })
+  # onStop(function() {
+  #   poolClose(pool)
+  #   cat("db connection pool closed.\n")
+  # })
 }
 
 # nolint end
