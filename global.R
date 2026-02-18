@@ -112,9 +112,6 @@ if (table_exists) {
   warning(sprintf("Table stressor_responses does not exist in schema %s", db_config$schema))
 }
 
-# pool will be closed automatically when the R session ends.
-# another option: register an onStop callback to server.R
-
 # Safely close the pool when the R process shuts down globally
 onStop(function() {
   if (exists("pool")) {
