@@ -5,6 +5,8 @@ source("modules/csv_validation.R")
 source("modules/error_handling.R")
 source("modules/csv_template.R")
 source("modules/file_validation.R")
+source("modules/customFileInput.R")
+
 # Use namespaced package calls; check optional email/future support
 # (avoid attaching packages inside modules)
 .email_support <- (
@@ -56,9 +58,9 @@ submit_relationship_ui <- function(id) {
         fluidRow(
           column(6, offset = 3, wellPanel(
             strong("Optional File Uploads"),
-            div(id = ns("pdf_wrapper"), fileInput(ns("supporting_pdf"), "Optional: PDF from which the relationship comes", accept = c(".pdf", "application/pdf"))),
+            div(id = ns("pdf_wrapper"), customFileInput(ns("supporting_pdf"), "Optional: PDF from which the relationship comes", accept = c(".pdf", "application/pdf"))),
             # uiOutput(ns("pdf_validation_status")),
-            div(id = ns("csv_wrapper"), fileInput(ns("sr_csv_file"), "Optional: CSV data for relationship curve(s)", accept = ".csv")),
+            div(id = ns("csv_wrapper"), customFileInput(ns("sr_csv_file"), "Optional: CSV data for relationship curve(s)", accept = ".csv")),
             uiOutput(ns("csv_validation_status")),
             tags$div(
               style = "margin-top:8px;",
