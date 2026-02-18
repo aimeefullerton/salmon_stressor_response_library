@@ -113,8 +113,8 @@ submit_relationship_ui <- function(id) {
           column(6,
             offset = 3,
             actionButton(ns("submit_relationship"), "Submit Relationship", class = "btn btn-primary btn-block"),
+            # uiOutput(ns("error_files")),
             tags$br(), tags$br(),
-            uiOutput(ns("error_files")),
             div(id = ns("submission_status"))
           )
         )
@@ -131,10 +131,45 @@ submit_relationship_server <- function(id) {
     uploaded_csv_data <- reactiveVal(NULL)
     uploaded_csv_validation <- reactiveVal(NULL)
     uploaded_pdf_validation <- reactiveVal(NULL)
+    csv_active <- reactiveVal(FALSE)
+    pdf_active <- reactiveVal(FALSE)
+
+    # Clear inline errors when user starts editing fields again
+    observeEvent(input$name,
+      {
+        output$error_name <- renderUI(NULL)
+      },
+      ignoreInit = TRUE
+    )
+    observeEvent(input$email,
+      {
+        output$error_email <- renderUI(NULL)
+      },
+      ignoreInit = TRUE
+    )
+    observeEvent(input$citation,
+      {
+        output$error_citation <- renderUI(NULL)
+      },
+      ignoreInit = TRUE
+    )
+    observeEvent(input$title,
+      {
+        output$error_title <- renderUI(NULL)
+      },
+      ignoreInit = TRUE
+    )
+    observeEvent(input$notes,
+      {
+        output$error_notes <- renderUI(NULL)
+      },
+      ignoreInit = TRUE
+    )
 
     # Handle CSV file upload and validation
     observeEvent(input$sr_csv_file, {
       req(input$sr_csv_file)
+      csv_active(TRUE)
       shinyjs::show("remove_csv")
       file <- input$sr_csv_file
 
@@ -233,6 +268,7 @@ submit_relationship_server <- function(id) {
     # Handle PDF file upload and validation (inline)
     observeEvent(input$supporting_pdf, {
       req(input$supporting_pdf)
+      pdf_active(TRUE)
       shinyjs::show("remove_pdf")
       file <- input$supporting_pdf
 
@@ -283,6 +319,7 @@ submit_relationship_server <- function(id) {
     observeEvent(input$remove_csv, {
       shinyjs::reset("csv_wrapper")
       shinyjs::hide("remove_csv")
+      csv_active(FALSE)
       uploaded_csv_data(NULL)
       uploaded_csv_validation(NULL)
       output$csv_validation_status <- renderUI(NULL)
@@ -292,6 +329,7 @@ submit_relationship_server <- function(id) {
     observeEvent(input$remove_pdf, {
       shinyjs::reset("pdf_wrapper")
       shinyjs::hide("remove_pdf")
+      pdf_active(FALSE)
       uploaded_pdf_validation(NULL)
       output$pdf_validation_status <- renderUI(NULL)
     })
@@ -308,60 +346,83 @@ submit_relationship_server <- function(id) {
 
     # Handle form submission (required fields + optional files)
     observeEvent(input$submit_relationship, {
-      # Basic required field checks
-      req(input$name, input$email, input$citation, input$title, input$notes)
-
-      errs <- character()
-      if (is.null(input$name) || trimws(input$name) == "") errs <- c(errs, "Name is required")
-      if (is.null(input$email) || trimws(input$email) == "") errs <- c(errs, "Email is required")
-      if (is.null(input$citation) || trimws(input$citation) == "") errs <- c(errs, "Citation is required")
-      if (is.null(input$title) || trimws(input$title) == "") errs <- c(errs, "Title is required")
-      if (is.null(input$notes) || trimws(input$notes) == "") errs <- c(errs, "Notes are required")
-
-      # Basic email format check
-      if (!is.null(input$email) && nzchar(trimws(input$email))) {
-        if (!grepl("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", trimws(input$email))) {
-          errs <- c(errs, "Email format appears invalid")
-        }
+      # Clear all previous inline error messages
+      error_fields <- c(
+        "error_name", "error_email", "error_citation", "error_title", "error_notes"
+      )
+      for (ef in error_fields) {
+        output[[ef]] <- renderUI(NULL)
       }
 
-      if (length(errs) > 0) {
-        show_error_modal(session, "Missing required fields", paste(errs, collapse = "<br>"))
+      errors <- list()
+
+      # Required field checks
+      if (is.null(input$name) || trimws(input$name) == "") {
+        errors$name <- "Name is required."
+      }
+      if (is.null(input$email) || trimws(input$email) == "") {
+        errors$email <- "Email is required."
+      } else if (!grepl("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", trimws(input$email))) {
+        errors$email <- "Please enter a valid email address."
+      }
+      if (is.null(input$citation) || trimws(input$citation) == "") {
+        errors$citation <- "Citation is required."
+      }
+      if (is.null(input$title) || trimws(input$title) == "") {
+        errors$title <- "Title is required."
+      }
+      if (is.null(input$notes) || trimws(input$notes) == "") {
+        errors$notes <- "Notes are required."
+      }
+
+      # Render inline errors
+      inline_error_tag <- function(msg) {
+        tags$p(class = "text-danger small mt-1", style = "margin-bottom: 0;", msg)
+      }
+
+      if (!is.null(errors$name)) output$error_name <- renderUI(inline_error_tag(errors$name))
+      if (!is.null(errors$email)) output$error_email <- renderUI(inline_error_tag(errors$email))
+      if (!is.null(errors$citation)) output$error_citation <- renderUI(inline_error_tag(errors$citation))
+      if (!is.null(errors$title)) output$error_title <- renderUI(inline_error_tag(errors$title))
+      if (!is.null(errors$notes)) output$error_notes <- renderUI(inline_error_tag(errors$notes))
+
+      if (length(errors) > 0) {
+        show_error_modal(session, "Missing required fields", paste(errors, collapse = "<br>"))
         return()
       }
 
-      # Require that CSV (if provided) was validated on upload — reuse cached result
-      if (!is.null(input$sr_csv_file)) {
+      # Require that CSV and PDF (if provided) were validated on upload — reuse cached results
+      file_modal_errors <- character()
+
+      if (csv_active()) {
         csv_cached <- uploaded_csv_validation()
         if (is.null(csv_cached)) {
-          show_error_modal(session, "CSV Not Validated", "Please upload and validate your CSV file before submitting (use the file chooser to re-upload).")
-          return()
-        }
-        if (!isTRUE(csv_cached$valid)) {
+          file_modal_errors <- c(file_modal_errors, "❌ CSV file has not been validated. Please either re-upload and validate your CSV file before submitting or remove it to submit your SR relationship without a CSV file.")
+        } else if (!isTRUE(csv_cached$valid)) {
           emsg <- get_csv_error_message(csv_cached)
-          show_error_modal(session, "CSV Validation Failed", emsg$message)
-          return()
+          file_modal_errors <- c(file_modal_errors, paste("CSV validation failed:", emsg$message))
         }
       }
 
-      # Require that PDF (if provided) was validated on upload — reuse cached result
-      if (!is.null(input$supporting_pdf)) {
+      if (pdf_active()) {
         pdf_cached <- uploaded_pdf_validation()
         if (is.null(pdf_cached)) {
-          show_error_modal(session, "PDF Not Validated", "Please upload and validate your PDF file before submitting (use the file chooser to re-upload).")
-          return()
+          file_modal_errors <- c(file_modal_errors, "❌ PDF file has not been validated. Please either re-upload and validate your PDF file before submitting or remove it to submit your SR relationship without a PDF file.")
+        } else if (!isTRUE(pdf_cached$valid)) {
+          file_modal_errors <- c(file_modal_errors, paste("PDF validation failed:", pdf_cached$message))
         }
-        if (!isTRUE(pdf_cached$valid)) {
-          show_error_modal(session, "PDF Validation Failed", pdf_cached$message)
-          return()
-        }
+      }
+
+      if (length(file_modal_errors) > 0) {
+        show_error_modal(session, "Submission Not Sent: File Upload Errors", paste(file_modal_errors, collapse = "<br><br>"))
+        return()
       }
 
       # If files passed validation, copy them to a secure temp dir with sanitized names
       saved_files <- list()
       safe_name <- function(n) gsub("[^A-Za-z0-9_.-]", "_", n)
 
-      if (!is.null(input$sr_csv_file)) {
+      if (csv_active()) {
         src <- input$sr_csv_file$datapath
         dest <- file.path(tempdir(), paste0(format(Sys.time(), "%Y%m%d%H%M%S"), "_", safe_name(input$sr_csv_file$name)))
         tryCatch(
@@ -376,7 +437,7 @@ submit_relationship_server <- function(id) {
         )
       }
 
-      if (!is.null(input$supporting_pdf)) {
+      if (pdf_active()) {
         src <- input$supporting_pdf$datapath
         dest <- file.path(tempdir(), paste0(format(Sys.time(), "%Y%m%d%H%M%S"), "_", safe_name(input$supporting_pdf$name)))
         tryCatch(
@@ -472,7 +533,9 @@ submit_relationship_server <- function(id) {
       # Clear cached upload state and reset the form UI after successful submission
       uploaded_csv_data(NULL)
       uploaded_csv_validation(NULL)
+      csv_active(FALSE)
       uploaded_pdf_validation(NULL)
+      pdf_active(FALSE)
       output$csv_validation_status <- renderUI(NULL)
       output$pdf_validation_status <- renderUI(NULL)
       shinyjs::hide("remove_csv")
