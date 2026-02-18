@@ -350,7 +350,7 @@ submit_relationship_server <- function(id) {
       # Show success and store metadata or temp paths if needed.
       show_success_modal(session, "Submission Accepted", sprintf("Thank you %s — your submission titled '%s' was received.", input$name, input$title))
 
-      # Prepare to send notification email asynchronously using blastula
+      # Prepare to send notification email asynchronously
       smtp_host <- Sys.getenv("SMTP_HOST")
       smtp_port <- as.integer(Sys.getenv("SMTP_PORT"))
       smtp_user <- Sys.getenv("SMTP_USER")
@@ -403,7 +403,7 @@ submit_relationship_server <- function(id) {
             seed = TRUE
           ) %...>%
             (function(res) {
-              message(sprintf("[EMAIL SENT] Submission notification sent for '%s'", input$title))
+              message(sprintf("[EMAIL SENT] Submission notification sent"))
               invisible(NULL)
             }) %...!%
             (function(e) {
@@ -424,16 +424,13 @@ submit_relationship_server <- function(id) {
         message("[EMAIL SKIPPED] SMTP config missing; not sending submission email.")
       }
 
-      # Clear cached upload state and reset the form UI
-      try(
-        {
-          uploaded_csv_data(NULL)
-          uploaded_csv_validation(NULL)
-          uploaded_pdf_validation(NULL)
-          shinyjs::reset(ns("submit_relationship_form"))
-        },
-        silent = TRUE
-      )
+      # Clear cached upload state and reset the form UI after successful submission
+      uploaded_csv_data(NULL)
+      uploaded_csv_validation(NULL)
+      uploaded_pdf_validation(NULL)
+      output$csv_validation_status <- renderUI(NULL)
+      output$pdf_validation_status <- renderUI(NULL)
+      reset("submit_relationship_form")
 
       # Log minimal info (avoid logging raw file contents)
       message(sprintf(
