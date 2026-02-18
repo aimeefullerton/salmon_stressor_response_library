@@ -33,7 +33,8 @@ validate_pdf_upload <- function(file_input) {
   } else {
     sz <- file.info(fpath)$size
     if (!is.na(sz) && sz > MAX_PDF_SIZE_BYTES) {
-      issues <- c(issues, sprintf("PDF exceeds maximum allowed size (%d bytes)", MAX_PDF_SIZE_BYTES))
+      MAX_PDF_SIZE_MB <- MAX_PDF_SIZE_BYTES / 1e6
+      issues <- c(issues, sprintf("PDF exceeds maximum allowed size (%.0f MB)", MAX_PDF_SIZE_MB))
     }
   }
 

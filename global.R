@@ -1,11 +1,15 @@
 # nolint start
 
+# Load required packages
 library(shiny)
 library(DBI)
 library(markdown)
 library(RPostgres)
 library(pool)
 library(promises)
+
+# Raise Shiny's maxRequestSize to allow server-side processing of larger file uploads (e.g., PDFs)
+options(shiny.maxRequestSize = 10 * 1024^2) # 10 MB
 
 # Configure future plan for background async tasks (emails, etc.)
 if (requireNamespace("future", quietly = TRUE)) {

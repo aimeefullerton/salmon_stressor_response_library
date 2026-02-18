@@ -59,7 +59,7 @@ submit_relationship_ui <- function(id) {
           column(6, offset = 3, wellPanel(
             strong("Optional File Uploads"),
             div(id = ns("pdf_wrapper"), customFileInput(ns("supporting_pdf"), "Optional: PDF from which the relationship comes", accept = c(".pdf", "application/pdf"))),
-            # uiOutput(ns("pdf_validation_status")),
+            uiOutput(ns("pdf_validation_status")),
             div(id = ns("csv_wrapper"), customFileInput(ns("sr_csv_file"), "Optional: CSV data for relationship curve(s)", accept = ".csv")),
             uiOutput(ns("csv_validation_status")),
             tags$div(
@@ -101,9 +101,10 @@ submit_relationship_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    # Reactive values to store the uploaded CSV data and its validation result
+    # Reactive values to store the uploaded CSV and PDF data and their validation results
     uploaded_csv_data <- reactiveVal(NULL)
     uploaded_csv_validation <- reactiveVal(NULL)
+    uploaded_pdf_validation <- reactiveVal(NULL)
 
     # Handle CSV file upload and validation
     observeEvent(input$sr_csv_file, {
@@ -202,6 +203,54 @@ submit_relationship_server <- function(id) {
       }
     })
 
+    # Handle PDF file upload and validation (inline)
+    observeEvent(input$supporting_pdf, {
+      req(input$supporting_pdf)
+      file <- input$supporting_pdf
+
+      validation_result <- tryCatch(
+        validate_pdf_upload(file),
+        error = function(e) {
+          output$pdf_validation_status <- renderUI({
+            tags$div(class = "alert alert-danger", paste("PDF validation error:", conditionMessage(e)))
+          })
+          list(valid = FALSE, message = conditionMessage(e), issues = list(conditionMessage(e)))
+        }
+      )
+
+      if (isTRUE(validation_result$valid)) {
+        fpath <- file$datapath
+        file_size <- NA
+        if (!is.null(fpath) && file.exists(fpath)) {
+          file_size <- file.info(fpath)$size
+        }
+
+        details <- list(
+          sprintf("Filename: %s", file$name),
+          sprintf("Size (MB): %s", ifelse(is.na(file_size), "unknown", sprintf("%.3f", file_size / 1e6)))
+        )
+
+        uploaded_pdf_validation(validation_result)
+
+        output$pdf_validation_status <- renderUI({
+          HTML(create_alert_html(
+            type = "success",
+            message = "PDF is valid and ready to submit",
+            details = details
+          ))
+        })
+      } else {
+        uploaded_pdf_validation(NULL)
+        output$pdf_validation_status <- renderUI({
+          HTML(create_alert_html(
+            type = "error",
+            message = sprintf("PDF upload validation failed: %s", validation_result$message),
+            details = validation_result$issues
+          ))
+        })
+      }
+    })
+
     # Handle CSV template download
     output$download_csv_template <- downloadHandler(
       filename = function() {
@@ -250,11 +299,15 @@ submit_relationship_server <- function(id) {
         }
       }
 
-      # Validate PDF if provided
+      # Require that PDF (if provided) was validated on upload — reuse cached result
       if (!is.null(input$supporting_pdf)) {
-        pdf_check <- validate_pdf_upload(input$supporting_pdf)
-        if (!isTRUE(pdf_check$valid)) {
-          show_error_modal(session, "PDF Validation Failed", pdf_check$message)
+        pdf_cached <- uploaded_pdf_validation()
+        if (is.null(pdf_cached)) {
+          show_error_modal(session, "PDF Not Validated", "Please upload and validate your PDF file before submitting (use the file chooser to re-upload).")
+          return()
+        }
+        if (!isTRUE(pdf_cached$valid)) {
+          show_error_modal(session, "PDF Validation Failed", pdf_cached$message)
           return()
         }
       }
@@ -376,6 +429,7 @@ submit_relationship_server <- function(id) {
         {
           uploaded_csv_data(NULL)
           uploaded_csv_validation(NULL)
+          uploaded_pdf_validation(NULL)
           shinyjs::reset(ns("submit_relationship_form"))
         },
         silent = TRUE
