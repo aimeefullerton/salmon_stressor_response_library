@@ -459,12 +459,10 @@ submit_relationship_server <- function(id) {
       # Prepare to send notification email asynchronously
       smtp_host <- Sys.getenv("SMTP_HOST")
       smtp_port <- as.integer(Sys.getenv("SMTP_PORT"))
-      smtp_user <- Sys.getenv("SMTP_USER")
-      smtp_pass <- Sys.getenv("SMTP_PASS")
       smtp_from <- Sys.getenv("SMTP_FROM")
       admin_to <- Sys.getenv("ADMIN_EMAIL")
 
-      if (nzchar(smtp_host) && nzchar(smtp_user) && nzchar(smtp_pass) && nzchar(smtp_from) && nzchar(admin_to)) {
+      if (nzchar(smtp_host) && nzchar(smtp_from) && nzchar(admin_to)) {
         if (.email_support) {
           attachments <- character(0)
           if (!is.null(saved_files$csv)) attachments <- c(attachments, saved_files$csv)
@@ -498,7 +496,7 @@ submit_relationship_server <- function(id) {
             {
               tryCatch(
                 {
-                  smtp <- emayili::server(host = smtp_host, port = smtp_port, username = smtp_user, password = smtp_pass)
+                  smtp <- emayili::server(host = smtp_host, port = smtp_port, helo = "noaa.gov")
                   smtp(email_env)
                 },
                 error = function(e) {
