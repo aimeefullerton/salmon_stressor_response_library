@@ -107,13 +107,6 @@ render_article_ui <- function(main_id, data) {
       ))
     ),
 
-    # Images Section
-    div(
-      style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
-      actionLink("toggle_images", "Images ▼", class = "section-title"),
-      hidden(div(id = "images_section", style = "font-size:1.1em;", uiOutput("article_images")))
-    ),
-
     # CSV Data Table
     div(
       style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",

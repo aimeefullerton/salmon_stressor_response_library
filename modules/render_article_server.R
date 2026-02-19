@@ -39,7 +39,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
   # vector of all section div IDs
   all_ids <- c(
     "metadata_section", "description_section", "citations_section",
-    "images_section", "csv_section", "plot_section", "interactive_plot_section"
+    "csv_section", "plot_section", "interactive_plot_section"
   )
 
   # expand all
@@ -49,7 +49,6 @@ render_article_server <- function(input, output, session, paper_id, db) {
     toggle_metadata = "Article Metadata",
     toggle_description = "Description & Function Details",
     toggle_citations = "Citation(s)",
-    toggle_images = "Images",
     toggle_csv = "Stressor Response Data",
     toggle_plot = "Stressor Response Chart",
     toggle_interactive_plot = "Interactive Plot"
@@ -108,7 +107,6 @@ render_article_server <- function(input, output, session, paper_id, db) {
 
   paper$citations <- safe_fromJSON(paper$citations_citation_text)
   paper$citation_links <- safe_fromJSON(paper$citations_citation_links)
-  paper$images <- safe_fromJSON(paper$images)
 
   safe_get <- function(df, col) {
     if (col %in% names(df)) {
@@ -168,30 +166,6 @@ render_article_server <- function(input, output, session, paper_id, db) {
         tags$p("No citations available.")
       }
     )
-  })
-
-  # Render images
-  output$article_images <- renderUI({
-    # Log the raw images data for debugging
-    cat("\n image raw:\n")
-    print(paper$images)
-
-    image_url <- NULL
-
-    if (is.list(paper$images) && !is.null(paper$images$image_url)) {
-      image_url <- paper$images$image_url
-    } else if (is.character(paper$images) && nzchar(paper$images)) {
-      image_url <- paper$images
-    }
-
-    if (!is.null(image_url) && nzchar(image_url)) {
-      tags$figure(
-        tags$img(src = image_url, width = "60%", alt = "Article Image"),
-        tags$figcaption("Figure extracted from the database.")
-      )
-    } else {
-      tags$p("No images available.")
-    }
   })
 
   # ===========================================================
@@ -563,7 +537,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
   })
 
   # Interactive Plot with Multi-Curve Support
-  output$interactive_plot <- renderPlotly({    
+  output$interactive_plot <- renderPlotly({
     if (nrow(df) == 0) {
       return(plot_ly(type = "scatter", mode = "markers", height = 200) %>%
         layout(
