@@ -10,6 +10,7 @@ source("modules/about_us.R", local = TRUE)
 source("modules/acknowledgement.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
 source("modules/user_guide.R", local = TRUE)
+source("modules/submit_relationship.R", local = TRUE)
 
 # Static resource for team images
 addResourcePath("teamimg", "modules/images")
@@ -19,6 +20,9 @@ ui <- navbarPage(
   id = "main_navbar",
   title = "Salmon Stressor-Response eLibrary",
   selected = "dashboard",
+  # use Bootstrap 5 for better styling and responsiveness
+  # https://bootswatch.com/5/ for themes if desired
+  theme = bslib::bs_theme(version = 4), # can add a default bootstrap theme via bootswatch if desired, e.g., bootswatch = "flatly"
 
   # About Tab
   tabPanel(
@@ -230,28 +234,14 @@ ui <- navbarPage(
           });
         "))
       ),
-
-      # conditionalPanel(
-      #   condition = "window.location.search.includes('main_id')",
-      #   fluidRow(
-      #     column(8, offset = 2, uiOutput("article_content"))
-      #   )
-      # )
     )
   ),
 
-  # Upload Tab
+  # Submit a Relationship Tab
   tabPanel(
-    title = "Upload Data",
-    value = "upload_data",
-    upload_ui("upload")
-  ),
-
-  # Admin Tab
-  tabPanel(
-    title = "Admin",
-    value = "manage_categories",
-    uiOutput("categories_auth_ui")
+    title = "Submit a Relationship",
+    value = "submit_relationship",
+    submit_relationship_ui("submit_relationship")
   )
 )
 # nolint end

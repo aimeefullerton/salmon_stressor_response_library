@@ -3,6 +3,7 @@
 # Load required modules
 source("modules/csv_validation.R")
 source("modules/error_handling.R")
+source("modules/csv_template.R")
 
 # Compact Upload UI (Updated + Centered & Spacing Reduced)
 upload_ui <- function(id) {
@@ -335,7 +336,7 @@ upload_server <- function(id, db_conn = pool) {
         # Store column order explicitly to preserve it during retrieval
         csv_data_with_schema <- list(
           columns = names(df_csv), # Preserve column order from csv
-          data = df_csv            # Actual data as array of objects (rows)
+          data = df_csv # Actual data as array of objects (rows)
         )
 
         # Convert to JSON to preserve NA as null
@@ -726,22 +727,7 @@ upload_server <- function(id, db_conn = pool) {
         paste0("SRF_template_", Sys.Date(), ".csv")
       },
       content = function(file) {
-        # Create template matching the exact required schema
-        template_data <- data.frame(
-          curve.id = rep("c1", 5),
-          stressor.label = rep("temperature", 5),
-          stressor.x = c(10, 15, 20, 25, 30),
-          units.x = rep("degC", 5),
-          response.label = rep("survival", 5),
-          response.y = c(0.95, 0.85, 0.70, 0.50, 0.30),
-          units.y = rep("proportion", 5),
-          stressor.value = rep("constant", 5),
-          lower.limit = c(0.90, 0.80, 0.65, 0.45, 0.25),
-          upper.limit = c(1.00, 0.90, 0.75, 0.55, 0.35),
-          sd = c(0.05, 0.05, 0.05, 0.05, 0.05)
-        )
-
-        write.csv(template_data, file, row.names = FALSE)
+        write_csv_template(file)
       }
     )
   })

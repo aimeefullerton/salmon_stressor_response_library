@@ -3,8 +3,8 @@
 # Load required modules
 source("modules/csv_validation.R", local = TRUE)
 source("modules/error_handling.R", local = TRUE)
-source("modules/about_us.R", local = TRUE) # Restored
-source("modules/acknowledgement.R", local = TRUE) # Restored
+source("modules/about_us.R", local = TRUE)
+source("modules/acknowledgement.R", local = TRUE)
 source("modules/filters.R", local = TRUE)
 source("modules/pagination.R", local = TRUE)
 source("modules/render_papers.R", local = TRUE)
@@ -15,9 +15,9 @@ source("modules/render_article_ui.R", local = TRUE)
 source("modules/render_article_server.R", local = TRUE)
 source("modules/downloads.R", local = TRUE)
 source("modules/upload.R", local = TRUE)
-source("modules/admin_auth.R", local = TRUE)
 source("modules/manage_categories.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
+source("modules/submit_relationship.R", local = TRUE)
 
 server <- function(input, output, session) {
   observeEvent(input$main_navbar,
@@ -56,57 +56,6 @@ server <- function(input, output, session) {
       }
     )
   }
-
-  # Launch admin authentication
-  # admin_ok <- adminAuthServer("auth", correct_pw = "secret123")
-
-  # output$categories_auth_ui <- renderUI({
-  #   if (!admin_ok()) {
-  #     adminAuthUI("auth")
-  #   } else {
-  #     tagList(
-  #       actionButton("logout_admin", "Logout", class = "btn btn-danger mb-3"),
-  #       manageCategoriesUI("manage_categories")
-  #     )
-  #   }
-  # })
-
-  # observeEvent(admin_ok(), {
-  #   if (admin_ok()) {
-  #     manageCategoriesServer("manage_categories", db)
-  #   }
-  # })
-
-  # Global logout tracker
-  admin_logged_in <- reactiveVal(FALSE)
-
-  # Pass in a function that toggles this
-  admin_ok <- adminAuthServer("auth", correct_pw = "secret123", updateStatus = admin_logged_in)
-
-  output$categories_auth_ui <- renderUI({
-    if (!admin_logged_in()) {
-      adminAuthUI("auth")
-    } else {
-      tagList(
-        div(
-          style = "display: flex; justify-content: flex-end; margin-bottom: 10px;",
-          actionButton("logout_admin", "Logout", class = "btn btn-danger")
-        ),
-        manageCategoriesUI("manage_categories")
-      )
-    }
-  })
-
-  observeEvent(admin_logged_in(), {
-    if (admin_logged_in()) {
-      manageCategoriesServer("manage_categories", db)
-    }
-  })
-
-  # Handle logout
-  observeEvent(input$logout_admin, {
-    admin_logged_in(FALSE)
-  })
 
   # Connect to database, using the pool from global.R
   db <- pool
@@ -167,7 +116,7 @@ server <- function(input, output, session) {
   toggle_filters_server(input, session)
   reset_filters_server(input, session)
 
-  upload_server("upload")
+  submit_relationship_server("submit_relationship")
 
   edaServer("eda")
 
@@ -277,12 +226,6 @@ server <- function(input, output, session) {
   })
   observeEvent(input$next_page, {
     updateNumericInput(session, "page", value = input$page + 1)
-  })
-
-  # only close connection pool when app is shut down
-  onStop(function() {
-    poolClose(pool)
-    cat("db connection pool closed.\n")
   })
 }
 
