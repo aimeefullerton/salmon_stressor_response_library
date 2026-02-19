@@ -19,12 +19,6 @@ update_filters_server <- function(input, output, session, data, db) {
       table = "stressor_responses",
       regex = FALSE
     ),
-    geography = list(
-      input_id = "geography",
-      column = "geography",
-      table = "stressor_responses",
-      regex = FALSE
-    ),
     life_stage = list(
       input_id = "life_stage",
       column = "life_stages",

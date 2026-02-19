@@ -102,7 +102,7 @@ ui <- navbarPage(
               choices = list(), multiple = TRUE,
               options = list("actions-box" = TRUE, "live-search" = TRUE)
             )),
-            column(3, pickerInput("geography", "Geography (Region)",
+            column(3, pickerInput("broad_stressor_name", "Broad Stressor Name",
               choices = list(), multiple = TRUE,
               options = list("actions-box" = TRUE, "live-search" = TRUE)
             ))
@@ -145,10 +145,6 @@ ui <- navbarPage(
           ),
           fluidRow(
             column(3, pickerInput("location_river_creek", "River / Creek",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("broad_stressor_name", "Broad Stressor Name",
               choices = list(), multiple = TRUE,
               options = list("actions-box" = TRUE, "live-search" = TRUE)
             ))

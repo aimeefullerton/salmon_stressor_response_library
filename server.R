@@ -32,7 +32,6 @@ server <- function(input, output, session) {
     updatePickerInput(session, "stressor", choices = getCategoryChoices("stressor_name"))
     updatePickerInput(session, "stressor_metric", choices = getCategoryChoices("specific_stressor_metric"))
     updatePickerInput(session, "species", choices = getCategoryChoices("species_common_name"))
-    updatePickerInput(session, "geography", choices = getCategoryChoices("geography"))
     updatePickerInput(session, "life_stage", choices = getCategoryChoices("life_stages"))
     updatePickerInput(session, "activity", choices = getCategoryChoices("activity"))
     updatePickerInput(session, "genus_latin", choices = getCategoryChoices("genus_latin"))
@@ -82,9 +81,6 @@ server <- function(input, output, session) {
     if (!is.null(input$species) && length(input$species) > 0) {
       df <- df[df$species_common_name %in% input$species, ]
     }
-    if (!is.null(input$geography) && length(input$geography) > 0) {
-      df <- df[df$geography %in% input$geography, ]
-    }
     if (!is.null(input$life_stage) && length(input$life_stage) > 0) {
       df <- df[Reduce(`|`, lapply(input$life_stage, function(stage) {
         grepl(stage, df$life_stages, ignore.case = TRUE)
@@ -124,31 +120,6 @@ server <- function(input, output, session) {
   # Download handler setup
   setup_download_csv(output, paginated_data, db, input, session)
 
-  # Article display logic
-  # observe({
-  #   query <- parseQueryString(session$clientData$url_search)
-  #   if (!is.null(query$main_id)) {
-  #     main_id <- as.numeric(query$main_id)
-  #     if (!is.na(main_id)) {
-  #       tryCatch(
-  #         {
-  #           render_article_ui(output, session)
-  #           render_article_server(input, output, session, main_id, db)
-  #         },
-  #         error = function(e) {
-  #           output$article_content <- renderUI({
-  #             tags$p(paste("Error rendering article:", e$message), style = "color: red; font-weight: bold;")
-  #           })
-  #           print(e)
-  #         }
-  #       )
-  #     } else {
-  #       output$article_content <- renderUI(
-  #         tags$p("Article not found.", style = "color: red; font-weight: bold;")
-  #       )
-  #     }
-  #   }
-  # })
   observe({
     ids <- paginated_data()$main_id
     lapply(ids, function(mid) {

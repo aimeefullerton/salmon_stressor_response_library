@@ -6,7 +6,6 @@ reset_filters_server <- function(input, session) {
     updateSelectInput(session, "stressor", selected = "All")
     updateSelectInput(session, "stressor_metric", selected = "All")
     updateSelectInput(session, "species", selected = "All")
-    updateSelectInput(session, "geography", selected = "All")
     updateSelectInput(session, "life_stage", selected = "All")
     updateSelectInput(session, "activity", selected = "All")
     updateSelectInput(session, "genus_latin", selected = "All")
