@@ -15,7 +15,6 @@ source("modules/render_article_ui.R", local = TRUE)
 source("modules/render_article_server.R", local = TRUE)
 source("modules/downloads.R", local = TRUE)
 source("modules/upload.R", local = TRUE)
-source("modules/manage_categories.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
 source("modules/submit_relationship.R", local = TRUE)
 
@@ -30,26 +29,26 @@ server <- function(input, output, session) {
   )
 
   updateFilterDropdowns <- function() {
-    updatePickerInput(session, "stressor", choices = getCategoryChoices("stressor_names"))
-    updatePickerInput(session, "stressor_metric", choices = getCategoryChoices("stressor_metrics"))
-    updatePickerInput(session, "species", choices = getCategoryChoices("species_common_names"))
-    updatePickerInput(session, "geography", choices = getCategoryChoices("geographies"))
+    updatePickerInput(session, "stressor", choices = getCategoryChoices("stressor_name"))
+    updatePickerInput(session, "stressor_metric", choices = getCategoryChoices("specific_stressor_metric"))
+    updatePickerInput(session, "species", choices = getCategoryChoices("species_common_name"))
+    updatePickerInput(session, "geography", choices = getCategoryChoices("geography"))
     updatePickerInput(session, "life_stage", choices = getCategoryChoices("life_stages"))
-    updatePickerInput(session, "activity", choices = getCategoryChoices("activities"))
-    updatePickerInput(session, "genus_latin", choices = getCategoryChoices("genus_latins"))
-    updatePickerInput(session, "species_latin", choices = getCategoryChoices("species_latins"))
-    updatePickerInput(session, "research_article_type", choices = getCategoryChoices("research_article_types"))
-    updatePickerInput(session, "location_country", choices = getCategoryChoices("location_countries"))
-    updatePickerInput(session, "location_state_province", choices = getCategoryChoices("location_state_provinces"))
-    updatePickerInput(session, "location_watershed_lab", choices = getCategoryChoices("location_watershed_labs"))
-    updatePickerInput(session, "location_river_creek", choices = getCategoryChoices("location_river_creeks"))
-    updatePickerInput(session, "broad_stressor_name", choices = getCategoryChoices("broad_stressor_names"))
+    updatePickerInput(session, "activity", choices = getCategoryChoices("activity"))
+    updatePickerInput(session, "genus_latin", choices = getCategoryChoices("genus_latin"))
+    updatePickerInput(session, "species_latin", choices = getCategoryChoices("species_latin"))
+    updatePickerInput(session, "research_article_type", choices = getCategoryChoices("research_article_type"))
+    updatePickerInput(session, "location_country", choices = getCategoryChoices("location_country"))
+    updatePickerInput(session, "location_state_province", choices = getCategoryChoices("location_state_province"))
+    updatePickerInput(session, "location_watershed_lab", choices = getCategoryChoices("location_watershed_lab"))
+    updatePickerInput(session, "location_river_creek", choices = getCategoryChoices("location_river_creek"))
+    updatePickerInput(session, "broad_stressor_name", choices = getCategoryChoices("broad_stressor_name"))
   }
 
-  getCategoryChoices <- function(table_name) {
+  getCategoryChoices <- function(column_name) {
     tryCatch(
       {
-        dbGetQuery(db, sprintf("SELECT name FROM %s ORDER BY name", table_name))$name
+        dbGetQuery(db, sprintf("SELECT DISTINCT %s FROM stressor_responses ORDER BY %s", column_name, column_name))[[column_name]]
       },
       error = function(e) {
         character(0)

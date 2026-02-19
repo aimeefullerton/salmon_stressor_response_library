@@ -93,8 +93,6 @@ if (table_exists) {
       activities <- sort(unique(na.omit(data$activity)))
       genus_latin <- sort(unique(na.omit(data$genus_latin)))
       species_latin <- sort(unique(na.omit(data$species_latin)))
-
-      # Extract unique values for new metadata filters
       research_article_types <- sort(unique(na.omit(data$research_article_type)))
       location_countries <- sort(unique(na.omit(data$location_country)))
       location_states_provinces <- sort(unique(na.omit(data$location_state_province)))

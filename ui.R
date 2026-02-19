@@ -5,7 +5,6 @@ library(shinyWidgets)
 
 # Source all necessary modules
 source("modules/upload.R", local = TRUE)
-source("modules/manage_categories.R", local = TRUE)
 source("modules/about_us.R", local = TRUE)
 source("modules/acknowledgement.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
