@@ -73,8 +73,8 @@ render_article_ui <- function(article_id, data) {
             column(8, textOutput("stressor_units"))
           ),
           fluidRow(
-            column(4, strong("Vital Rate (Process):")),
-            column(8, textOutput("vital_rate"))
+            column(4, strong("Response:")),
+            column(8, textOutput("response"))
           ),
           fluidRow(
             column(4, strong("Life Stage:")),

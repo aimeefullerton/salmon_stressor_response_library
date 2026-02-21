@@ -130,7 +130,7 @@ upload_ui <- function(id) {
 
       # Vital Rate Tab
       fluidRow(
-        column(3, offset = 3, textInput(ns("vital_rate"), "Vital Rate (Process)", placeholder = "Enter vital rate details")),
+        column(3, offset = 3, textInput(ns("response"), "Response", placeholder = "Enter vital rate details")),
         column(3, textInput(ns("season"), "Season", placeholder = "Describe seasonal timing"))
       ),
       fluidRow(
@@ -383,7 +383,7 @@ upload_server <- function(id, db_conn = pool) {
               location_state_province, location_watershed_lab, location_river_creek,
               broad_stressor_name, overview, function_derivation,
               transferability_of_function, source_of_stressor_data1,
-              vital_rate, season, activity_details, stressor_magnitude, poe_chain,
+              response, season, activity_details, stressor_magnitude, poe_chain,
               covariates_dependencies, citation_text, citation_links,
               citation_link, revision_log, csv_data_json
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31::jsonb)",
@@ -408,7 +408,7 @@ upload_server <- function(id, db_conn = pool) {
               input$function_derivation,
               input$transferability_of_function,
               input$source_of_stressor_data1,
-              input$vital_rate,
+              input$response,
               input$season,
               input$activity_details,
               input$stressor_magnitude,
@@ -452,7 +452,7 @@ upload_server <- function(id, db_conn = pool) {
 
           # Clear text inputs and textareas
           text_inputs <- c(
-            "title", "stressor_units", "vital_rate", "season",
+            "title", "stressor_units", "response", "season",
             "activity_details", "stressor_magnitude", "poe_chain",
             "key_covariates", "citation_url", "citation_link_text"
           )
@@ -690,7 +690,7 @@ upload_server <- function(id, db_conn = pool) {
         input$source_of_stressor_data1
       })
       output$preview_vital <- renderText({
-        input$vital_rate
+        input$response
       })
       output$preview_season <- renderText({
         input$season
