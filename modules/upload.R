@@ -118,7 +118,7 @@ upload_ui <- function(id) {
         ))
       ),
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("description_transferability_of_function"), "Transferability of Function",
+        column(6, offset = 3, textAreaInput(ns("transferability_of_function"), "Transferability of Function",
           placeholder = "Describe notes regarding the transferability of the function to other species and systems.", height = "200px", width = "800px"
         ))
       ),
@@ -382,7 +382,7 @@ upload_server <- function(id, db_conn = pool) {
               life_stages, activity, research_article_type, location_country,
               location_state_province, location_watershed_lab, location_river_creek,
               broad_stressor_name, overview, function_derivation,
-              description_transferability_of_function, description_source_of_stressor_data1,
+              transferability_of_function, description_source_of_stressor_data1,
               vital_rate, season, activity_details, stressor_magnitude, poe_chain,
               covariates_dependencies, citations_citation_text, citations_citation_links,
               citation_link, revision_log, csv_data_json
@@ -406,7 +406,7 @@ upload_server <- function(id, db_conn = pool) {
               paste(input$broad_stressor_name, collapse = ", "),
               input$overview,
               input$function_derivation,
-              input$description_transferability_of_function,
+              input$transferability_of_function,
               input$description_source_of_stressor_data1,
               input$vital_rate,
               input$season,
@@ -467,7 +467,7 @@ upload_server <- function(id, db_conn = pool) {
 
           textarea_inputs <- c(
             "overview", "function_derivation",
-            "description_transferability_of_function",
+            "transferability_of_function",
             "description_source_of_stressor_data1", "citation_text",
             "revision_log"
           )
@@ -684,7 +684,7 @@ upload_server <- function(id, db_conn = pool) {
         input$function_derivation
       })
       output$preview_transferability <- renderText({
-        input$description_transferability_of_function
+        input$transferability_of_function
       })
       output$preview_datasource <- renderText({
         input$description_source_of_stressor_data1
