@@ -126,7 +126,7 @@ ui <- navbarPage(
             ))
           ),
           fluidRow(
-            column(3, pickerInput("research_article_type", "Research Article Type",
+            column(3, pickerInput("article_type", "Article Type",
               choices = list(), multiple = TRUE,
               options = list("actions-box" = TRUE, "live-search" = TRUE)
             )),

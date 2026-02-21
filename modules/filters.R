@@ -36,8 +36,8 @@ filter_data_server <- function(input, data, session) {
       data_filtered <- data_filtered[data_filtered$species_latin %in% input$species_latin, ]
     }
 
-    if (!is.null(input$research_article_type) && length(input$research_article_type) > 0) {
-      data_filtered <- data_filtered[data_filtered$research_article_type %in% input$research_article_type, ]
+    if (!is.null(input$article_type) && length(input$article_type) > 0) {
+      data_filtered <- data_filtered[data_filtered$article_type %in% input$article_type, ]
     }
     if (!is.null(input$location_country) && length(input$location_country) > 0) {
       data_filtered <- data_filtered[data_filtered$location_country %in% input$location_country, ]

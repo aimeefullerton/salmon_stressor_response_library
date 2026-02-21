@@ -36,7 +36,7 @@ server <- function(input, output, session) {
     updatePickerInput(session, "activity", choices = getCategoryChoices("activity"))
     updatePickerInput(session, "genus_latin", choices = getCategoryChoices("genus_latin"))
     updatePickerInput(session, "species_latin", choices = getCategoryChoices("species_latin"))
-    updatePickerInput(session, "research_article_type", choices = getCategoryChoices("research_article_type"))
+    updatePickerInput(session, "article_type", choices = getCategoryChoices("article_type"))
     updatePickerInput(session, "location_country", choices = getCategoryChoices("location_country"))
     updatePickerInput(session, "location_state_province", choices = getCategoryChoices("location_state_province"))
     updatePickerInput(session, "location_watershed_lab", choices = getCategoryChoices("location_watershed_lab"))

@@ -59,7 +59,7 @@ render_papers_server <- function(output, paginated_data, input, session) {
               class = "paper-meta-row",
               HTML(format_field("Common Name", paper$species_common_name, TRUE)),
               HTML(format_field("Life Stage", paper$life_stages, TRUE)),
-              HTML(format_field("Type", paper$research_article_type, TRUE)),
+              HTML(format_field("Type", paper$article_type, TRUE)),
               HTML(format_field("Activity", paper$activity, TRUE))
             ),
             div(

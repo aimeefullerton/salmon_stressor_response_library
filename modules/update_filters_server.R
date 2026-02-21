@@ -43,9 +43,9 @@ update_filters_server <- function(input, output, session, data, db) {
       table = "stressor_responses",
       regex = FALSE
     ),
-    research_article_type = list(
-      input_id = "research_article_type",
-      column = "research_article_type",
+    article_type = list(
+      input_id = "article_type",
+      column = "article_type",
       table = "stressor_responses",
       regex = FALSE
     ),

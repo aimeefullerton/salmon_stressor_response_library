@@ -94,7 +94,7 @@ upload_ui <- function(id) {
 
       # New Metadata Fields
       fluidRow(
-        column(3, offset = 3, pickerInput(ns("research_article_type"), "Research Article Type", NULL, multiple = TRUE, options = picker_opts)),
+        column(3, offset = 3, pickerInput(ns("article_type"), "Research Article Type", NULL, multiple = TRUE, options = picker_opts)),
         column(3, pickerInput(ns("location_country"), "Country", NULL, multiple = TRUE, options = picker_opts))
       ),
       fluidRow(
@@ -187,7 +187,7 @@ upload_server <- function(id, db_conn = pool) {
       "geography" = "geographies",
       "life_stage" = "life_stages",
       "activity" = "activities",
-      "research_article_type" = "research_article_types",
+      "article_type" = "article_types",
       "location_country" = "location_countries",
       "location_state_province" = "location_states_provinces",
       "location_watershed_lab" = "location_watersheds_labs",
@@ -379,7 +379,7 @@ upload_server <- function(id, db_conn = pool) {
             "INSERT INTO stressor_responses (
               title, stressor_name, specific_stressor_metric, stressor_units,
               species_common_name, genus_latin, species_latin, geography,
-              life_stages, activity, research_article_type, location_country,
+              life_stages, activity, article_type, location_country,
               location_state_province, location_watershed_lab, location_river_creek,
               broad_stressor_name, overview, function_derivation,
               transferability_of_function, source_of_stressor_data1,
@@ -398,7 +398,7 @@ upload_server <- function(id, db_conn = pool) {
               paste(input$geography, collapse = ", "),
               paste(input$life_stage, collapse = ", "),
               paste(input$activity, collapse = ", "),
-              paste(input$research_article_type, collapse = ", "),
+              paste(input$article_type, collapse = ", "),
               paste(input$location_country, collapse = ", "),
               paste(input$location_state_province, collapse = ", "),
               paste(input$location_watershed_lab, collapse = ", "),
@@ -660,7 +660,7 @@ upload_server <- function(id, db_conn = pool) {
         paste(input$activity, collapse = ", ")
       })
       output$preview_article <- renderText({
-        paste(input$research_article_type, collapse = ", ")
+        paste(input$article_type, collapse = ", ")
       })
       output$preview_country <- renderText({
         paste(input$location_country, collapse = ", ")
