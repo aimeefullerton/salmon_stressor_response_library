@@ -108,7 +108,7 @@ upload_ui <- function(id) {
 
       # Description Fields
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("description_overview"), "Detailed SR Function Description",
+        column(6, offset = 3, textAreaInput(ns("overview"), "Detailed SR Function Description",
           placeholder = "Describe importance and why it is being included. Include key pieces of information, such as the original source formula, function derivation, pathways of effect etc.", height = "200px", width = "800px"
         ))
       ),
@@ -381,7 +381,7 @@ upload_server <- function(id, db_conn = pool) {
               species_common_name, genus_latin, species_latin, geography,
               life_stages, activity, research_article_type, location_country,
               location_state_province, location_watershed_lab, location_river_creek,
-              broad_stressor_name, description_overview, description_function_derivation,
+              broad_stressor_name, overview, description_function_derivation,
               description_transferability_of_function, description_source_of_stressor_data1,
               vital_rate, season, activity_details, stressor_magnitude, poe_chain,
               covariates_dependencies, citations_citation_text, citations_citation_links,
@@ -404,7 +404,7 @@ upload_server <- function(id, db_conn = pool) {
               paste(input$location_watershed_lab, collapse = ", "),
               paste(input$location_river_creek, collapse = ", "),
               paste(input$broad_stressor_name, collapse = ", "),
-              input$description_overview,
+              input$overview,
               input$description_function_derivation,
               input$description_transferability_of_function,
               input$description_source_of_stressor_data1,
@@ -466,7 +466,7 @@ upload_server <- function(id, db_conn = pool) {
           }
 
           textarea_inputs <- c(
-            "description_overview", "description_function_derivation",
+            "overview", "description_function_derivation",
             "description_transferability_of_function",
             "description_source_of_stressor_data1", "citation_text",
             "revision_log"
@@ -678,7 +678,7 @@ upload_server <- function(id, db_conn = pool) {
         paste(input$broad_stressor_name, collapse = ", ")
       })
       output$preview_overview <- renderText({
-        input$description_overview
+        input$overview
       })
       output$preview_derivation <- renderText({
         input$description_function_derivation

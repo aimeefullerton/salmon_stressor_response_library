@@ -91,7 +91,7 @@ render_article_ui <- function(article_id, data) {
       hidden(div(
         id = "description_section",
         style = "font-size:1.1em;",
-        strong("Detailed SR Function Description"), br(), textOutput("description_overview"), br(), br(),
+        strong("Detailed SR Function Description"), br(), textOutput("overview"), br(), br(),
         strong("Function Derivation"), br(), textOutput("function_derivation")
       ))
     ),
