@@ -384,7 +384,7 @@ upload_server <- function(id, db_conn = pool) {
               broad_stressor_name, overview, function_derivation,
               transferability_of_function, source_of_stressor_data1,
               vital_rate, season, activity_details, stressor_magnitude, poe_chain,
-              covariates_dependencies, citation_text, citations_citation_links,
+              covariates_dependencies, citation_text, citation_links,
               citation_link, revision_log, csv_data_json
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31::jsonb)",
             params = list(

@@ -106,7 +106,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
   }
 
   paper$citations <- safe_fromJSON(paper$citation_text)
-  paper$citation_links <- safe_fromJSON(paper$citations_citation_links)
+  paper$citation_links <- safe_fromJSON(paper$citation_links)
 
   safe_get <- function(df, col) {
     if (col %in% names(df)) {
@@ -141,7 +141,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
     } else {
       citation_texts <- NULL
     }
-    citation_links_raw <- safe_get(paper, "citations_citation_links")
+    citation_links_raw <- safe_get(paper, "citation_links")
     citation_links <- safe_fromJSON(citation_links_raw)
     if (!is.list(citation_links) || length(citation_links) == 0) {
       citation_links <- vector("list", length(citation_texts))
