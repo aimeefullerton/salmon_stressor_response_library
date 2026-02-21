@@ -113,7 +113,7 @@ upload_ui <- function(id) {
         ))
       ),
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("description_function_derivation"), "Function Derivation",
+        column(6, offset = 3, textAreaInput(ns("function_derivation"), "Function Derivation",
           placeholder = "Describe the source of the function (e.g., expert opinion, mechanistic or theory based, correlative model etc.)", height = "200px", width = "800px"
         ))
       ),
@@ -381,7 +381,7 @@ upload_server <- function(id, db_conn = pool) {
               species_common_name, genus_latin, species_latin, geography,
               life_stages, activity, research_article_type, location_country,
               location_state_province, location_watershed_lab, location_river_creek,
-              broad_stressor_name, overview, description_function_derivation,
+              broad_stressor_name, overview, function_derivation,
               description_transferability_of_function, description_source_of_stressor_data1,
               vital_rate, season, activity_details, stressor_magnitude, poe_chain,
               covariates_dependencies, citations_citation_text, citations_citation_links,
@@ -405,7 +405,7 @@ upload_server <- function(id, db_conn = pool) {
               paste(input$location_river_creek, collapse = ", "),
               paste(input$broad_stressor_name, collapse = ", "),
               input$overview,
-              input$description_function_derivation,
+              input$function_derivation,
               input$description_transferability_of_function,
               input$description_source_of_stressor_data1,
               input$vital_rate,
@@ -466,7 +466,7 @@ upload_server <- function(id, db_conn = pool) {
           }
 
           textarea_inputs <- c(
-            "overview", "description_function_derivation",
+            "overview", "function_derivation",
             "description_transferability_of_function",
             "description_source_of_stressor_data1", "citation_text",
             "revision_log"
@@ -681,7 +681,7 @@ upload_server <- function(id, db_conn = pool) {
         input$overview
       })
       output$preview_derivation <- renderText({
-        input$description_function_derivation
+        input$function_derivation
       })
       output$preview_transferability <- renderText({
         input$description_transferability_of_function

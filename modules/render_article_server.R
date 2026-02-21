@@ -131,7 +131,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
   output$stressor_units <- renderText(safe_get(paper, "stressor_units"))
   output$life_stage <- renderText(safe_get(paper, "life_stages"))
   output$overview <- renderText(safe_get(paper, "overview"))
-  output$function_derivation <- renderText(safe_get(paper, "description_function_derivation"))
+  output$function_derivation <- renderText(safe_get(paper, "function_derivation"))
 
   # Render citations
   output$citations <- renderUI({
