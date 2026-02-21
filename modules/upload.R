@@ -123,7 +123,7 @@ upload_ui <- function(id) {
         ))
       ),
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("description_source_of_stressor_data1"), "Source of Stressor Data",
+        column(6, offset = 3, textAreaInput(ns("source_of_stressor_data1"), "Source of Stressor Data",
           placeholder = "Describe the source of stressor data needed to apply the function", height = "200px", width = "800px"
         ))
       ),
@@ -382,7 +382,7 @@ upload_server <- function(id, db_conn = pool) {
               life_stages, activity, research_article_type, location_country,
               location_state_province, location_watershed_lab, location_river_creek,
               broad_stressor_name, overview, function_derivation,
-              transferability_of_function, description_source_of_stressor_data1,
+              transferability_of_function, source_of_stressor_data1,
               vital_rate, season, activity_details, stressor_magnitude, poe_chain,
               covariates_dependencies, citations_citation_text, citations_citation_links,
               citation_link, revision_log, csv_data_json
@@ -407,7 +407,7 @@ upload_server <- function(id, db_conn = pool) {
               input$overview,
               input$function_derivation,
               input$transferability_of_function,
-              input$description_source_of_stressor_data1,
+              input$source_of_stressor_data1,
               input$vital_rate,
               input$season,
               input$activity_details,
@@ -468,7 +468,7 @@ upload_server <- function(id, db_conn = pool) {
           textarea_inputs <- c(
             "overview", "function_derivation",
             "transferability_of_function",
-            "description_source_of_stressor_data1", "citation_text",
+            "source_of_stressor_data1", "citation_text",
             "revision_log"
           )
           for (tid in textarea_inputs) {
@@ -687,7 +687,7 @@ upload_server <- function(id, db_conn = pool) {
         input$transferability_of_function
       })
       output$preview_datasource <- renderText({
-        input$description_source_of_stressor_data1
+        input$source_of_stressor_data1
       })
       output$preview_vital <- renderText({
         input$vital_rate
