@@ -105,7 +105,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
     parsed
   }
 
-  paper$citations <- safe_fromJSON(paper$citations_citation_text)
+  paper$citations <- safe_fromJSON(paper$citation_text)
   paper$citation_links <- safe_fromJSON(paper$citations_citation_links)
 
   safe_get <- function(df, col) {
@@ -135,7 +135,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
 
   # Render citations
   output$citations <- renderUI({
-    citation_texts <- safe_get(paper, "citations_citation_text")
+    citation_texts <- safe_get(paper, "citation_text")
     if (!is.null(citation_texts) && is.character(citation_texts) && nzchar(citation_texts)) {
       citation_texts <- unlist(strsplit(citation_texts, "\\\r\\\n\\\r\\\n"))
     } else {
