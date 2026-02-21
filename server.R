@@ -121,7 +121,7 @@ server <- function(input, output, session) {
   setup_download_csv(output, paginated_data, db, input, session)
 
   observe({
-    ids <- paginated_data()$main_id
+    ids <- paginated_data()$article_id
     lapply(ids, function(mid) {
       observeEvent(input[[paste0("view_article_", mid)]],
         {

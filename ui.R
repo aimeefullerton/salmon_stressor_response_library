@@ -76,7 +76,7 @@ ui <- navbarPage(
     fluidPage(
       useShinyjs(),
       conditionalPanel(
-        condition = "!window.location.search.includes('main_id')",
+        condition = "!window.location.search.includes('article_id')",
         fluidRow(
           column(8, textInput("search", "Search All Text", placeholder = "Type keywords...")),
           column(4, actionButton("toggle_filters", "Show Filters", icon = icon("filter")))

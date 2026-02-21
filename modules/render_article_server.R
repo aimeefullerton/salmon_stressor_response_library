@@ -16,7 +16,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
 
   # Fetch article data from db
   paper <- dbGetQuery(db,
-    "SELECT * FROM stressor_responses WHERE main_id = $1",
+    "SELECT * FROM stressor_responses WHERE article_id = $1",
     params = list(paper_id)
   )
 

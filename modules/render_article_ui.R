@@ -3,19 +3,19 @@
 library(shinyjs)
 library(dygraphs)
 
-render_article_ui <- function(main_id, data) {
+render_article_ui <- function(article_id, data) {
   # Find the article row
-  article <- data[data$main_id == main_id, ]
+  article <- data[data$article_id == article_id, ]
   if (nrow(article) == 0) {
     return(tags$p("Article not found."))
   }
 
   # Unique IDs for this article
-  meta_id <- paste0("metadata_section_", main_id)
-  desc_id <- paste0("description_section_", main_id)
-  cite_id <- paste0("citations_section_", main_id)
-  expand_id <- paste0("expand_all_", main_id)
-  collapse_id <- paste0("collapse_all_", main_id)
+  meta_id <- paste0("metadata_section_", article_id)
+  desc_id <- paste0("description_section_", article_id)
+  cite_id <- paste0("citations_section_", article_id)
+  expand_id <- paste0("expand_all_", article_id)
+  collapse_id <- paste0("collapse_all_", article_id)
 
   tagList(
     # ===== Article title =====
