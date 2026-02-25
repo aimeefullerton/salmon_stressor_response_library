@@ -1,6 +1,5 @@
 # nolint start
 
-# Load required modules
 source("modules/csv_validation.R", local = TRUE)
 source("modules/error_handling.R", local = TRUE)
 source("modules/about_us.R", local = TRUE)
@@ -19,183 +18,162 @@ source("modules/eda.R", local = TRUE)
 source("modules/submit_relationship.R", local = TRUE)
 
 server <- function(input, output, session) {
-  observeEvent(input$main_navbar,
-    {
-      if (input$main_navbar == "dashboard") {
-        updateFilterDropdowns()
-      }
-    },
-    ignoreInit = TRUE
-  )
-
-  updateFilterDropdowns <- function() {
-    updatePickerInput(session, "stressor", choices = getCategoryChoices("stressor_name"))
-    updatePickerInput(session, "stressor_metric", choices = getCategoryChoices("specific_stressor_metric"))
-    updatePickerInput(session, "species", choices = getCategoryChoices("species_common_name"))
-    updatePickerInput(session, "life_stage", choices = getCategoryChoices("life_stages"))
-    updatePickerInput(session, "activity", choices = getCategoryChoices("activity"))
-    updatePickerInput(session, "genus_latin", choices = getCategoryChoices("genus_latin"))
-    updatePickerInput(session, "species_latin", choices = getCategoryChoices("species_latin"))
-    updatePickerInput(session, "article_type", choices = getCategoryChoices("article_type"))
-    updatePickerInput(session, "location_country", choices = getCategoryChoices("location_country"))
-    updatePickerInput(session, "location_state_province", choices = getCategoryChoices("location_state_province"))
-    updatePickerInput(session, "location_watershed_lab", choices = getCategoryChoices("location_watershed_lab"))
-    updatePickerInput(session, "location_river_creek", choices = getCategoryChoices("location_river_creek"))
-    updatePickerInput(session, "broad_stressor_name", choices = getCategoryChoices("broad_stressor_name"))
-  }
-
-  getCategoryChoices <- function(column_name) {
-    tryCatch(
-      {
-        dbGetQuery(db, sprintf("SELECT DISTINCT %s FROM stressor_responses ORDER BY %s", column_name, column_name))[[column_name]]
-      },
-      error = function(e) {
-        character(0)
-      }
-    )
-  }
-
-  # Connect to database, using the pool from global.R
   db <- pool
 
+  # ── Initial data load ──────────────────────────────────────────────────────
   table_exists <- dbExistsTable(db, Id(schema = db_config$schema, table = "stressor_responses"))
+
   if (!table_exists) {
     warning("Table `stressor_responses` does not exist in the database.")
     data <- data.frame()
   } else {
-    data <- dbReadTable(db, Id(schema = db_config$schema, table = "stressor_responses"))
+    data <- dbGetQuery(db, "SELECT * FROM stressor_responses ORDER BY article_id ASC")
   }
 
+  # ── Filter dropdowns ───────────────────────────────────────────────────────
+  getCategoryChoices <- function(column_name) {
+    tryCatch(
+      dbGetQuery(
+        db,
+        sprintf(
+          "SELECT DISTINCT %s FROM stressor_responses WHERE %s IS NOT NULL ORDER BY %s",
+          column_name, column_name, column_name
+        )
+      )[[column_name]],
+      error = function(e) character(0)
+    )
+  }
+
+  updateFilterDropdowns <- function() {
+    cols <- c(
+      "stressor"                = "stressor_name",
+      "stressor_metric"         = "specific_stressor_metric",
+      "species"                 = "species_common_name",
+      "life_stage"              = "life_stages",
+      "activity"                = "activity",
+      "genus_latin"             = "genus_latin",
+      "species_latin"           = "species_latin",
+      "article_type"            = "article_type",
+      "location_country"        = "location_country",
+      "location_state_province" = "location_state_province",
+      "location_watershed_lab"  = "location_watershed_lab",
+      "location_river_creek"    = "location_river_creek",
+      "broad_stressor_name"     = "broad_stressor_name"
+    )
+    for (input_id in names(cols)) {
+      updatePickerInput(session, input_id, choices = getCategoryChoices(cols[[input_id]]))
+    }
+  }
+
+  observeEvent(input$main_navbar,
+    {
+      if (input$main_navbar == "dashboard") updateFilterDropdowns()
+    },
+    ignoreInit = TRUE
+  )
+
+  # ── Filtered & paginated data ──────────────────────────────────────────────
   filtered_data <- filter_data_server(input, data, session)
 
-  progressive_data <- reactive({
-    req(data)
-    df <- data
-
-    if (!is.null(input$stressor) && length(input$stressor) > 0) {
-      df <- df[df$stressor_name %in% input$stressor, ]
-    }
-    if (!is.null(input$stressor_metric) && length(input$stressor_metric) > 0) {
-      df <- df[df$specific_stressor_metric %in% input$stressor_metric, ]
-    }
-    if (!is.null(input$species) && length(input$species) > 0) {
-      df <- df[df$species_common_name %in% input$species, ]
-    }
-    if (!is.null(input$life_stage) && length(input$life_stage) > 0) {
-      df <- df[Reduce(`|`, lapply(input$life_stage, function(stage) {
-        grepl(stage, df$life_stages, ignore.case = TRUE)
-      })), ]
-    }
-    if (!is.null(input$activity) && length(input$activity) > 0) {
-      df <- df[df$activity %in% input$activity, ]
-    }
-    if (!is.null(input$genus_latin) && length(input$genus_latin) > 0) {
-      df <- df[df$genus_latin %in% input$genus_latin, ]
-    }
-    if (!is.null(input$species_latin) && length(input$species_latin) > 0) {
-      df <- df[df$species_latin %in% input$species_latin, ]
-    }
-
-    df
-  })
-
-  # pagination <- pagination_server(input, filtered_data)
-  # paginated_data <- pagination$paginated_data
-  # output$page_info <- renderText(pagination$page_info())
   pagination <- pagination_server(input, output, session, filtered_data)
   paginated_data <- pagination$paginated_data
   output$page_info <- renderText(pagination$page_info())
   output$page_info_top <- renderText(pagination$page_info())
 
-  update_filters_server(input, output, session, data, db)
-  toggle_filters_server(input, session)
-  reset_filters_server(input, session)
-
-  submit_relationship_server("submit_relationship")
-
-  edaServer("eda")
-
-  render_papers_server(output, paginated_data, input, session)
-
-  # Download handler setup
-  setup_download_csv(output, paginated_data, db, input, session)
-
-  observe({
-    ids <- paginated_data()$article_id
-    lapply(ids, function(mid) {
-      observeEvent(input[[paste0("view_article_", mid)]],
-        {
-          showModal(modalDialog(
-            title = paste("Article", mid),
-            render_article_ui(mid, paginated_data()),
-            easyClose = TRUE,
-            size = "l"
-          ))
-          # This sets up all outputs for the selected article
-          render_article_server(input, output, session, mid, db)
-        },
-        ignoreInit = TRUE
-      )
-
-      observeEvent(input[[paste0("expand_all_", mid)]],
-        {
-          shinyjs::show("metadata_section")
-          shinyjs::show("description_section")
-          shinyjs::show("citations_section")
-          shinyjs::show("images_section")
-          shinyjs::show("csv_section")
-          shinyjs::show("interactive_plot_section")
-        },
-        ignoreInit = TRUE
-      )
-
-      observeEvent(input[[paste0("collapse_all_", mid)]],
-        {
-          shinyjs::hide("metadata_section")
-          shinyjs::hide("description_section")
-          shinyjs::hide("citations_section")
-          shinyjs::hide("images_section")
-          shinyjs::hide("csv_section")
-          shinyjs::hide("interactive_plot_section")
-        },
-        ignoreInit = TRUE
-      )
-    })
-  })
-
-  # Section toggles
-  observeEvent(input$toggle_metadata, {
-    toggle("metadata_section")
-  })
-  observeEvent(input$toggle_description, {
-    toggle("description_section")
-  })
-  observeEvent(input$toggle_citations, {
-    toggle("citations_section")
-  })
-  observeEvent(input$toggle_images, {
-    toggle("images_section")
-  })
-  observeEvent(input$toggle_csv, {
-    toggle("csv_section")
-  })
-  observeEvent(input$toggle_plot, {
-    toggle("plot_section")
-  })
-  observeEvent(input$generate_plot, {
-    show("compare_plot")
-  })
   observeEvent(filtered_data(), {
     updateNumericInput(session, "page", value = 1)
   })
-  observeEvent(input$toggle_interactive_plot, {
-    toggle("interactive_plot_section")
-  })
+
   observeEvent(input$prev_page, {
     updateNumericInput(session, "page", value = max(1, input$page - 1))
   })
+
   observeEvent(input$next_page, {
     updateNumericInput(session, "page", value = input$page + 1)
+  })
+
+  # ── Modules ────────────────────────────────────────────────────────────────
+  update_filters_server(input, output, session, data, db)
+  toggle_filters_server(input, session)
+  reset_filters_server(input, session)
+  submit_relationship_server("submit_relationship")
+  edaServer("eda")
+  render_papers_server(output, paginated_data, input, session)
+  setup_download_csv(output, paginated_data, db, input, session)
+
+  # ── Article modal ──────────────────────────────────────────────────────────
+  # Track which articles have had render_article_server called to avoid
+  # registering duplicate output renderers on repeated modal opens.
+  initialized_articles <- character(0)
+
+  observe({
+    ids <- paginated_data()$article_id
+
+    lapply(ids, function(mid) {
+      mid_str <- as.character(mid)
+
+      # ── Open modal ────────────────────────────────────────────────────────
+      # always re-register (safe, modal UI is recreated each time)
+      observeEvent(input[[paste0("view_article_", mid)]],
+        {
+          showModal(modalDialog(
+            title     = paste("Article", mid),
+            render_article_ui(mid, paginated_data()),
+            easyClose = TRUE,
+            size      = "l"
+          ))
+          if (!mid_str %in% initialized_articles) {
+            render_article_server(input, output, session, mid, db)
+            initialized_articles <<- c(initialized_articles, mid_str)
+          }
+        },
+        ignoreInit = TRUE
+      )
+
+      # guard all per-article observers with the same initialized_articles check
+      if (!mid_str %in% initialized_articles) {
+        # ── Expand all ────────────────────────────────────────────────────────
+        observeEvent(input[[paste0("expand_all_", mid)]],
+          {
+            shinyjs::show(paste0("metadata_section_", mid))
+            shinyjs::show(paste0("description_section_", mid))
+            shinyjs::show(paste0("citations_section_", mid))
+            shinyjs::show(paste0("csv_section_", mid))
+            shinyjs::show(paste0("interactive_plot_section_", mid))
+          },
+          ignoreInit = TRUE
+        )
+        # ── Collapse all ──────────────────────────────────────────────────────
+        observeEvent(input[[paste0("collapse_all_", mid)]],
+          {
+            shinyjs::hide(paste0("metadata_section_", mid))
+            shinyjs::hide(paste0("description_section_", mid))
+            shinyjs::hide(paste0("citations_section_", mid))
+            shinyjs::hide(paste0("csv_section_", mid))
+            shinyjs::hide(paste0("interactive_plot_section_", mid))
+          },
+          ignoreInit = TRUE
+        )
+
+        # ── Section toggles ───────────────────────────────────────────────────
+        # shinyjs::toggle + arrow label updates are both handled in
+        # render_article_server.R so they stay in sync. Only the
+        # show/hide calls for expand/collapse all remain here.
+        for (section in c("metadata", "description", "citations", "csv", "interactive_plot")) {
+          local({
+            s <- section
+            m <- mid
+            observeEvent(input[[paste0("toggle_", s, "_", m)]],
+              {
+                shinyjs::toggle(paste0(s, "_section_", m))
+              },
+              ignoreInit = TRUE
+            )
+          })
+        }
+        # Note: updateActionLink for arrow labels is in render_article_server.R
+      }
+    })
   })
 }
 
