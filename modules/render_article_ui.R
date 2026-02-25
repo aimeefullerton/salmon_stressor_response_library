@@ -4,31 +4,30 @@ library(shinyjs)
 library(dygraphs)
 
 render_article_ui <- function(article_id, data) {
-  # Find the article row
   article <- data[data$article_id == article_id, ]
   if (nrow(article) == 0) {
     return(tags$p("Article not found."))
   }
 
-  # Unique IDs for this article
+  # All IDs scoped to article_id to avoid conflicts between articles
+  expand_id <- paste0("expand_all_", article_id)
+  collapse_id <- paste0("collapse_all_", article_id)
   meta_id <- paste0("metadata_section_", article_id)
   desc_id <- paste0("description_section_", article_id)
   cite_id <- paste0("citations_section_", article_id)
-  expand_id <- paste0("expand_all_", article_id)
-  collapse_id <- paste0("collapse_all_", article_id)
+  csv_id <- paste0("csv_section_", article_id)
+  plot_id <- paste0("interactive_plot_section_", article_id)
 
   tagList(
-    # ===== Article title =====
+    # ── Title ──────────────────────────────────────────────────────────────
     fluidRow(
       column(12,
         align = "center",
-        tags$h3(article$title,
-          style = "margin-top: 20px; margin-bottom: 10px;"
-        )
+        tags$h3(article$title, style = "margin-top: 20px; margin-bottom: 10px;")
       )
     ),
 
-    # ===== Expand / Collapse =====
+    # ── Expand / Collapse ──────────────────────────────────────────────────
     fluidRow(
       column(12,
         align = "center",
@@ -43,88 +42,66 @@ render_article_ui <- function(article_id, data) {
       )
     ),
 
-
-    # Article Metadata Section
+    # ── Article Metadata ───────────────────────────────────────────────────
     div(
       style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #f8f9fa; border-radius: 8px;",
-      actionLink("toggle_metadata", "Article Metadata ▼", class = "section-title"),
-      hidden(
-        div(
-          id = "metadata_section",
-          style = "font-size:1.1em;",
-          fluidRow(
-            column(4, strong("Species Common Name:")),
-            column(8, textOutput("species_name"))
-          ),
-          fluidRow(
-            column(4, strong("Latin Name (Genus species):")),
-            column(8, em(textOutput("genus_latin")))
-          ),
-          fluidRow(
-            column(4, strong("Stressor Name:")),
-            column(8, textOutput("stressor_name"))
-          ),
-          fluidRow(
-            column(4, strong("Specific Stressor Metric:")),
-            column(8, textOutput("specific_stressor_metric"))
-          ),
-          fluidRow(
-            column(4, strong("Stressor Units:")),
-            column(8, textOutput("stressor_units"))
-          ),
-          fluidRow(
-            column(4, strong("Response:")),
-            column(8, textOutput("response"))
-          ),
-          fluidRow(
-            column(4, strong("Life Stage:")),
-            column(8, textOutput("life_stage"))
-          )
-        )
-      )
-    ),
-
-    # Description & Function Details
-    div(
-      style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
-      actionLink("toggle_description", "Description & Function Details ▼", class = "section-title"),
+      actionLink(paste0("toggle_metadata_", article_id), "Article Metadata ▼", class = "section-title"),
       hidden(div(
-        id = "description_section",
+        id    = meta_id,
         style = "font-size:1.1em;",
-        strong("Detailed SR Function Description"), br(), textOutput("overview"), br(), br(),
-        strong("Function Derivation"), br(), textOutput("function_derivation")
+        fluidRow(column(4, strong("Species Common Name:")), column(8, textOutput(paste0("species_name_", article_id)))),
+        fluidRow(column(4, strong("Latin Name (Genus species):")), column(8, em(textOutput(paste0("genus_latin_", article_id))))),
+        fluidRow(column(4, strong("Stressor Name:")), column(8, textOutput(paste0("stressor_name_", article_id)))),
+        fluidRow(column(4, strong("Specific Stressor Metric:")), column(8, textOutput(paste0("specific_stressor_metric_", article_id)))),
+        fluidRow(column(4, strong("Stressor Units:")), column(8, textOutput(paste0("stressor_units_", article_id)))),
+        fluidRow(column(4, strong("Response:")), column(8, textOutput(paste0("response_", article_id)))),
+        fluidRow(column(4, strong("Life Stage:")), column(8, textOutput(paste0("life_stage_", article_id))))
       ))
     ),
 
-    # Citations Section
+    # ── Description & Function Details ─────────────────────────────────────
     div(
       style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
-      actionLink("toggle_citations", "Citation(s) ▼", class = "section-title"),
+      actionLink(paste0("toggle_description_", article_id), "Description & Function Details ▼", class = "section-title"),
       hidden(div(
-        id = "citations_section",
+        id = desc_id,
         style = "font-size:1.1em;",
-        uiOutput("citations")
+        strong("Detailed SR Function Description"), br(), textOutput(paste0("overview_", article_id)), br(), br(),
+        strong("Function Derivation"), br(), textOutput(paste0("function_derivation_", article_id))
       ))
     ),
 
-    # CSV Data Table
+    # ── Citations ──────────────────────────────────────────────────────────
     div(
       style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
-      actionLink("toggle_csv", "Stressor Response Data ▼", class = "section-title"),
-      hidden(div(id = "csv_section", style = "font-size:1.1em;", tableOutput("csv_table")))
+      actionLink(paste0("toggle_citations_", article_id), "Citation(s) ▼", class = "section-title"),
+      hidden(div(
+        id    = cite_id,
+        style = "font-size:1.1em;",
+        uiOutput(paste0("citations_", article_id))
+      ))
     ),
 
-    # Stressor Response Plot
-    # div(style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
-    # actionLink("toggle_plot", "Stressor Response Chart ▼", class = "section-title"),
-    # hidden(div(id = "plot_section",  style = "font-size:1.1em;", plotOutput("stressor_plot")))
-    # ),
-
-    # Interactive Plot Section using Plotly
+    # ── CSV Data Table ─────────────────────────────────────────────────────
     div(
       style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
-      actionLink("toggle_interactive_plot", "Stressor Response Chart ▼", class = "section-title"),
-      hidden(div(id = "interactive_plot_section", style = "font-size:1.1em;", plotlyOutput("interactive_plot")))
+      actionLink(paste0("toggle_csv_", article_id), "Stressor Response Data ▼", class = "section-title"),
+      hidden(div(
+        id    = csv_id,
+        style = "font-size:1.1em;",
+        tableOutput(paste0("csv_table_", article_id))
+      ))
+    ),
+
+    # ── Interactive Plot ───────────────────────────────────────────────────
+    div(
+      style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
+      actionLink(paste0("toggle_interactive_plot_", article_id), "Stressor Response Chart ▼", class = "section-title"),
+      hidden(div(
+        id    = plot_id,
+        style = "font-size:1.1em;",
+        plotlyOutput(paste0("interactive_plot_", article_id))
+      ))
     )
   )
 }
