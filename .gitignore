@@ -1,3 +1,7 @@
+# files
 .Renviron
-_notes/*
 .RData
+
+# folders
+_notes/*
+/data/postgres_backups/*
