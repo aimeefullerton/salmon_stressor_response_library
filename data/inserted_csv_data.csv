@@ -1,0 +1,1265 @@
+article_id,row_index,curve_id,stressor_label,stressor_x,units_x,response_label,response_y,units_y,stressor_value,lower_limit,upper_limit,sd
+1,1,c1,Alkalinity,0,mgCaCO3/l,Density,0,Scaler,,0,200,
+1,2,c1,Alkalinity,9.93,mgCaCO3/l,Density,0.62,Scaler,,0,200,
+1,3,c1,Alkalinity,29.31,mgCaCO3/l,Density,1.01,Scaler,,0,200,
+1,4,c1,Alkalinity,45.39,mgCaCO3/l,Density,1.22,Scaler,,0,200,
+1,5,c1,Alkalinity,61.94,mgCaCO3/l,Density,1.4,Scaler,,0,200,
+1,6,c1,Alkalinity,87.94,mgCaCO3/l,Density,1.64,Scaler,,0,200,
+1,7,c1,Alkalinity,119.62,mgCaCO3/l,Density,1.89,Scaler,,0,200,
+1,8,c1,Alkalinity,151.3,mgCaCO3/l,Density,2.13,Scaler,,0,200,
+1,9,c1,Alkalinity,175.41,mgCaCO3/l,Density,2.27,Scaler,,0,200,
+1,10,c1,Alkalinity,200,mgCaCO3/l,Density,2.41,Scaler,,0,200,
+2,1,c1,Angling Effort (hours/km),0,hrs/km,Mean System Capacity (%),100,% Capacity,,0,1600,
+2,2,c1,Angling Effort (hours/km),18,hrs/km,Mean System Capacity (%),36.2,% Capacity,,0,1600,
+2,3,c1,Angling Effort (hours/km),1600,hrs/km,Mean System Capacity (%),36.2,% Capacity,,0,1600,
+3,1,c1,Angling Effort (hours/km),0,hr/km,Mean System Capacity (%),100,% Capacity,,0,100,
+3,2,c1,Angling Effort (hours/km),50,hr/km,Mean System Capacity (%),38.3,% Capacity,,0,50,
+3,3,c1,Angling Effort (hours/km),1600,hr/km,Mean System Capacity (%),38.3,% Capacity,,0,50,
+4,1,c1,Temperature (June 1-21 ADM),8,°C,Survival (%),1,Productivity multiplier,,0,100,
+4,2,c1,Temperature (June 1-21 ADM),9,°C,Survival (%),1,Productivity multiplier,,0,100,
+4,3,c1,Temperature (June 1-21 ADM),10,°C,Survival (%),1,Productivity multiplier,,0,100,
+4,4,c1,Temperature (June 1-21 ADM),11,°C,Survival (%),1,Productivity multiplier,,0,100,
+4,5,c1,Temperature (June 1-21 ADM),12,°C,Survival (%),1,Productivity multiplier,,0,100,
+4,6,c1,Temperature (June 1-21 ADM),13,°C,Survival (%),1,Productivity multiplier,,0,100,
+4,7,c1,Temperature (June 1-21 ADM),14,°C,Survival (%),1,Productivity multiplier,,0,100,
+4,8,c1,Temperature (June 1-21 ADM),15,°C,Survival (%),1,Productivity multiplier,,0,100,
+4,9,c1,Temperature (June 1-21 ADM),16,°C,Survival (%),1,Productivity multiplier,,0,100,
+4,10,c1,Temperature (June 1-21 ADM),17,°C,Survival (%),1,Productivity multiplier,,0,100,
+4,11,c1,Temperature (June 1-21 ADM),18,°C,Survival (%),1,Productivity multiplier,,0,100,
+4,12,c1,Temperature (June 1-21 ADM),19,°C,Survival (%),0.83,Productivity multiplier,,0,100,
+4,13,c1,Temperature (June 1-21 ADM),20,°C,Survival (%),0.66,Productivity multiplier,,0,100,
+4,14,c1,Temperature (June 1-21 ADM),21,°C,Survival (%),0.49,Productivity multiplier,,0,100,
+4,15,c1,Temperature (June 1-21 ADM),22,°C,Survival (%),0.32,Productivity multiplier,,0,100,
+4,16,c1,Temperature (June 1-21 ADM),23,°C,Survival (%),0.15,Productivity multiplier,,0,100,
+4,17,c1,Temperature (June 1-21 ADM),24,°C,Survival (%),0,Productivity multiplier,,0,100,
+4,18,c1,Temperature (June 1-21 ADM),25,°C,Survival (%),0,Productivity multiplier,,0,100,
+4,19,c1,Temperature (June 1-21 ADM),26,°C,Survival (%),0,Productivity multiplier,,0,100,
+4,20,c1,Temperature (June 1-21 ADM),27,°C,Survival (%),0,Productivity multiplier,,0,100,
+4,21,c1,Temperature (June 1-21 ADM),28,°C,Survival (%),0,Productivity multiplier,,0,100,
+4,22,c1,Temperature (June 1-21 ADM),29,°C,Survival (%),0,Productivity multiplier,,0,100,
+4,23,c1,Temperature (June 1-21 ADM),30,°C,Survival (%),0,Productivity multiplier,,0,100,
+4,24,c1,Temperature (June 1-21 ADM),31,°C,Survival (%),0,Productivity multiplier,,0,100,
+4,25,c1,Temperature (June 1-21 ADM),32,°C,Survival (%),0,Productivity multiplier,,0,100,
+5,1,c1,Fine Sediment (% smaller than 2-6.35mm),0.34,% Sediment smaller than 2-6.35mm,Emergence (%),89.79,% emergence,,0,100,5.22
+5,2,c1,Fine Sediment (% smaller than 2-6.35mm),6.69,% Sediment smaller than 2-6.35mm,Emergence (%),89.11,% emergence,,0,100,6.24
+5,3,c1,Fine Sediment (% smaller than 2-6.35mm),10.8,% Sediment smaller than 2-6.35mm,Emergence (%),87.56,% emergence,,0,100,9.16
+5,4,c1,Fine Sediment (% smaller than 2-6.35mm),13.89,% Sediment smaller than 2-6.35mm,Emergence (%),84.99,% emergence,,0,100,12.42
+5,5,c1,Fine Sediment (% smaller than 2-6.35mm),16.46,% Sediment smaller than 2-6.35mm,Emergence (%),80.53,% emergence,,0,100,15.85
+5,6,c1,Fine Sediment (% smaller than 2-6.35mm),18.69,% Sediment smaller than 2-6.35mm,Emergence (%),73.84,% emergence,,0,100,15.68
+5,7,c1,Fine Sediment (% smaller than 2-6.35mm),21.77,% Sediment smaller than 2-6.35mm,Emergence (%),65.95,% emergence,,0,100,22.88
+5,8,c1,Fine Sediment (% smaller than 2-6.35mm),24.17,% Sediment smaller than 2-6.35mm,Emergence (%),58.58,% emergence,,0,100,23.05
+5,9,c1,Fine Sediment (% smaller than 2-6.35mm),27.09,% Sediment smaller than 2-6.35mm,Emergence (%),50.34,% emergence,,0,100,26.14
+5,10,c1,Fine Sediment (% smaller than 2-6.35mm),29.49,% Sediment smaller than 2-6.35mm,Emergence (%),40.91,% emergence,,0,100,24.77
+5,11,c1,Fine Sediment (% smaller than 2-6.35mm),32.06,% Sediment smaller than 2-6.35mm,Emergence (%),32.5,% emergence,,0,100,20.14
+5,12,c1,Fine Sediment (% smaller than 2-6.35mm),33.77,% Sediment smaller than 2-6.35mm,Emergence (%),25.15,% emergence,,0,100,12.78
+5,13,c1,Fine Sediment (% smaller than 2-6.35mm),37.2,% Sediment smaller than 2-6.35mm,Emergence (%),18.12,% emergence,,0,100,9.7
+5,14,c1,Fine Sediment (% smaller than 2-6.35mm),40.97,% Sediment smaller than 2-6.35mm,Emergence (%),12.11,% emergence,,0,100,10.38
+5,15,c1,Fine Sediment (% smaller than 2-6.35mm),45.77,% Sediment smaller than 2-6.35mm,Emergence (%),7.14,% emergence,,0,100,6.09
+5,16,c1,Fine Sediment (% smaller than 2-6.35mm),51.43,% Sediment smaller than 2-6.35mm,Emergence (%),4.91,% emergence,,0,100,4.38
+5,17,c1,Fine Sediment (% smaller than 2-6.35mm),56.23,% Sediment smaller than 2-6.35mm,Emergence (%),3.54,% emergence,,0,100,3.18
+5,18,c1,Fine Sediment (% smaller than 2-6.35mm),59.83,% Sediment smaller than 2-6.35mm,Emergence (%),3.71,% emergence,,0,100,3.35
+6,1,c1,Substrate in Boulders (%),0,% Boulder Cover,Survivorship (%),0.95,Scaler,,0.95,0.95,
+6,2,c1,Substrate in Boulders (%),0.25,% Boulder Cover,Survivorship (%),0.95,Scaler,,0.95,0.95,
+6,3,c1,Substrate in Boulders (%),0.75,% Boulder Cover,Survivorship (%),7.03,Scaler,,7.03,7.03,
+6,4,c1,Substrate in Boulders (%),1,% Boulder Cover,Survivorship (%),7.03,Scaler,,7.03,7.03,
+7,1,c1,Temperature (June 1-21 ADM),8,°C,Survivorship (%),0.9974,Productivity multiplier,,0.9974,0.9974,
+7,2,c1,Temperature (June 1-21 ADM),10,°C,Survivorship (%),0.9944,Productivity multiplier,,0.9944,0.9944,
+7,3,c1,Temperature (June 1-21 ADM),12,°C,Survivorship (%),0.988,Productivity multiplier,,0.988,0.988,
+7,4,c1,Temperature (June 1-21 ADM),14,°C,Survivorship (%),0.9743,Productivity multiplier,,0.9743,0.9743,
+7,5,c1,Temperature (June 1-21 ADM),16,°C,Survivorship (%),0.9459,Productivity multiplier,,0.9459,0.9459,
+7,6,c1,Temperature (June 1-21 ADM),18,°C,Survivorship (%),0.8896,Productivity multiplier,,0.8896,0.8896,
+7,7,c1,Temperature (June 1-21 ADM),20,°C,Survivorship (%),0.788,Productivity multiplier,,0.788,0.788,
+7,8,c1,Temperature (June 1-21 ADM),22,°C,Survivorship (%),0.6316,Productivity multiplier,,0.6316,0.6316,
+7,9,c1,Temperature (June 1-21 ADM),24,°C,Survivorship (%),0.4415,Productivity multiplier,,0.4415,0.4415,
+7,10,c1,Temperature (June 1-21 ADM),26,°C,Survivorship (%),0.2672,Productivity multiplier,,0.2672,0.2672,
+7,11,c1,Temperature (June 1-21 ADM),28,°C,Survivorship (%),0.1439,Productivity multiplier,,0.1439,0.1439,
+7,12,c1,Temperature (June 1-21 ADM),30,°C,Survivorship (%),0.072,Productivity multiplier,,0.072,0.072,
+7,13,c1,Temperature (June 1-21 ADM),32,°C,Survivorship (%),0.0345,Productivity multiplier,,0.0345,0.0345,
+8,1,c1,Temperature,10.1,°C,Mean System Capacity (%),100,% Survivorship,,100,100,0
+8,2,c1,Temperature,12.91,°C,Mean System Capacity (%),100,% Survivorship,,100,100,0
+8,3,c1,Temperature,14.27,°C,Mean System Capacity (%),98.45,% Survivorship,,85,98,2
+8,4,c1,Temperature,15.22,°C,Mean System Capacity (%),95.34,% Survivorship,,85,95,3
+8,5,c1,Temperature,16.09,°C,Mean System Capacity (%),91.71,% Survivorship,,75,95,6
+8,6,c1,Temperature,17.11,°C,Mean System Capacity (%),86.53,% Survivorship,,60,95,10
+8,7,c1,Temperature,17.79,°C,Mean System Capacity (%),80.83,% Survivorship,,33,93,15
+8,8,c1,Temperature,18.11,°C,Mean System Capacity (%),76.68,% Survivorship,,33,93,20
+8,9,c1,Temperature,18.52,°C,Mean System Capacity (%),70.98,% Survivorship,,33,93,20
+8,10,c1,Temperature,19.42,°C,Mean System Capacity (%),58.03,% Survivorship,,20,85,20
+8,11,c1,Temperature,19.76,°C,Mean System Capacity (%),53.37,% Survivorship,,20,80,20
+8,12,c1,Temperature,19.98,°C,Mean System Capacity (%),51.81,% Survivorship,,15,80,20
+9,1,c1,Calcite Concentration,0,CC,Mean System Capacity (%),100,% Capacity,,100,100,
+9,2,c1,Calcite Concentration,0.05,CC,Mean System Capacity (%),86.52,% Capacity,,86.52,86.52,
+9,3,c1,Calcite Concentration,0.07,CC,Mean System Capacity (%),80,% Capacity,,80,80,
+9,4,c1,Calcite Concentration,0.1,CC,Mean System Capacity (%),71.3,% Capacity,,71.3,71.3,
+9,5,c1,Calcite Concentration,0.13,CC,Mean System Capacity (%),63.04,% Capacity,,63.04,63.04,
+9,6,c1,Calcite Concentration,0.18,CC,Mean System Capacity (%),54.35,% Capacity,,54.35,54.35,
+9,7,c1,Calcite Concentration,0.22,CC,Mean System Capacity (%),46.96,% Capacity,,46.96,46.96,
+9,8,c1,Calcite Concentration,0.27,CC,Mean System Capacity (%),39.57,% Capacity,,39.57,39.57,
+9,9,c1,Calcite Concentration,0.35,CC,Mean System Capacity (%),30,% Capacity,,30,30,
+9,10,c1,Calcite Concentration,0.43,CC,Mean System Capacity (%),22.17,% Capacity,,22.17,22.17,
+9,11,c1,Calcite Concentration,0.53,CC,Mean System Capacity (%),15.65,% Capacity,,15.65,15.65,
+9,12,c1,Calcite Concentration,0.63,CC,Mean System Capacity (%),11.3,% Capacity,,11.3,11.3,
+9,13,c1,Calcite Concentration,0.72,CC,Mean System Capacity (%),8.26,% Capacity,,8.26,8.26,
+9,14,c1,Calcite Concentration,0.81,CC,Mean System Capacity (%),5.65,% Capacity,,5.65,5.65,
+9,15,c1,Calcite Concentration,0.9,CC,Mean System Capacity (%),4.35,% Capacity,,4.35,4.35,
+9,16,c1,Calcite Concentration,1,CC,Mean System Capacity (%),2.61,% Capacity,,2.61,2.61,
+9,17,c1,Calcite Concentration,1.1,CC,Mean System Capacity (%),1.74,% Capacity,,1.74,1.74,
+9,18,c1,Calcite Concentration,1.22,CC,Mean System Capacity (%),0.87,% Capacity,,0.87,0.87,
+9,19,c1,Calcite Concentration,1.32,CC,Mean System Capacity (%),0.43,% Capacity,,0.43,0.43,
+9,20,c1,Calcite Concentration,1.43,CC,Mean System Capacity (%),0.43,% Capacity,,0.43,0.43,
+9,21,c1,Calcite Concentration,1.53,CC,Mean System Capacity (%),0,% Capacity,,0,0,
+9,22,c1,Calcite Concentration,1.64,CC,Mean System Capacity (%),0,% Capacity,,0,0,
+9,23,c1,Calcite Concentration,1.75,CC,Mean System Capacity (%),0,% Capacity,,0,0,
+9,24,c1,Calcite Concentration,2,CC,Mean System Capacity (%),0,% Capacity,,0,0,
+10,1,c1,Temperature,0.08,°C,Survival (%),4.5,% Survival,,0,50,20
+10,2,c1,Temperature,0.39,°C,Survival (%),10.6,% Survival,,0,50,20
+10,3,c1,Temperature,0.86,°C,Survival (%),19.5,% Survival,,10,50,20
+10,4,c1,Temperature,1.49,°C,Survival (%),30.6,% Survival,,20,75,20
+10,5,c1,Temperature,1.65,°C,Survival (%),33.3,% Survival,,25,75,20
+10,6,c1,Temperature,2.51,°C,Survival (%),46.7,% Survival,,40,75,20
+10,7,c1,Temperature,2.66,°C,Survival (%),48.9,% Survival,,45,100,20
+10,8,c1,Temperature,3.53,°C,Survival (%),60.6,% Survival,,50,100,20
+10,9,c1,Temperature,4,°C,Survival (%),66.2,% Survival,,50,100,20
+10,10,c1,Temperature,4.47,°C,Survival (%),71.4,% Survival,,50,100,20
+10,11,c1,Temperature,5.33,°C,Survival (%),79.5,% Survival,,55,100,20
+10,12,c1,Temperature,6.11,°C,Survival (%),85.6,% Survival,,60,100,20
+10,13,c1,Temperature,7.13,°C,Survival (%),91.4,% Survival,,60,100,20
+10,14,c1,Temperature,7.99,°C,Survival (%),94.6,% Survival,,60,100,20
+10,15,c1,Temperature,8.86,°C,Survival (%),96.1,% Survival,,55,100,20
+10,16,c1,Temperature,9.8,°C,Survival (%),96,% Survival,,50,100,20
+10,17,c1,Temperature,10.89,°C,Survival (%),93.3,% Survival,,50,100,20
+10,18,c1,Temperature,11.76,°C,Survival (%),89.4,% Survival,,40,100,20
+10,19,c1,Temperature,12.77,°C,Survival (%),82.7,% Survival,,20,100,20
+10,20,c1,Temperature,14.03,°C,Survival (%),71.3,% Survival,,10,100,20
+10,21,c1,Temperature,14.18,°C,Survival (%),69.7,% Survival,,0,100,20
+10,22,c1,Temperature,14.89,°C,Survival (%),61.5,% Survival,,0,100,20
+10,23,c1,Temperature,15.67,°C,Survival (%),51.2,% Survival,,0,100,20
+10,24,c1,Temperature,16.14,°C,Survival (%),44.4,% Survival,,0,100,20
+10,25,c1,Temperature,17.01,°C,Survival (%),30.4,% Survival,,0,85,20
+10,26,c1,Temperature,17.63,°C,Survival (%),19.5,% Survival,,0,85,20
+10,27,c1,Temperature,17.79,°C,Survival (%),16.5,% Survival,,0,85,20
+10,28,c1,Temperature,18.1,°C,Survival (%),10.6,% Survival,,0,85,20
+10,29,c1,Temperature,18.42,°C,Survival (%),4.3,% Survival,,0,85,20
+10,30,c1,Temperature,18.57,°C,Survival (%),1.3,% Survival,,0,85,20
+11,1,c1,Non-Native Trout (% Carrying Capacity),0,% Non-Native Capacity,Mean System Capacity (%),80,% Capacity,,0,100,
+11,2,c1,Non-Native Trout (% Carrying Capacity),20,% Non-Native Capacity,Mean System Capacity (%),60,% Capacity,,0,100,
+11,3,c1,Non-Native Trout (% Carrying Capacity),40,% Non-Native Capacity,Mean System Capacity (%),40,% Capacity,,0,100,
+11,4,c1,Non-Native Trout (% Carrying Capacity),60,% Non-Native Capacity,Mean System Capacity (%),20,% Capacity,,0,100,
+11,5,c1,Non-Native Trout (% Carrying Capacity),80,% Non-Native Capacity,Mean System Capacity (%),0,% Capacity,,0,100,
+11,6,c1,Non-Native Trout (% Carrying Capacity),100,% Non-Native Capacity,Mean System Capacity (%),0,% Capacity,,0,100,
+12,1,c1,Pool Habitat (% covered by cobbles and boulders),0,% sturcture,Mean System Capacity (%),0.2,% Survivorship,,0,1,
+12,2,c1,Pool Habitat (% covered by cobbles and boulders),3,% sturcture,Mean System Capacity (%),0.36,% Survivorship,,0,1,
+12,3,c1,Pool Habitat (% covered by cobbles and boulders),6,% sturcture,Mean System Capacity (%),0.52,% Survivorship,,0,1,
+12,4,c1,Pool Habitat (% covered by cobbles and boulders),9,% sturcture,Mean System Capacity (%),0.68,% Survivorship,,0,1,
+12,5,c1,Pool Habitat (% covered by cobbles and boulders),12,% sturcture,Mean System Capacity (%),0.84,% Survivorship,,0,1,
+12,6,c1,Pool Habitat (% covered by cobbles and boulders),15,% sturcture,Mean System Capacity (%),1,% Survivorship,,0,1,
+12,7,c1,Pool Habitat (% covered by cobbles and boulders),18,% sturcture,Mean System Capacity (%),1,% Survivorship,,0,1,
+13,1,c1,Direct Mortality (%),0,% Mortality,Mean System Capacity (%),100,% Capacity,,0,100,
+13,2,c1,Direct Mortality (%),0.2,% Mortality,Mean System Capacity (%),100,% Capacity,,0,100,
+13,3,c1,Direct Mortality (%),0.28,% Mortality,Mean System Capacity (%),50,% Capacity,,0,100,
+13,4,c1,Direct Mortality (%),0.32,% Mortality,Mean System Capacity (%),10,% Capacity,,0,100,
+14,1,c1,Direct Mortality (%),0,% Mortality,Mean System Capacity (%),100,% Capacity,,0,100,
+14,2,c1,Direct Mortality (%),0.35,% Mortality,Mean System Capacity (%),100,% Capacity,,0,100,
+14,3,c1,Direct Mortality (%),0.3825,% Mortality,Mean System Capacity (%),100,% Capacity,,0,100,
+14,4,c1,Direct Mortality (%),0.415,% Mortality,Mean System Capacity (%),60,% Capacity,,0,100,
+14,5,c1,Direct Mortality (%),0.4475,% Mortality,Mean System Capacity (%),40,% Capacity,,0,100,
+14,6,c1,Direct Mortality (%),0.48,% Mortality,Mean System Capacity (%),20,% Capacity,,0,100,
+14,7,c1,Direct Mortality (%),0.5125,% Mortality,Mean System Capacity (%),15,% Capacity,,0,100,
+14,8,c1,Direct Mortality (%),0.545,% Mortality,Mean System Capacity (%),10,% Capacity,,0,100,
+14,9,c1,Direct Mortality (%),0.5775,% Mortality,Mean System Capacity (%),10,% Capacity,,0,100,
+14,10,c1,Direct Mortality (%),0.61,% Mortality,Mean System Capacity (%),10,% Capacity,,0,100,
+15,1,c1,Dissolved Oxygen (mg/L),3.16,mg/L,Survival (%),3.06,% Survival,,0,100,3.67
+15,2,c1,Dissolved Oxygen (mg/L),3.7,mg/L,Survival (%),4.29,% Survival,,0,100,3.27
+15,3,c1,Dissolved Oxygen (mg/L),4.19,mg/L,Survival (%),5.1,% Survival,,0,100,5.71
+15,4,c1,Dissolved Oxygen (mg/L),4.68,mg/L,Survival (%),5.51,% Survival,,0,100,5.31
+15,5,c1,Dissolved Oxygen (mg/L),5.32,mg/L,Survival (%),6.33,% Survival,,0,100,8.16
+15,6,c1,Dissolved Oxygen (mg/L),5.8,mg/L,Survival (%),7.55,% Survival,,0,100,6.94
+15,7,c1,Dissolved Oxygen (mg/L),6.52,mg/L,Survival (%),9.18,% Survival,,0,100,6.94
+15,8,c1,Dissolved Oxygen (mg/L),7.19,mg/L,Survival (%),10.41,% Survival,,0,100,20.41
+15,9,c1,Dissolved Oxygen (mg/L),7.48,mg/L,Survival (%),12.86,% Survival,,0,100,17.96
+15,10,c1,Dissolved Oxygen (mg/L),7.81,mg/L,Survival (%),17.35,% Survival,,0,100,26.53
+15,11,c1,Dissolved Oxygen (mg/L),8.12,mg/L,Survival (%),23.47,% Survival,,0,100,20.41
+15,12,c1,Dissolved Oxygen (mg/L),8.51,mg/L,Survival (%),33.67,% Survival,,0,100,31.43
+15,13,c1,Dissolved Oxygen (mg/L),8.68,mg/L,Survival (%),44.29,% Survival,,0,100,44.08
+15,14,c1,Dissolved Oxygen (mg/L),8.79,mg/L,Survival (%),53.27,% Survival,,0,100,35.1
+15,15,c1,Dissolved Oxygen (mg/L),8.92,mg/L,Survival (%),64.29,% Survival,,0,100,34.69
+15,16,c1,Dissolved Oxygen (mg/L),9.07,mg/L,Survival (%),74.49,% Survival,,0,100,25.31
+15,17,c1,Dissolved Oxygen (mg/L),9.2,mg/L,Survival (%),83.47,% Survival,,0,100,16.73
+15,18,c1,Dissolved Oxygen (mg/L),9.28,mg/L,Survival (%),88.78,% Survival,,0,100,11.43
+15,19,c1,Dissolved Oxygen (mg/L),9.28,mg/L,Survival (%),88.78,% Survival,,0,100,11.43
+16,1,c1,Dissolved Oxygen (mg/L),3,mg/L,Mean length of sac fry (mm),16.63,mm,,0,100,
+16,2,c1,Dissolved Oxygen (mg/L),4,mg/L,Mean length of sac fry (mm),17.64,mm,,0,100,
+16,3,c1,Dissolved Oxygen (mg/L),5,mg/L,Mean length of sac fry (mm),18.15,mm,,0,100,
+16,4,c1,Dissolved Oxygen (mg/L),6,mg/L,Mean length of sac fry (mm),18.55,mm,,0,100,
+16,5,c1,Dissolved Oxygen (mg/L),7,mg/L,Mean length of sac fry (mm),18.87,mm,,0,100,
+16,6,c1,Dissolved Oxygen (mg/L),8,mg/L,Mean length of sac fry (mm),19.11,mm,,0,100,
+16,7,c1,Dissolved Oxygen (mg/L),9,mg/L,Mean length of sac fry (mm),19.3,mm,,0,100,
+16,8,c1,Dissolved Oxygen (mg/L),10,mg/L,Mean length of sac fry (mm),19.41,mm,,0,100,
+16,9,c1,Dissolved Oxygen (mg/L),11,mg/L,Mean length of sac fry (mm),19.62,mm,,0,100,
+17,1,c1,Dissolved Oxygen (mg/L),2.65,mg/L,Survival (%),14.08,% Survival,,0,100,7.8
+17,2,c1,Dissolved Oxygen (mg/L),3,mg/L,Survival (%),16.36,% Survival,,0,100,5.52
+17,3,c1,Dissolved Oxygen (mg/L),3.62,mg/L,Survival (%),19.78,% Survival,,0,100,12.36
+17,4,c1,Dissolved Oxygen (mg/L),4.22,mg/L,Survival (%),23.02,% Survival,,0,100,9.13
+17,5,c1,Dissolved Oxygen (mg/L),4.79,mg/L,Survival (%),26.06,% Survival,,0,100,13.32
+17,6,c1,Dissolved Oxygen (mg/L),5.51,mg/L,Survival (%),30.05,% Survival,,0,100,9.32
+17,7,c1,Dissolved Oxygen (mg/L),6,mg/L,Survival (%),32.91,% Survival,,0,100,13.89
+17,8,c1,Dissolved Oxygen (mg/L),6.61,mg/L,Survival (%),36.14,% Survival,,0,100,10.65
+17,9,c1,Dissolved Oxygen (mg/L),7.31,mg/L,Survival (%),40.14,% Survival,,0,100,14.84
+17,10,c1,Dissolved Oxygen (mg/L),8.34,mg/L,Survival (%),45.84,% Survival,,0,100,13.51
+17,11,c1,Dissolved Oxygen (mg/L),9.04,mg/L,Survival (%),49.65,% Survival,,0,100,11.98
+17,12,c1,Dissolved Oxygen (mg/L),9.18,mg/L,Survival (%),50.41,% Survival,,0,100,11.03
+18,1,c1,Drift production,0,% of reach in riffles,Density,0,Scaler,,0,1,
+18,2,c1,Drift production,0.5,% of reach in riffles,Density,1,Scaler,,0,1,
+18,3,c1,Drift production,1,% of reach in riffles,Density,1,Scaler,,0,1,
+19,1,c1,Fine sediment,0,% embeddedness,Density,2.47,fish/m2,,2.47,2.47,
+19,2,c1,Fine sediment,4.3,% embeddedness,Density,2.3,fish/m2,,2.3,2.3,
+19,3,c1,Fine sediment,9.68,% embeddedness,Density,2.07,fish/m2,,2.07,2.07,
+19,4,c1,Fine sediment,15.05,% embeddedness,Density,1.86,fish/m2,,1.86,1.86,
+19,5,c1,Fine sediment,19,% embeddedness,Density,1.7,fish/m2,,1.7,1.7,
+19,6,c1,Fine sediment,22.94,% embeddedness,Density,1.57,fish/m2,,1.57,1.57,
+19,7,c1,Fine sediment,28.32,% embeddedness,Density,1.41,fish/m2,,1.41,1.41,
+19,8,c1,Fine sediment,32.97,% embeddedness,Density,1.24,fish/m2,,1.24,1.24,
+19,9,c1,Fine sediment,39.43,% embeddedness,Density,1.06,fish/m2,,1.06,1.06,
+19,10,c1,Fine sediment,45.88,% embeddedness,Density,0.87,fish/m2,,0.87,0.87,
+19,11,c1,Fine sediment,53.05,% embeddedness,Density,0.7,fish/m2,,0.7,0.7,
+19,12,c1,Fine sediment,61.29,% embeddedness,Density,0.52,fish/m2,,0.52,0.52,
+19,13,c1,Fine sediment,74.19,% embeddedness,Density,0.3,fish/m2,,0.3,0.3,
+19,14,c1,Fine sediment,85.3,% embeddedness,Density,0.18,fish/m2,,0.18,0.18,
+19,15,c1,Fine sediment,94.98,% embeddedness,Density,0.1,fish/m2,,0.1,0.1,
+19,16,c1,Fine sediment,100,% embeddedness,Density,0.08,fish/m2,,0.08,0.08,
+20,1,c1,Fine sediment,0,% embeddedness,Density,2.75,fish/m2,,2.75,2.75,
+20,2,c1,Fine sediment,2.96,% embeddedness,Density,2.55,fish/m2,,2.55,2.55,
+20,3,c1,Fine sediment,5.93,% embeddedness,Density,2.36,fish/m2,,2.36,2.36,
+20,4,c1,Fine sediment,9.26,% embeddedness,Density,2.15,fish/m2,,2.15,2.15,
+20,5,c1,Fine sediment,12.96,% embeddedness,Density,1.97,fish/m2,,1.97,1.97,
+20,6,c1,Fine sediment,17.04,% embeddedness,Density,1.76,fish/m2,,1.76,1.76,
+20,7,c1,Fine sediment,23.33,% embeddedness,Density,1.51,fish/m2,,1.51,1.51,
+20,8,c1,Fine sediment,29.26,% embeddedness,Density,1.27,fish/m2,,1.27,1.27,
+20,9,c1,Fine sediment,37.78,% embeddedness,Density,1.02,fish/m2,,1.02,1.02,
+20,10,c1,Fine sediment,45.93,% embeddedness,Density,0.81,fish/m2,,0.81,0.81,
+20,11,c1,Fine sediment,53.7,% embeddedness,Density,0.66,fish/m2,,0.66,0.66,
+20,12,c1,Fine sediment,61.48,% embeddedness,Density,0.53,fish/m2,,0.53,0.53,
+20,13,c1,Fine sediment,70.74,% embeddedness,Density,0.4,fish/m2,,0.4,0.4,
+20,14,c1,Fine sediment,80.74,% embeddedness,Density,0.31,fish/m2,,0.31,0.31,
+20,15,c1,Fine sediment,91.48,% embeddedness,Density,0.22,fish/m2,,0.22,0.22,
+20,16,c1,Fine sediment,97.41,% embeddedness,Density,0.2,fish/m2,,0.2,0.2,
+20,17,c1,Fine sediment,100,% embeddedness,Density,0.2,fish/m2,,0.2,0.2,
+21,1,c1,Fine sediment,0,% embeddedness,Density,9.98,fish/m2,,9.98,9.98,
+21,2,c1,Fine sediment,2.87,% embeddedness,Density,10.02,fish/m2,,10.02,10.02,
+21,3,c1,Fine sediment,8.6,% embeddedness,Density,9.95,fish/m2,,9.95,9.95,
+21,4,c1,Fine sediment,15.77,% embeddedness,Density,9.88,fish/m2,,9.88,9.88,
+21,5,c1,Fine sediment,23.66,% embeddedness,Density,9.66,fish/m2,,9.66,9.66,
+21,6,c1,Fine sediment,32.97,% embeddedness,Density,9.33,fish/m2,,9.33,9.33,
+21,7,c1,Fine sediment,41.58,% embeddedness,Density,8.94,fish/m2,,8.94,8.94,
+21,8,c1,Fine sediment,47.31,% embeddedness,Density,8.5,fish/m2,,8.5,8.5,
+21,9,c1,Fine sediment,54.12,% embeddedness,Density,8.03,fish/m2,,8.03,8.03,
+21,10,c1,Fine sediment,60.57,% embeddedness,Density,7.53,fish/m2,,7.53,7.53,
+21,11,c1,Fine sediment,67.74,% embeddedness,Density,6.91,fish/m2,,6.91,6.91,
+21,12,c1,Fine sediment,71.68,% embeddedness,Density,6.48,fish/m2,,6.48,6.48,
+21,13,c1,Fine sediment,76.7,% embeddedness,Density,5.94,fish/m2,,5.94,5.94,
+21,14,c1,Fine sediment,83.51,% embeddedness,Density,5.21,fish/m2,,5.21,5.21,
+21,15,c1,Fine sediment,87.81,% embeddedness,Density,4.71,fish/m2,,4.71,4.71,
+21,16,c1,Fine sediment,93.55,% embeddedness,Density,3.95,fish/m2,,3.95,3.95,
+21,17,c1,Fine sediment,98.21,% embeddedness,Density,3.33,fish/m2,,3.33,3.33,
+21,18,c1,Fine sediment,100,% embeddedness,Density,3.15,fish/m2,,3.15,3.15,
+22,1,c1,Fine sediment,0,% embeddedness,Density,7.38,fish/m2,,7.38,7.38,
+22,2,c1,Fine sediment,1.87,% embeddedness,Density,6.99,fish/m2,,6.99,6.99,
+22,3,c1,Fine sediment,4.12,% embeddedness,Density,6.52,fish/m2,,6.52,6.52,
+22,4,c1,Fine sediment,5.99,% embeddedness,Density,6.03,fish/m2,,6.03,6.03,
+22,5,c1,Fine sediment,8.24,% embeddedness,Density,5.58,fish/m2,,5.58,5.58,
+22,6,c1,Fine sediment,11.61,% embeddedness,Density,5.02,fish/m2,,5.02,5.02,
+22,7,c1,Fine sediment,13.86,% embeddedness,Density,4.66,fish/m2,,4.66,4.66,
+22,8,c1,Fine sediment,16.85,% embeddedness,Density,4.19,fish/m2,,4.19,4.19,
+22,9,c1,Fine sediment,21.35,% embeddedness,Density,3.65,fish/m2,,3.65,3.65,
+22,10,c1,Fine sediment,24.34,% embeddedness,Density,3.24,fish/m2,,3.24,3.24,
+22,11,c1,Fine sediment,29.59,% embeddedness,Density,2.72,fish/m2,,2.72,2.72,
+22,12,c1,Fine sediment,34.08,% embeddedness,Density,2.32,fish/m2,,2.32,2.32,
+22,13,c1,Fine sediment,39.33,% embeddedness,Density,1.94,fish/m2,,1.94,1.94,
+22,14,c1,Fine sediment,44.94,% embeddedness,Density,1.56,fish/m2,,1.56,1.56,
+22,15,c1,Fine sediment,51.31,% embeddedness,Density,1.29,fish/m2,,1.29,1.29,
+22,16,c1,Fine sediment,58.8,% embeddedness,Density,0.99,fish/m2,,0.99,0.99,
+22,17,c1,Fine sediment,64.04,% embeddedness,Density,0.84,fish/m2,,0.84,0.84,
+22,18,c1,Fine sediment,70.79,% embeddedness,Density,0.66,fish/m2,,0.66,0.66,
+22,19,c1,Fine sediment,79.4,% embeddedness,Density,0.48,fish/m2,,0.48,0.48,
+22,20,c1,Fine sediment,87.27,% embeddedness,Density,0.39,fish/m2,,0.39,0.39,
+22,21,c1,Fine sediment,94.01,% embeddedness,Density,0.25,fish/m2,,0.25,0.25,
+22,22,c1,Fine sediment,100,% embeddedness,Density,0.21,fish/m2,,0.21,0.21,
+23,1,c1,Fine sediment,0,% embeddedness,Density,3.07,fish/m2,,3.07,3.07,
+23,2,c1,Fine sediment,4.63,% embeddedness,Density,3.05,fish/m2,,3.05,3.05,
+23,3,c1,Fine sediment,11.74,% embeddedness,Density,2.99,fish/m2,,2.99,2.99,
+23,4,c1,Fine sediment,19.57,% embeddedness,Density,2.84,fish/m2,,2.84,2.84,
+23,5,c1,Fine sediment,26.33,% embeddedness,Density,2.66,fish/m2,,2.66,2.66,
+23,6,c1,Fine sediment,31.67,% embeddedness,Density,2.49,fish/m2,,2.49,2.49,
+23,7,c1,Fine sediment,36.65,% embeddedness,Density,2.34,fish/m2,,2.34,2.34,
+23,8,c1,Fine sediment,40.21,% embeddedness,Density,2.21,fish/m2,,2.21,2.21,
+23,9,c1,Fine sediment,45.2,% embeddedness,Density,2.01,fish/m2,,2.01,2.01,
+23,10,c1,Fine sediment,48.75,% embeddedness,Density,1.85,fish/m2,,1.85,1.85,
+23,11,c1,Fine sediment,54.8,% embeddedness,Density,1.63,fish/m2,,1.63,1.63,
+23,12,c1,Fine sediment,59.07,% embeddedness,Density,1.44,fish/m2,,1.44,1.44,
+23,13,c1,Fine sediment,63.7,% embeddedness,Density,1.25,fish/m2,,1.25,1.25,
+23,14,c1,Fine sediment,68.33,% embeddedness,Density,1.07,fish/m2,,1.07,1.07,
+23,15,c1,Fine sediment,72.95,% embeddedness,Density,0.89,fish/m2,,0.89,0.89,
+23,16,c1,Fine sediment,79.36,% embeddedness,Density,0.67,fish/m2,,0.67,0.67,
+23,17,c1,Fine sediment,84.7,% embeddedness,Density,0.48,fish/m2,,0.48,0.48,
+23,18,c1,Fine sediment,91.46,% embeddedness,Density,0.28,fish/m2,,0.28,0.28,
+23,19,c1,Fine sediment,96.09,% embeddedness,Density,0.16,fish/m2,,0.16,0.16,
+23,20,c1,Fine sediment,100,% embeddedness,Density,0.08,fish/m2,,0.08,0.08,
+24,1,c1,Substrate particles,0.14,% smaller than 6.35mm,Embryo Survival (%),97.09,% Survival,,97.09,97.09,
+24,2,c1,Substrate particles,3.03,% smaller than 6.35mm,Embryo Survival (%),93.82,% Survival,,93.82,93.82,
+24,3,c1,Substrate particles,5.05,% smaller than 6.35mm,Embryo Survival (%),90.55,% Survival,,90.55,90.55,
+24,4,c1,Substrate particles,7.21,% smaller than 6.35mm,Embryo Survival (%),85.82,% Survival,,85.82,85.82,
+24,5,c1,Substrate particles,9.81,% smaller than 6.35mm,Embryo Survival (%),79.64,% Survival,,79.64,79.64,
+24,6,c1,Substrate particles,11.83,% smaller than 6.35mm,Embryo Survival (%),73.82,% Survival,,73.82,73.82,
+24,7,c1,Substrate particles,14.57,% smaller than 6.35mm,Embryo Survival (%),66.18,% Survival,,66.18,66.18,
+24,8,c1,Substrate particles,16.73,% smaller than 6.35mm,Embryo Survival (%),59.27,% Survival,,59.27,59.27,
+24,9,c1,Substrate particles,18.75,% smaller than 6.35mm,Embryo Survival (%),52.36,% Survival,,52.36,52.36,
+24,10,c1,Substrate particles,21.63,% smaller than 6.35mm,Embryo Survival (%),43.64,% Survival,,43.64,43.64,
+24,11,c1,Substrate particles,24.23,% smaller than 6.35mm,Embryo Survival (%),35.64,% Survival,,35.64,35.64,
+24,12,c1,Substrate particles,26.83,% smaller than 6.35mm,Embryo Survival (%),29.09,% Survival,,29.09,29.09,
+24,13,c1,Substrate particles,30.14,% smaller than 6.35mm,Embryo Survival (%),21.82,% Survival,,21.82,21.82,
+24,14,c1,Substrate particles,33.75,% smaller than 6.35mm,Embryo Survival (%),16,% Survival,,16,16,
+24,15,c1,Substrate particles,36.78,% smaller than 6.35mm,Embryo Survival (%),11.64,% Survival,,11.64,11.64,
+24,16,c1,Substrate particles,41.54,% smaller than 6.35mm,Embryo Survival (%),6.55,% Survival,,6.55,6.55,
+24,17,c1,Substrate particles,46.59,% smaller than 6.35mm,Embryo Survival (%),4,% Survival,,4,4,
+24,18,c1,Substrate particles,49.9,% smaller than 6.35mm,Embryo Survival (%),2.91,% Survival,,2.91,2.91,
+24,19,c1,Substrate particles,55.38,% smaller than 6.35mm,Embryo Survival (%),2.18,% Survival,,2.18,2.18,
+24,20,c1,Substrate particles,59.71,% smaller than 6.35mm,Embryo Survival (%),1.82,% Survival,,1.82,1.82,
+25,1,c1,Substrate particles,0,% smaller than 6.35mm,Embryo Survival (%),97.69,% Survival,,97.69,97.69,
+25,2,c1,Substrate particles,5.99,% smaller than 6.35mm,Embryo Survival (%),95.05,% Survival,,95.05,95.05,
+25,3,c1,Substrate particles,9.63,% smaller than 6.35mm,Embryo Survival (%),93.07,% Survival,,93.07,93.07,
+25,4,c1,Substrate particles,12.89,% smaller than 6.35mm,Embryo Survival (%),90.1,% Survival,,90.1,90.1,
+25,5,c1,Substrate particles,17.44,% smaller than 6.35mm,Embryo Survival (%),86.14,% Survival,,86.14,86.14,
+25,6,c1,Substrate particles,20.69,% smaller than 6.35mm,Embryo Survival (%),81.85,% Survival,,81.85,81.85,
+25,7,c1,Substrate particles,24.34,% smaller than 6.35mm,Embryo Survival (%),75.58,% Survival,,75.58,75.58,
+25,8,c1,Substrate particles,26.68,% smaller than 6.35mm,Embryo Survival (%),70.63,% Survival,,70.63,70.63,
+25,9,c1,Substrate particles,30.59,% smaller than 6.35mm,Embryo Survival (%),61.06,% Survival,,61.06,61.06,
+25,10,c1,Substrate particles,34.88,% smaller than 6.35mm,Embryo Survival (%),48.84,% Survival,,48.84,48.84,
+25,11,c1,Substrate particles,37.74,% smaller than 6.35mm,Embryo Survival (%),41.25,% Survival,,41.25,41.25,
+25,12,c1,Substrate particles,40.48,% smaller than 6.35mm,Embryo Survival (%),33.33,% Survival,,33.33,33.33,
+25,13,c1,Substrate particles,43.08,% smaller than 6.35mm,Embryo Survival (%),27.06,% Survival,,27.06,27.06,
+25,14,c1,Substrate particles,45.68,% smaller than 6.35mm,Embryo Survival (%),21.12,% Survival,,21.12,21.12,
+25,15,c1,Substrate particles,48.81,% smaller than 6.35mm,Embryo Survival (%),15.18,% Survival,,15.18,15.18,
+25,16,c1,Substrate particles,52.45,% smaller than 6.35mm,Embryo Survival (%),10.23,% Survival,,10.23,10.23,
+25,17,c1,Substrate particles,56.75,% smaller than 6.35mm,Embryo Survival (%),4.95,% Survival,,4.95,4.95,
+25,18,c1,Substrate particles,59.87,% smaller than 6.35mm,Embryo Survival (%),3.3,% Survival,,3.3,3.3,
+26,1,c1,Substrate particles,0,% smaller than 6.35mm,Embryo Survival (%),100,% Survival,,100,100,
+26,2,c1,Substrate particles,2.15,% smaller than 6.35mm,Embryo Survival (%),99.31,% Survival,,99.31,99.31,
+26,3,c1,Substrate particles,4.3,% smaller than 6.35mm,Embryo Survival (%),97.58,% Survival,,97.58,97.58,
+26,4,c1,Substrate particles,7.65,% smaller than 6.35mm,Embryo Survival (%),94.12,% Survival,,94.12,94.12,
+26,5,c1,Substrate particles,11.54,% smaller than 6.35mm,Embryo Survival (%),89.62,% Survival,,89.62,89.62,
+26,6,c1,Substrate particles,13.96,% smaller than 6.35mm,Embryo Survival (%),85.12,% Survival,,85.12,85.12,
+26,7,c1,Substrate particles,16.24,% smaller than 6.35mm,Embryo Survival (%),80.97,% Survival,,80.97,80.97,
+26,8,c1,Substrate particles,19.73,% smaller than 6.35mm,Embryo Survival (%),73.7,% Survival,,73.7,73.7,
+26,9,c1,Substrate particles,22.68,% smaller than 6.35mm,Embryo Survival (%),65.74,% Survival,,65.74,65.74,
+26,10,c1,Substrate particles,25.64,% smaller than 6.35mm,Embryo Survival (%),58.13,% Survival,,58.13,58.13,
+26,11,c1,Substrate particles,28.59,% smaller than 6.35mm,Embryo Survival (%),49.83,% Survival,,49.83,49.83,
+26,12,c1,Substrate particles,31.81,% smaller than 6.35mm,Embryo Survival (%),40.14,% Survival,,40.14,40.14,
+26,13,c1,Substrate particles,34.63,% smaller than 6.35mm,Embryo Survival (%),32.87,% Survival,,32.87,32.87,
+26,14,c1,Substrate particles,36.64,% smaller than 6.35mm,Embryo Survival (%),28.03,% Survival,,28.03,28.03,
+26,15,c1,Substrate particles,38.79,% smaller than 6.35mm,Embryo Survival (%),23.53,% Survival,,23.53,23.53,
+26,16,c1,Substrate particles,41.61,% smaller than 6.35mm,Embryo Survival (%),18.34,% Survival,,18.34,18.34,
+26,17,c1,Substrate particles,47.52,% smaller than 6.35mm,Embryo Survival (%),9.69,% Survival,,9.69,9.69,
+26,18,c1,Substrate particles,51.41,% smaller than 6.35mm,Embryo Survival (%),5.88,% Survival,,5.88,5.88,
+26,19,c1,Substrate particles,54.9,% smaller than 6.35mm,Embryo Survival (%),3.46,% Survival,,3.46,3.46,
+26,20,c1,Substrate particles,58.52,% smaller than 6.35mm,Embryo Survival (%),2.08,% Survival,,2.08,2.08,
+26,21,c1,Substrate particles,59.87,% smaller than 6.35mm,Embryo Survival (%),1.73,% Survival,,1.73,1.73,
+26,22,c1,Substrate particles,59.87,% smaller than 6.35mm,Embryo Survival (%),1.73,% Survival,,1.73,1.73,
+27,1,c1,Substrate in Fines (%),0,% substrate in fines,Density,1,Scaler,,0,1,
+27,2,c1,Substrate in Fines (%),0.11,% substrate in fines,Density,1,Scaler,,0,1,
+27,3,c1,Substrate in Fines (%),1,% substrate in fines,Density,0,Scaler,,0,0,
+28,1,c1,Peak flow recurrence interval,0,Years,Egg-to-fry Survival,1,Productivity multiplier,,0,1,
+28,2,c1,Peak flow recurrence interval,2,Years,Egg-to-fry Survival,0.9191,Productivity multiplier,,0,1,
+28,3,c1,Peak flow recurrence interval,5,Years,Egg-to-fry Survival,0.784,Productivity multiplier,,0,1,
+28,4,c1,Peak flow recurrence interval,10,Years,Egg-to-fry Survival,0.6015,Productivity multiplier,,0,1,
+28,5,c1,Peak flow recurrence interval,20,Years,Egg-to-fry Survival,0.354,Productivity multiplier,,0,1,
+28,6,c1,Peak flow recurrence interval,30,Years,Egg-to-fry Survival,0.2084,Productivity multiplier,,0,1,
+28,7,c1,Peak flow recurrence interval,40,Years,Egg-to-fry Survival,0.1227,Productivity multiplier,,0,1,
+28,8,c1,Peak flow recurrence interval,50,Years,Egg-to-fry Survival,0.0722,Productivity multiplier,,0,1,
+28,9,c1,Peak flow recurrence interval,60,Years,Egg-to-fry Survival,0.0425,Productivity multiplier,,0,1,
+28,10,c1,Peak flow recurrence interval,70,Years,Egg-to-fry Survival,0.025,Productivity multiplier,,0,1,
+28,11,c1,Peak flow recurrence interval,80,Years,Egg-to-fry Survival,0.0147,Productivity multiplier,,0,1,
+28,12,c1,Peak flow recurrence interval,90,Years,Egg-to-fry Survival,0.0087,Productivity multiplier,,0,1,
+28,13,c1,Peak flow recurrence interval,100,Years,Egg-to-fry Survival,0.0051,Productivity multiplier,,0,1,
+29,1,c1,Human Footprint (%),100,% of landscape,Mean System Capacity (%),20,% Capacity,,0,100,
+29,2,c1,Human Footprint (%),90,% of landscape,Mean System Capacity (%),20,% Capacity,,0,100,
+29,3,c1,Human Footprint (%),80,% of landscape,Mean System Capacity (%),24,% Capacity,,0,100,
+29,4,c1,Human Footprint (%),70,% of landscape,Mean System Capacity (%),30,% Capacity,,0,100,
+29,5,c1,Human Footprint (%),60,% of landscape,Mean System Capacity (%),40,% Capacity,,0,100,
+29,6,c1,Human Footprint (%),50,% of landscape,Mean System Capacity (%),60,% Capacity,,0,100,
+29,7,c1,Human Footprint (%),45,% of landscape,Mean System Capacity (%),70,% Capacity,,0,100,
+29,8,c1,Human Footprint (%),35,% of landscape,Mean System Capacity (%),84,% Capacity,,0,100,
+29,9,c1,Human Footprint (%),30.5,% of landscape,Mean System Capacity (%),90,% Capacity,,0,100,
+29,10,c1,Human Footprint (%),28,% of landscape,Mean System Capacity (%),92,% Capacity,,0,100,
+29,11,c1,Human Footprint (%),26,% of landscape,Mean System Capacity (%),94,% Capacity,,0,100,
+29,12,c1,Human Footprint (%),24,% of landscape,Mean System Capacity (%),96,% Capacity,,0,100,
+29,13,c1,Human Footprint (%),22,% of landscape,Mean System Capacity (%),98,% Capacity,,0,100,
+29,14,c1,Human Footprint (%),20,% of landscape,Mean System Capacity (%),100,% Capacity,,0,100,
+29,15,c1,Human Footprint (%),0,% of landscape,Mean System Capacity (%),100,% Capacity,,0,100,
+30,1,c1,Barrier Dams (#),0,Unitless,Mean System Capacity (%),100,% Capacity,,0,100,
+30,2,c1,Barrier Dams (#),1,Unitless,Mean System Capacity (%),80,% Capacity,,0,100,
+30,3,c1,Barrier Dams (#),2,Unitless,Mean System Capacity (%),60,% Capacity,,0,100,
+30,4,c1,Barrier Dams (#),3,Unitless,Mean System Capacity (%),40,% Capacity,,0,100,
+30,5,c1,Barrier Dams (#),4,Unitless,Mean System Capacity (%),20,% Capacity,,0,100,
+30,6,c1,Barrier Dams (#),5,Unitless,Mean System Capacity (%),0,% Capacity,,0,100,
+31,1,c1,Fragmentation (large barrier dams),100,relative effect size,Mean System Capacity (%),20,% Capacity,,0,100,
+31,2,c1,Fragmentation (large barrier dams),90,relative effect size,Mean System Capacity (%),20,% Capacity,,0,100,
+31,3,c1,Fragmentation (large barrier dams),80,relative effect size,Mean System Capacity (%),24,% Capacity,,0,100,
+31,4,c1,Fragmentation (large barrier dams),70,relative effect size,Mean System Capacity (%),30,% Capacity,,0,100,
+31,5,c1,Fragmentation (large barrier dams),60,relative effect size,Mean System Capacity (%),40,% Capacity,,0,100,
+31,6,c1,Fragmentation (large barrier dams),50,relative effect size,Mean System Capacity (%),60,% Capacity,,0,100,
+31,7,c1,Fragmentation (large barrier dams),45,relative effect size,Mean System Capacity (%),70,% Capacity,,0,100,
+31,8,c1,Fragmentation (large barrier dams),35,relative effect size,Mean System Capacity (%),84,% Capacity,,0,100,
+31,9,c1,Fragmentation (large barrier dams),30.5,relative effect size,Mean System Capacity (%),90,% Capacity,,0,100,
+31,10,c1,Fragmentation (large barrier dams),28,relative effect size,Mean System Capacity (%),92,% Capacity,,0,100,
+31,11,c1,Fragmentation (large barrier dams),26,relative effect size,Mean System Capacity (%),94,% Capacity,,0,100,
+31,12,c1,Fragmentation (large barrier dams),24,relative effect size,Mean System Capacity (%),96,% Capacity,,0,100,
+31,13,c1,Fragmentation (large barrier dams),22,relative effect size,Mean System Capacity (%),98,% Capacity,,0,100,
+31,14,c1,Fragmentation (large barrier dams),20,relative effect size,Mean System Capacity (%),100,% Capacity,,0,100,
+31,15,c1,Fragmentation (large barrier dams),0,relative effect size,Mean System Capacity (%),100,% Capacity,,0,100,
+32,1,c1,Fragmentation (road crossings/km stream),0,road crossings/km stream,Mean System Capacity (%),100,% Capacity,,0,100,
+32,2,c1,Fragmentation (road crossings/km stream),0.01,road crossings/km stream,Mean System Capacity (%),100,% Capacity,,0,100,
+32,3,c1,Fragmentation (road crossings/km stream),0.07175,road crossings/km stream,Mean System Capacity (%),80,% Capacity,,0,100,
+32,4,c1,Fragmentation (road crossings/km stream),0.1335,road crossings/km stream,Mean System Capacity (%),60,% Capacity,,0,100,
+32,5,c1,Fragmentation (road crossings/km stream),0.19525,road crossings/km stream,Mean System Capacity (%),40,% Capacity,,0,100,
+32,6,c1,Fragmentation (road crossings/km stream),0.257,road crossings/km stream,Mean System Capacity (%),20,% Capacity,,0,100,
+32,7,c1,Fragmentation (road crossings/km stream),0.31875,road crossings/km stream,Mean System Capacity (%),0,% Capacity,,0,100,
+33,1,c1,Type of Cover,0.1,type of cover,Habitat Suitability Index,1,Suitability index,,0,1,
+33,2,c1,Type of Cover,0.2,type of cover,Habitat Suitability Index,1,Suitability index,,0,1,
+33,3,c1,Type of Cover,0.3,type of cover,Habitat Suitability Index,1,Suitability index,,0,1,
+33,4,c1,Type of Cover,0.4,type of cover,Habitat Suitability Index,1,Suitability index,,0,1,
+33,5,c1,Type of Cover,0.5,type of cover,Habitat Suitability Index,0.8,Suitability index,,0,1,
+33,6,c1,Type of Cover,0.6,type of cover,Habitat Suitability Index,0.8,Suitability index,,0,1,
+33,7,c1,Type of Cover,0.7,type of cover,Habitat Suitability Index,0.1,Suitability index,,0,1,
+33,8,c1,Type of Cover,0.8,type of cover,Habitat Suitability Index,0.7,Suitability index,,0,1,
+33,9,c1,Type of Cover,0.9,type of cover,Habitat Suitability Index,0.2,Suitability index,,0,1,
+34,1,c1,Type of Cover,0.1,type of cover,Habitat Suitability Index,1,Suitability index,,0,1,
+34,2,c1,Type of Cover,0.2,type of cover,Habitat Suitability Index,1,Suitability index,,0,1,
+34,3,c1,Type of Cover,0.3,type of cover,Habitat Suitability Index,1,Suitability index,,0,1,
+34,4,c1,Type of Cover,0.4,type of cover,Habitat Suitability Index,1,Suitability index,,0,1,
+34,5,c1,Type of Cover,0.5,type of cover,Habitat Suitability Index,0.8,Suitability index,,0,1,
+34,6,c1,Type of Cover,0.6,type of cover,Habitat Suitability Index,0.8,Suitability index,,0,1,
+34,7,c1,Type of Cover,0.7,type of cover,Habitat Suitability Index,0.1,Suitability index,,0,1,
+34,8,c1,Type of Cover,0.8,type of cover,Habitat Suitability Index,0.1,Suitability index,,0,1,
+34,9,c1,Type of Cover,0.9,type of cover,Habitat Suitability Index,0.2,Suitability index,,0,1,
+35,1,c1,Type of Cover,0.1,type of cover,Habitat Suitability Index,1,Suitability index,,0,1,
+35,2,c1,Type of Cover,0.2,type of cover,Habitat Suitability Index,1,Suitability index,,0,1,
+35,3,c1,Type of Cover,0.3,type of cover,Habitat Suitability Index,1,Suitability index,,0,1,
+35,4,c1,Type of Cover,0.4,type of cover,Habitat Suitability Index,1,Suitability index,,0,1,
+35,5,c1,Type of Cover,0.5,type of cover,Habitat Suitability Index,0.8,Suitability index,,0,1,
+35,6,c1,Type of Cover,0.6,type of cover,Habitat Suitability Index,0.8,Suitability index,,0,1,
+35,7,c1,Type of Cover,0.7,type of cover,Habitat Suitability Index,0.1,Suitability index,,0,1,
+35,8,c1,Type of Cover,0.8,type of cover,Habitat Suitability Index,0.7,Suitability index,,0,1,
+35,9,c1,Type of Cover,0.9,type of cover,Habitat Suitability Index,0.2,Suitability index,,0,1,
+36,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+36,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+36,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+36,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+36,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+36,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,0.7,Suitability index,,0,1,
+36,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,0.7,Suitability index,,0,1,
+36,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+36,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+37,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+37,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+37,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,0.3,Suitability index,,0,1,
+37,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+37,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+37,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+37,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,0.5,Suitability index,,0,1,
+37,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+37,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+38,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0.38,Suitability index,,0,1,
+38,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0.38,Suitability index,,0,1,
+38,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,0.74,Suitability index,,0,1,
+38,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,0.88,Suitability index,,0,1,
+38,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,0.88,Suitability index,,0,1,
+38,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+38,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+38,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+38,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0.5,Suitability index,,0,1,
+39,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+39,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+39,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+39,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+39,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+39,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,0.7,Suitability index,,0,1,
+39,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,0.7,Suitability index,,0,1,
+39,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+39,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+40,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+40,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+40,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,0.3,Suitability index,,0,1,
+40,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+40,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+40,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+40,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,0.5,Suitability index,,0,1,
+40,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+40,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+41,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+41,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+41,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,0.8,Suitability index,,0,1,
+41,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+41,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,0.8,Suitability index,,0,1,
+41,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,0.5,Suitability index,,0,1,
+41,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+41,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+41,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+42,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+42,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+42,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,0.3,Suitability index,,0,1,
+42,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+42,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+42,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+42,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,0.5,Suitability index,,0,1,
+42,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+42,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+43,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0.1,Suitability index,,0,1,
+43,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0.1,Suitability index,,0,1,
+43,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,0.1,Suitability index,,0,1,
+43,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,0.3,Suitability index,,0,1,
+43,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,0.3,Suitability index,,0,1,
+43,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,0.5,Suitability index,,0,1,
+43,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,0.7,Suitability index,,0,1,
+43,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+43,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0.3,Suitability index,,0,1,
+44,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+44,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+44,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,0.3,Suitability index,,0,1,
+44,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+44,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+44,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+44,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,0.5,Suitability index,,0,1,
+44,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+44,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+45,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+45,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+45,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,0.5,Suitability index,,0,1,
+45,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+45,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+45,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+45,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,0.3,Suitability index,,0,1,
+45,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+45,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+46,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0.38,Suitability index,,0,1,
+46,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0.38,Suitability index,,0,1,
+46,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,0.74,Suitability index,,0,1,
+46,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,0.88,Suitability index,,0,1,
+46,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,0.88,Suitability index,,0,1,
+46,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+46,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+46,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+46,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0.5,Suitability index,,0,1,
+47,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0.15,Suitability index,,0,1,
+47,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0.15,Suitability index,,0,1,
+47,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,0.76,Suitability index,,0,1,
+47,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,0.91,Suitability index,,0,1,
+47,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,0.91,Suitability index,,0,1,
+47,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+47,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+47,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+47,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0.3,Suitability index,,0,1,
+48,1,c1,Type of Cover,1,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+48,2,c1,Type of Cover,2,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+48,3,c1,Type of Cover,3,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+48,4,c1,Type of Cover,4,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+48,5,c1,Type of Cover,5,type of substrate,Habitat Suitability Index,1,Suitability index,,0,1,
+48,6,c1,Type of Cover,6,type of substrate,Habitat Suitability Index,0.7,Suitability index,,0,1,
+48,7,c1,Type of Cover,7,type of substrate,Habitat Suitability Index,0.7,Suitability index,,0,1,
+48,8,c1,Type of Cover,8,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+48,9,c1,Type of Cover,9,type of substrate,Habitat Suitability Index,0,Suitability index,,0,1,
+49,1,c1,Stream Habitat Loss (%),0,%,Mean System Capacity (%),100,% Capacity,,0,100,
+49,2,c1,Stream Habitat Loss (%),20,%,Mean System Capacity (%),80,% Capacity,,0,100,
+49,3,c1,Stream Habitat Loss (%),40,%,Mean System Capacity (%),60,% Capacity,,0,100,
+49,4,c1,Stream Habitat Loss (%),60,%,Mean System Capacity (%),40,% Capacity,,0,100,
+49,5,c1,Stream Habitat Loss (%),80,%,Mean System Capacity (%),20,% Capacity,,0,100,
+49,6,c1,Stream Habitat Loss (%),100,%,Mean System Capacity (%),0,% Capacity,,0,100,
+50,1,c1,Direct Habitat Loss (%),0,%,Mean System Capacity (%),100,% Capacity,,0,100,
+50,2,c1,Direct Habitat Loss (%),20,%,Mean System Capacity (%),80,% Capacity,,0,100,
+50,3,c1,Direct Habitat Loss (%),40,%,Mean System Capacity (%),60,% Capacity,,0,100,
+50,4,c1,Direct Habitat Loss (%),60,%,Mean System Capacity (%),40,% Capacity,,0,100,
+50,5,c1,Direct Habitat Loss (%),80,%,Mean System Capacity (%),20,% Capacity,,0,100,
+50,6,c1,Direct Habitat Loss (%),100,%,Mean System Capacity (%),0,% Capacity,,0,100,
+51,1,c1,Substrate Fine Coverage (<1.7mm),0,%,Egg-to-fry Survival (%),93,% Survival,,0,100,
+51,2,c1,Substrate Fine Coverage (<1.7mm),11.6,%,Egg-to-fry Survival (%),93,% Survival,,0,100,
+51,3,c1,Substrate Fine Coverage (<1.7mm),12,%,Egg-to-fry Survival (%),91.48,% Survival,,0,100,
+51,4,c1,Substrate Fine Coverage (<1.7mm),14,%,Egg-to-fry Survival (%),81.06,% Survival,,0,100,
+51,5,c1,Substrate Fine Coverage (<1.7mm),16,%,Egg-to-fry Survival (%),70.64,% Survival,,0,100,
+51,6,c1,Substrate Fine Coverage (<1.7mm),18,%,Egg-to-fry Survival (%),60.22,% Survival,,0,100,
+51,7,c1,Substrate Fine Coverage (<1.7mm),20,%,Egg-to-fry Survival (%),49.8,% Survival,,0,100,
+51,8,c1,Substrate Fine Coverage (<1.7mm),22,%,Egg-to-fry Survival (%),39.38,% Survival,,0,100,
+51,9,c1,Substrate Fine Coverage (<1.7mm),24,%,Egg-to-fry Survival (%),28.96,% Survival,,0,100,
+51,10,c1,Substrate Fine Coverage (<1.7mm),26,%,Egg-to-fry Survival (%),18.54,% Survival,,0,100,
+51,11,c1,Substrate Fine Coverage (<1.7mm),28,%,Egg-to-fry Survival (%),8.12,% Survival,,0,100,
+51,12,c1,Substrate Fine Coverage (<1.7mm),28.3,%,Egg-to-fry Survival (%),6,% Survival,,0,100,
+51,13,c1,Substrate Fine Coverage (<1.7mm),100,%,Egg-to-fry Survival (%),6,% Survival,,0,100,
+52,1,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),14,°C,Survivorship,1,% Survivorship,,0,1,
+52,2,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),15,°C,Survivorship,1,% Survivorship,,0,1,
+52,3,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),16,°C,Survivorship,0.95,% Survivorship,,0,1,
+52,4,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),17,°C,Survivorship,0.67,% Survivorship,,0,1,
+52,5,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),18,°C,Survivorship,0.39,% Survivorship,,0,1,
+52,6,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),19,°C,Survivorship,0.01,% Survivorship,,0,1,
+52,7,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),20,°C,Survivorship,0.01,% Survivorship,,0,1,
+52,8,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),21,°C,Survivorship,0.01,% Survivorship,,0,1,
+53,1,c1,Impervious Area (%),0,% Impervious Area,Prespawn Surviorship (%),0,% Survivorship,,0,1,
+53,2,c1,Impervious Area (%),66.67,% Impervious Area,Prespawn Surviorship (%),1,% Survivorship,,0,1,
+53,3,c1,Impervious Area (%),100,% Impervious Area,Prespawn Surviorship (%),1,% Survivorship,,0,1,
+54,1,c1,Temperature,0,°C,Survival (%),0,% Survival,,0,1,
+54,2,c1,Temperature,0.5,°C,Survival (%),0,% Survival,,0,1,
+54,3,c1,Temperature,1,°C,Survival (%),0.04,% Survival,,0,1,
+54,4,c1,Temperature,1.5,°C,Survival (%),0.5,% Survival,,0,1,
+54,5,c1,Temperature,2,°C,Survival (%),1,% Survival,,0,1,
+54,6,c1,Temperature,12,°C,Survival (%),1,% Survival,,0,1,
+54,7,c1,Temperature,15,°C,Survival (%),0.8,% Survival,,0,1,
+54,8,c1,Temperature,15.5,°C,Survival (%),0.5,% Survival,,0,1,
+54,9,c1,Temperature,16.89,°C,Survival (%),0.1742,% Survival,,0,1,
+54,10,c1,Temperature,17.09,°C,Survival (%),0.082,% Survival,,0,1,
+54,11,c1,Temperature,17.63,°C,Survival (%),0,% Survival,,0,1,
+54,12,c1,Temperature,21.71,°C,Survival (%),0,% Survival,,0,1,
+55,1,c1,Temperature,0,°C,Survival (%),0,% Survival,,0,1,
+55,2,c1,Temperature,1.37,°C,Survival (%),0,% Survival,,0,1,
+55,3,c1,Temperature,1.86,°C,Survival (%),0.0055,% Survival,,0,1,
+55,4,c1,Temperature,2.16,°C,Survival (%),0.0699,% Survival,,0,1,
+55,5,c1,Temperature,2.3,°C,Survival (%),0.2134,% Survival,,0,1,
+55,6,c1,Temperature,2.5,°C,Survival (%),0.3718,% Survival,,0,1,
+55,7,c1,Temperature,2.89,°C,Survival (%),0.5303,% Survival,,0,1,
+55,8,c1,Temperature,3.23,°C,Survival (%),0.6936,% Survival,,0,1,
+55,9,c1,Temperature,3.67,°C,Survival (%),0.8768,% Survival,,0,1,
+55,10,c1,Temperature,3.72,°C,Survival (%),1,% Survival,,0,1,
+55,11,c1,Temperature,4.02,°C,Survival (%),1,% Survival,,0,1,
+55,12,c1,Temperature,6.66,°C,Survival (%),1,% Survival,,0,1,
+55,13,c1,Temperature,7.45,°C,Survival (%),1,% Survival,,0,1,
+55,14,c1,Temperature,8.53,°C,Survival (%),1,% Survival,,0,1,
+55,15,c1,Temperature,10.93,°C,Survival (%),1,% Survival,,0,1,
+55,16,c1,Temperature,11.81,°C,Survival (%),1,% Survival,,0,1,
+55,17,c1,Temperature,13.28,°C,Survival (%),1,% Survival,,0,1,
+55,18,c1,Temperature,13.96,°C,Survival (%),0.9411,% Survival,,0,1,
+55,19,c1,Temperature,15.04,°C,Survival (%),0.5748,% Survival,,0,1,
+55,20,c1,Temperature,15.39,°C,Survival (%),0.3025,% Survival,,0,1,
+55,21,c1,Temperature,15.92,°C,Survival (%),0.1342,% Survival,,0,1,
+55,22,c1,Temperature,16.37,°C,Survival (%),0.0105,% Survival,,0,1,
+55,23,c1,Temperature,16.81,°C,Survival (%),0,% Survival,,0,1,
+55,24,c1,Temperature,18.03,°C,Survival (%),0,% Survival,,0,1,
+55,25,c1,Temperature,19.6,°C,Survival (%),0,% Survival,,0,1,
+55,26,c1,Temperature,20.29,°C,Survival (%),0,% Survival,,0,1,
+56,1,c1,Fine sediment (% <0.85mm),0.1,% fines,Survivorship (%),100,Productivity multiplier,,45,100,20
+56,2,c1,Fine sediment (% <0.85mm),2.33,% fines,Survivorship (%),94.6,% Survivorship,,45,100,25
+56,3,c1,Fine sediment (% <0.85mm),4.07,% fines,Survivorship (%),88.85,% Survivorship,,30,100,25
+56,4,c1,Fine sediment (% <0.85mm),6.1,% fines,Survivorship (%),80.93,% Survivorship,,30,100,30
+56,5,c1,Fine sediment (% <0.85mm),7.85,% fines,Survivorship (%),72.66,% Survivorship,,30,100,30
+56,6,c1,Fine sediment (% <0.85mm),9.98,% fines,Survivorship (%),61.15,% Survivorship,,15,100,25
+56,7,c1,Fine sediment (% <0.85mm),12.79,% fines,Survivorship (%),47.12,% Survivorship,,15,100,25
+56,8,c1,Fine sediment (% <0.85mm),15.99,% fines,Survivorship (%),32.01,% Survivorship,,2.5,85,20
+56,9,c1,Fine sediment (% <0.85mm),18.99,% fines,Survivorship (%),21.58,% Survivorship,,0,85,20
+56,10,c1,Fine sediment (% <0.85mm),22.09,% fines,Survivorship (%),12.95,% Survivorship,,0,35,10
+56,11,c1,Fine sediment (% <0.85mm),24.03,% fines,Survivorship (%),10.43,% Survivorship,,0,35,7.5
+56,12,c1,Fine sediment (% <0.85mm),28,% fines,Survivorship (%),5.4,% Survivorship,,0,10,5
+56,13,c1,Fine sediment (% <0.85mm),33.04,% fines,Survivorship (%),2.88,% Survivorship,,0,10,2.5
+56,14,c1,Fine sediment (% <0.85mm),38.76,% fines,Survivorship (%),1.8,% Survivorship,,0,10,1
+56,15,c1,Fine sediment (% <0.85mm),49.32,% fines,Survivorship (%),1.08,% Survivorship,,0,10,0
+57,1,c1,Temperature,16.8,°C,Survivorship (%),1,% Survivorship,,0,100,
+57,2,c1,Temperature,17.8,°C,Survivorship (%),1,% Survivorship,,0,100,
+57,3,c1,Temperature,18.8,°C,Survivorship (%),0.979930603,% Survivorship,,0,100,
+57,4,c1,Temperature,19.8,°C,Survivorship (%),0.9652464,% Survivorship,,0,100,
+57,5,c1,Temperature,20.8,°C,Survivorship (%),0.941722508,% Survivorship,,0,100,
+57,6,c1,Temperature,21.8,°C,Survivorship (%),0.905357629,% Survivorship,,0,100,
+57,7,c1,Temperature,22.8,°C,Survivorship (%),0.851333628,% Survivorship,,0,100,
+57,8,c1,Temperature,23.8,°C,Survivorship (%),0.774747976,% Survivorship,,0,100,
+57,9,c1,Temperature,24.8,°C,Survivorship (%),0.672275962,% Survivorship,,0,100,
+58,1,c1,Dissolved Oxygen (mg/L),2.19,mg/L,Food Conversion Ratio,0,Food conversion ratio,,0,0,0
+58,2,c1,Dissolved Oxygen (mg/L),2.28,mg/L,Food Conversion Ratio,0.02,Food conversion ratio,,0.02,0.02,0.02
+58,3,c1,Dissolved Oxygen (mg/L),2.39,mg/L,Food Conversion Ratio,0.04,Food conversion ratio,,0.04,0.04,0.04
+58,4,c1,Dissolved Oxygen (mg/L),2.46,mg/L,Food Conversion Ratio,0.05,Food conversion ratio,,0.05,0.05,0.02
+58,5,c1,Dissolved Oxygen (mg/L),2.65,mg/L,Food Conversion Ratio,0.07,Food conversion ratio,,0.07,0.07,0.05
+58,6,c1,Dissolved Oxygen (mg/L),2.79,mg/L,Food Conversion Ratio,0.1,Food conversion ratio,,0.1,0.1,0.05
+58,7,c1,Dissolved Oxygen (mg/L),2.89,mg/L,Food Conversion Ratio,0.11,Food conversion ratio,,0.11,0.11,0.06
+58,8,c1,Dissolved Oxygen (mg/L),2.89,mg/L,Food Conversion Ratio,0.11,Food conversion ratio,,0.11,0.11,0.06
+58,9,c1,Dissolved Oxygen (mg/L),3.07,mg/L,Food Conversion Ratio,0.13,Food conversion ratio,,0.13,0.13,0.08
+58,10,c1,Dissolved Oxygen (mg/L),3.23,mg/L,Food Conversion Ratio,0.15,Food conversion ratio,,0.15,0.15,0.07
+58,11,c1,Dissolved Oxygen (mg/L),3.46,mg/L,Food Conversion Ratio,0.17,Food conversion ratio,,0.17,0.17,0.09
+58,12,c1,Dissolved Oxygen (mg/L),3.71,mg/L,Food Conversion Ratio,0.2,Food conversion ratio,,0.2,0.2,0.06
+58,13,c1,Dissolved Oxygen (mg/L),3.81,mg/L,Food Conversion Ratio,0.2,Food conversion ratio,,0.2,0.2,0.06
+58,14,c1,Dissolved Oxygen (mg/L),3.95,mg/L,Food Conversion Ratio,0.21,Food conversion ratio,,0.21,0.21,0.07
+58,15,c1,Dissolved Oxygen (mg/L),4.24,mg/L,Food Conversion Ratio,0.22,Food conversion ratio,,0.22,0.22,0.08
+58,16,c1,Dissolved Oxygen (mg/L),4.47,mg/L,Food Conversion Ratio,0.22,Food conversion ratio,,0.22,0.22,0.05
+58,17,c1,Dissolved Oxygen (mg/L),5.02,mg/L,Food Conversion Ratio,0.22,Food conversion ratio,,0.22,0.22,0.05
+58,18,c1,Dissolved Oxygen (mg/L),5.48,mg/L,Food Conversion Ratio,0.22,Food conversion ratio,,0.22,0.22,0.03
+58,19,c1,Dissolved Oxygen (mg/L),6.06,mg/L,Food Conversion Ratio,0.22,Food conversion ratio,,0.22,0.22,0.03
+58,20,c1,Dissolved Oxygen (mg/L),6.62,mg/L,Food Conversion Ratio,0.22,Food conversion ratio,,0.22,0.22,0.03
+58,21,c1,Dissolved Oxygen (mg/L),7.66,mg/L,Food Conversion Ratio,0.22,Food conversion ratio,,0.22,0.22,0.04
+58,22,c1,Dissolved Oxygen (mg/L),8.36,mg/L,Food Conversion Ratio,0.22,Food conversion ratio,,0.22,0.22,0.03
+58,23,c1,Dissolved Oxygen (mg/L),8.55,mg/L,Food Conversion Ratio,0.22,Food conversion ratio,,0.22,0.22,0.03
+59,1,c1,Depth (m),0,m,Habitat Suitability Index,0,Suitability index,,0,0,
+59,2,c1,Depth (m),0.1,m,Habitat Suitability Index,0,Suitability index,,0,0,
+59,3,c1,Depth (m),0.15,m,Habitat Suitability Index,0,Suitability index,,0,0,
+59,4,c1,Depth (m),0.3,m,Habitat Suitability Index,1,Suitability index,,1,1,
+59,5,c1,Depth (m),0.61,m,Habitat Suitability Index,1,Suitability index,,1,1,
+59,6,c1,Depth (m),1,m,Habitat Suitability Index,1,Suitability index,,1,1,
+59,7,c1,Depth (m),1.83,m,Habitat Suitability Index,1,Suitability index,,1,1,
+60,1,c1,Depth (m),0,m,Habitat Suitability Index,0,Suitability index,,0,0,
+60,2,c1,Depth (m),0.06,m,Habitat Suitability Index,0,Suitability index,,0,0,
+60,3,c1,Depth (m),0.2,m,Habitat Suitability Index,1,Suitability index,,1,1,
+60,4,c1,Depth (m),0.76,m,Habitat Suitability Index,1,Suitability index,,1,1,
+60,5,c1,Depth (m),1.22,m,Habitat Suitability Index,0.502,Suitability index,,0.502,0.502,
+60,6,c1,Depth (m),1.83,m,Habitat Suitability Index,0.502,Suitability index,,0.502,0.502,
+61,1,c1,Depth (m),0,m,Habitat Suitability Index,0,Suitability index,,0,0,
+61,2,c1,Depth (m),0.08,m,Habitat Suitability Index,0,Suitability index,,0,0,
+61,3,c1,Depth (m),0.23,m,Habitat Suitability Index,0.2018,Suitability index,,0.2018,0.2018,
+61,4,c1,Depth (m),0.38,m,Habitat Suitability Index,0.6606,Suitability index,,0.6606,0.6606,
+61,5,c1,Depth (m),0.46,m,Habitat Suitability Index,1,Suitability index,,1,1,
+61,6,c1,Depth (m),0.92,m,Habitat Suitability Index,1,Suitability index,,1,1,
+61,7,c1,Depth (m),1.06,m,Habitat Suitability Index,0.4083,Suitability index,,0.4083,0.4083,
+62,1,c1,Depth (m),0,m,Habitat Suitability Index,0,Suitability index,,0,0,
+62,2,c1,Depth (m),0.15,m,Habitat Suitability Index,0,Suitability index,,0,0,
+62,3,c1,Depth (m),0.3,m,Habitat Suitability Index,1,Suitability index,,1,1,
+62,4,c1,Depth (m),0.91,m,Habitat Suitability Index,1,Suitability index,,1,1,
+62,5,c1,Depth (m),1.53,m,Habitat Suitability Index,0,Suitability index,,0,0,
+63,1,c1,Velocity (m/s),0,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+63,2,c1,Velocity (m/s),0.07,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+63,3,c1,Velocity (m/s),0.18,m/s,Habitat Suitability Index,0.8765,Suitability index,,0,1,
+63,4,c1,Velocity (m/s),0.4,m/s,Habitat Suitability Index,1,Suitability index,,0,1,
+63,5,c1,Velocity (m/s),0.62,m/s,Habitat Suitability Index,1,Suitability index,,0,1,
+63,6,c1,Velocity (m/s),0.91,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+63,7,c1,Velocity (m/s),1.83,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+64,1,c1,Velocity (m/s),0,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+64,2,c1,Velocity (m/s),0.09,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+64,3,c1,Velocity (m/s),0.38,m/s,Habitat Suitability Index,0.749,Suitability index,,0.749,0.749,
+64,4,c1,Velocity (m/s),0.92,m/s,Habitat Suitability Index,0.298,Suitability index,,0.298,0.298,
+64,5,c1,Velocity (m/s),1.22,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+64,6,c1,Velocity (m/s),1.83,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+65,1,c1,Velocity (m/s),0,m/s,Habitat Suitability Index,0.2274,Suitability index,,0.2274,0.2274,
+65,2,c1,Velocity (m/s),0.05,m/s,Habitat Suitability Index,0.6093,Suitability index,,0.6093,0.6093,
+65,3,c1,Velocity (m/s),0.09,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+65,4,c1,Velocity (m/s),0.28,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+65,5,c1,Velocity (m/s),0.4,m/s,Habitat Suitability Index,0.5581,Suitability index,,0.5581,0.5581,
+65,6,c1,Velocity (m/s),0.58,m/s,Habitat Suitability Index,0.3061,Suitability index,,0.3061,0.3061,
+65,7,c1,Velocity (m/s),0.79,m/s,Habitat Suitability Index,0.0581,Suitability index,,0.0581,0.0581,
+65,8,c1,Velocity (m/s),0.92,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+65,9,c1,Velocity (m/s),1.82,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+65,10,c1,Velocity (m/s),1.83,m/s,Habitat Suitability Index,0.003,Suitability index,,0.003,0.003,
+66,1,c1,Velocity (m/s),0,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+66,2,c1,Velocity (m/s),0.15,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+66,3,c1,Velocity (m/s),0.3,m/s,Habitat Suitability Index,0.2996,Suitability index,,0.2996,0.2996,
+66,4,c1,Velocity (m/s),0.46,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+66,5,c1,Velocity (m/s),0.85,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+66,6,c1,Velocity (m/s),1.22,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+67,1,c1,Phosphorus loading,0.01,tonnes/ha/year,Mean System Capacity (%),100,% Capacity,,0,100,
+67,2,c1,Phosphorus loading,0.06,tonnes/ha/year,Mean System Capacity (%),70,% Capacity,,0,100,
+67,3,c1,Phosphorus loading,1.1,tonnes/ha/year,Mean System Capacity (%),50,% Capacity,,0,100,
+67,4,c1,Phosphorus loading,14.2,tonnes/ha/year,Mean System Capacity (%),20,% Capacity,,0,100,
+67,5,c1,Phosphorus loading,978,tonnes/ha/year,Mean System Capacity (%),0,% Capacity,,0,100,
+68,1,c1,Phosphorus loading,0.01,tonnes/ha/year,Mean System Capacity (%),100,% Capacity,,0,100,
+68,2,c1,Phosphorus loading,0.06,tonnes/ha/year,Mean System Capacity (%),70,% Capacity,,0,100,
+68,3,c1,Phosphorus loading,1.1,tonnes/ha/year,Mean System Capacity (%),50,% Capacity,,0,100,
+68,4,c1,Phosphorus loading,14.2,tonnes/ha/year,Mean System Capacity (%),20,% Capacity,,0,100,
+68,5,c1,Phosphorus loading,978,tonnes/ha/year,Mean System Capacity (%),0,% Capacity,,0,100,
+69,1,c1,Depth (m),0.195072,m,Density,0,Density,,0,0,
+69,2,c1,Depth (m),1.2192,m,Density,47.2,Density,,47.2,47.2,
+70,1,c1,Pool length (m),1.02,m,Parr capacity scalar/multiplier,1,Scaler,,1,1,
+70,2,c1,Pool length (m),4,m,Parr capacity scalar/multiplier,1,Scaler,,1,1,
+70,3,c1,Pool length (m),4.6,m,Parr capacity scalar/multiplier,0.8772,Scaler,,0.8772,0.8772,
+70,4,c1,Pool length (m),5.25,m,Parr capacity scalar/multiplier,0.7672,Scaler,,0.7672,0.7672,
+70,5,c1,Pool length (m),5.74,m,Parr capacity scalar/multiplier,0.7037,Scaler,,0.7037,0.7037,
+70,6,c1,Pool length (m),6.26,m,Parr capacity scalar/multiplier,0.6487,Scaler,,0.6487,0.6487,
+70,7,c1,Pool length (m),6.79,m,Parr capacity scalar/multiplier,0.5937,Scaler,,0.5937,0.5937,
+70,8,c1,Pool length (m),7.13,m,Parr capacity scalar/multiplier,0.5598,Scaler,,0.5598,0.5598,
+70,9,c1,Pool length (m),7.58,m,Parr capacity scalar/multiplier,0.5302,Scaler,,0.5302,0.5302,
+70,10,c1,Pool length (m),8.38,m,Parr capacity scalar/multiplier,0.4794,Scaler,,0.4794,0.4794,
+70,11,c1,Pool length (m),9.17,m,Parr capacity scalar/multiplier,0.437,Scaler,,0.437,0.437,
+70,12,c1,Pool length (m),10,m,Parr capacity scalar/multiplier,0.4032,Scaler,,0.4032,0.4032,
+71,1,c1,Pool Surface Area (m2),34.18,m2,Density (scaled 0-100),10.21,Density,,0,100,0.61
+71,2,c1,Pool Surface Area (m2),53.16,m2,Density (scaled 0-100),15.7,Density,,0,100,7.93
+71,3,c1,Pool Surface Area (m2),69.62,m2,Density (scaled 0-100),20.58,Density,,0,100,3.05
+71,4,c1,Pool Surface Area (m2),79.75,m2,Density (scaled 0-100),23.93,Density,,0,100,0.3
+71,5,c1,Pool Surface Area (m2),96.2,m2,Density (scaled 0-100),28.2,Density,,0,100,14.94
+71,6,c1,Pool Surface Area (m2),121.52,m2,Density (scaled 0-100),35.21,Density,,0,100,7.93
+71,7,c1,Pool Surface Area (m2),136.71,m2,Density (scaled 0-100),40.4,Density,,0,100,2.74
+71,8,c1,Pool Surface Area (m2),151.9,m2,Density (scaled 0-100),44.66,Density,,0,100,16.16
+71,9,c1,Pool Surface Area (m2),177.22,m2,Density (scaled 0-100),52.59,Density,,0,100,8.23
+71,10,c1,Pool Surface Area (m2),188.61,m2,Density (scaled 0-100),55.95,Density,,0,100,4.88
+71,11,c1,Pool Surface Area (m2),240.51,m2,Density (scaled 0-100),71.8,Density,,0,100,15.85
+71,12,c1,Pool Surface Area (m2),270.89,m2,Density (scaled 0-100),72.1,Density,,0,100,15.55
+71,13,c1,Pool Surface Area (m2),330.38,m2,Density (scaled 0-100),73.02,Density,,0,100,19.21
+71,14,c1,Pool Surface Area (m2),378.48,m2,Density (scaled 0-100),73.93,Density,,0,100,18.29
+71,15,c1,Pool Surface Area (m2),410.13,m2,Density (scaled 0-100),73.93,Density,,0,100,18.29
+71,16,c1,Pool Surface Area (m2),440.51,m2,Density (scaled 0-100),74.24,Density,,0,100,17.99
+71,17,c1,Pool Surface Area (m2),483.54,m2,Density (scaled 0-100),75.15,Density,,0,100,19.82
+71,18,c1,Pool Surface Area (m2),524.05,m2,Density (scaled 0-100),75.76,Density,,0,100,19.21
+71,19,c1,Pool Surface Area (m2),598.73,m2,Density (scaled 0-100),76.37,Density,,0,100,18.6
+71,20,c1,Pool Surface Area (m2),598.73,m2,Density (scaled 0-100),76.37,Density,,0,100,18.6
+72,1,c1,Depth (m),0,m,Habitat Suitability Index,0,Suitability index,,0,0,
+72,2,c1,Depth (m),0.05,m,Habitat Suitability Index,1,Suitability index,,1,1,
+72,3,c1,Depth (m),0.25,m,Habitat Suitability Index,1,Suitability index,,1,1,
+72,4,c1,Depth (m),0.42,m,Habitat Suitability Index,0.4685,Suitability index,,0.4685,0.4685,
+72,5,c1,Depth (m),0.45,m,Habitat Suitability Index,0.3738,Suitability index,,0.3738,0.3738,
+72,6,c1,Depth (m),0.49,m,Habitat Suitability Index,0.295,Suitability index,,0.295,0.295,
+72,7,c1,Depth (m),0.53,m,Habitat Suitability Index,0.2224,Suitability index,,0.2224,0.2224,
+72,8,c1,Depth (m),0.55,m,Habitat Suitability Index,0.1688,Suitability index,,0.1688,0.1688,
+72,9,c1,Depth (m),0.6,m,Habitat Suitability Index,0.1309,Suitability index,,0.1309,0.1309,
+72,10,c1,Depth (m),0.65,m,Habitat Suitability Index,0.0962,Suitability index,,0.0962,0.0962,
+72,11,c1,Depth (m),1,m,Habitat Suitability Index,0.1025,Suitability index,,0.1025,0.1025,
+73,1,c1,Depth (m),0,m,Habitat Suitability Index,0,Suitability index,,0,0,
+73,2,c1,Depth (m),0.25,m,Habitat Suitability Index,1,Suitability index,,1,1,
+73,3,c1,Depth (m),0.5,m,Habitat Suitability Index,1,Suitability index,,1,1,
+73,4,c1,Depth (m),0.75,m,Habitat Suitability Index,0.291,Suitability index,,0.291,0.291,
+73,5,c1,Depth (m),1,m,Habitat Suitability Index,0.1301,Suitability index,,0.1301,0.1301,
+74,1,c1,Depth (m),0.02,m,Habitat Suitability Index,0,Suitability index,,0,0,
+74,2,c1,Depth (m),0.21,m,Habitat Suitability Index,0.7877,Suitability index,,0.7877,0.7877,
+74,3,c1,Depth (m),0.25,m,Habitat Suitability Index,0.9095,Suitability index,,0.9095,0.9095,
+74,4,c1,Depth (m),0.3,m,Habitat Suitability Index,0.98,Suitability index,,0.98,0.98,
+74,5,c1,Depth (m),0.31,m,Habitat Suitability Index,0.98,Suitability index,,0.98,0.98,
+74,6,c1,Depth (m),0.32,m,Habitat Suitability Index,0.9928,Suitability index,,0.9928,0.9928,
+74,7,c1,Depth (m),0.33,m,Habitat Suitability Index,0.9896,Suitability index,,0.9896,0.9896,
+74,8,c1,Depth (m),0.34,m,Habitat Suitability Index,1,Suitability index,,1,1,
+74,9,c1,Depth (m),0.61,m,Habitat Suitability Index,0.9992,Suitability index,,0.9992,0.9992,
+74,10,c1,Depth (m),1,m,Habitat Suitability Index,1,Suitability index,,1,1,
+75,1,c1,Depth (m),0,m,Habitat Suitability Index,0,Suitability index,,0,0,
+75,2,c1,Depth (m),0.61,m,Habitat Suitability Index,1,Suitability index,,1,1,
+75,3,c1,Depth (m),1,m,Habitat Suitability Index,1,Suitability index,,1,1,
+76,1,c1,Velocity (m/s),0,m/s,Habitat Suitability Index,0.1991,Suitability index,,0.1991,0.1991,
+76,2,c1,Velocity (m/s),0.01,m/s,Habitat Suitability Index,0.6003,Suitability index,,0.6003,0.6003,
+76,3,c1,Velocity (m/s),0.03,m/s,Habitat Suitability Index,0.8009,Suitability index,,0.8009,0.8009,
+76,4,c1,Velocity (m/s),0.07,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+76,5,c1,Velocity (m/s),0.2,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+76,6,c1,Velocity (m/s),0.25,m/s,Habitat Suitability Index,0.8503,Suitability index,,0.8503,0.8503,
+76,7,c1,Velocity (m/s),0.31,m/s,Habitat Suitability Index,0.6294,Suitability index,,0.6294,0.6294,
+76,8,c1,Velocity (m/s),0.41,m/s,Habitat Suitability Index,0.3241,Suitability index,,0.3241,0.3241,
+76,9,c1,Velocity (m/s),0.45,m/s,Habitat Suitability Index,0.2166,Suitability index,,0.2166,0.2166,
+76,10,c1,Velocity (m/s),0.61,m/s,Habitat Suitability Index,0.0509,Suitability index,,0.0509,0.0509,
+76,11,c1,Velocity (m/s),0.62,m/s,Habitat Suitability Index,0.0509,Suitability index,,0.0509,0.0509,
+76,12,c1,Velocity (m/s),0.63,m/s,Habitat Suitability Index,0.0392,Suitability index,,0.0392,0.0392,
+76,13,c1,Velocity (m/s),0.64,m/s,Habitat Suitability Index,0.0392,Suitability index,,0.0392,0.0392,
+76,14,c1,Velocity (m/s),0.65,m/s,Habitat Suitability Index,0.0189,Suitability index,,0.0189,0.0189,
+76,15,c1,Velocity (m/s),0.67,m/s,Habitat Suitability Index,0.0189,Suitability index,,0.0189,0.0189,
+76,16,c1,Velocity (m/s),0.68,m/s,Habitat Suitability Index,0.0073,Suitability index,,0.0073,0.0073,
+76,17,c1,Velocity (m/s),0.69,m/s,Habitat Suitability Index,0.0102,Suitability index,,0.0102,0.0102,
+76,18,c1,Velocity (m/s),0.7,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+77,1,c1,Velocity (m/s),0,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+77,2,c1,Velocity (m/s),0.15,m/s,Habitat Suitability Index,0.7798,Suitability index,,0.7798,0.7798,
+77,3,c1,Velocity (m/s),0.29,m/s,Habitat Suitability Index,0.1926,Suitability index,,0.1926,0.1926,
+77,4,c1,Velocity (m/s),0.45,m/s,Habitat Suitability Index,0.0385,Suitability index,,0.0385,0.0385,
+77,5,c1,Velocity (m/s),0.6,m/s,Habitat Suitability Index,0.0094,Suitability index,,0.0094,0.0094,
+77,6,c1,Velocity (m/s),0.8,m/s,Habitat Suitability Index,0.0065,Suitability index,,0.0065,0.0065,
+77,7,c1,Velocity (m/s),0.9,m/s,Habitat Suitability Index,0.0007,Suitability index,,0.0007,0.0007,
+77,8,c1,Velocity (m/s),0.91,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+78,1,c1,Velocity (m/s),0,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+78,2,c1,Velocity (m/s),0.03,m/s,Habitat Suitability Index,0.2012,Suitability index,,0.2012,0.2012,
+78,3,c1,Velocity (m/s),0.07,m/s,Habitat Suitability Index,0.4025,Suitability index,,0.4025,0.4025,
+78,4,c1,Velocity (m/s),0.13,m/s,Habitat Suitability Index,0.6718,Suitability index,,0.6718,0.6718,
+78,5,c1,Velocity (m/s),0.18,m/s,Habitat Suitability Index,0.8297,Suitability index,,0.8297,0.8297,
+78,6,c1,Velocity (m/s),0.2,m/s,Habitat Suitability Index,0.8978,Suitability index,,0.8978,0.8978,
+78,7,c1,Velocity (m/s),0.25,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+78,8,c1,Velocity (m/s),0.55,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+78,9,c1,Velocity (m/s),0.74,m/s,Habitat Suitability Index,0.6966,Suitability index,,0.6966,0.6966,
+78,10,c1,Velocity (m/s),0.86,m/s,Habitat Suitability Index,0.4861,Suitability index,,0.4861,0.4861,
+78,11,c1,Velocity (m/s),1,m/s,Habitat Suitability Index,0.2817,Suitability index,,0.2817,0.2817,
+79,1,c1,Velocity (m/s),0,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+79,2,c1,Velocity (m/s),0.15,m/s,Habitat Suitability Index,0.9868,Suitability index,,0.9868,0.9868,
+79,3,c1,Velocity (m/s),0.3,m/s,Habitat Suitability Index,0.5967,Suitability index,,0.5967,0.5967,
+79,4,c1,Velocity (m/s),0.4,m/s,Habitat Suitability Index,0.3584,Suitability index,,0.3584,0.3584,
+79,5,c1,Velocity (m/s),0.45,m/s,Habitat Suitability Index,0.2407,Suitability index,,0.2407,0.2407,
+79,6,c1,Velocity (m/s),0.6,m/s,Habitat Suitability Index,0.0828,Suitability index,,0.0828,0.0828,
+79,7,c1,Velocity (m/s),0.75,m/s,Habitat Suitability Index,0.0209,Suitability index,,0.0209,0.0209,
+79,8,c1,Velocity (m/s),1,m/s,Habitat Suitability Index,0.0209,Suitability index,,0.0209,0.0209,
+80,1,c1,Depth (m),0,m,Habitat Suitability Index,0,Suitability index,,0,0,
+80,2,c1,Depth (m),0.05,m,Habitat Suitability Index,0.1213,Suitability index,,0.1213,0.1213,
+80,3,c1,Depth (m),0.07,m,Habitat Suitability Index,0.1902,Suitability index,,0.1902,0.1902,
+80,4,c1,Depth (m),0.1,m,Habitat Suitability Index,0.3082,Suitability index,,0.3082,0.3082,
+80,5,c1,Depth (m),0.12,m,Habitat Suitability Index,0.4066,Suitability index,,0.4066,0.4066,
+80,6,c1,Depth (m),0.13,m,Habitat Suitability Index,0.5148,Suitability index,,0.5148,0.5148,
+80,7,c1,Depth (m),0.16,m,Habitat Suitability Index,0.6623,Suitability index,,0.6623,0.6623,
+80,8,c1,Depth (m),0.18,m,Habitat Suitability Index,0.8557,Suitability index,,0.8557,0.8557,
+80,9,c1,Depth (m),0.2,m,Habitat Suitability Index,0.9672,Suitability index,,0.9672,0.9672,
+80,10,c1,Depth (m),0.22,m,Habitat Suitability Index,1,Suitability index,,1,1,
+80,11,c1,Depth (m),1,m,Habitat Suitability Index,1,Suitability index,,1,1,
+81,1,c1,Depth (m),0,m,Habitat Suitability Index,0,Suitability index,,0,0,
+81,2,c1,Depth (m),0.25,m,Habitat Suitability Index,1,Suitability index,,1,1,
+81,3,c1,Depth (m),0.8,m,Habitat Suitability Index,1,Suitability index,,1,1,
+81,4,c1,Depth (m),0.85,m,Habitat Suitability Index,0.8,Suitability index,,0.8,0.8,
+81,5,c1,Depth (m),1,m,Habitat Suitability Index,0.5508,Suitability index,,0.5508,0.5508,
+82,1,c1,Depth (m),0.03,m,Habitat Suitability Index,0,Suitability index,,0,0,
+82,2,c1,Depth (m),0.27,m,Habitat Suitability Index,1,Suitability index,,1,1,
+82,3,c1,Depth (m),0.61,m,Habitat Suitability Index,1,Suitability index,,1,1,
+82,4,c1,Depth (m),0.92,m,Habitat Suitability Index,0.1967,Suitability index,,0.1967,0.1967,
+82,5,c1,Depth (m),1,m,Habitat Suitability Index,0.1705,Suitability index,,0.1705,0.1705,
+83,1,c1,Depth (m),0.03,m,Habitat Suitability Index,0,Suitability index,,0,0,
+83,2,c1,Depth (m),0.21,m,Habitat Suitability Index,1,Suitability index,,1,1,
+83,3,c1,Depth (m),0.3,m,Habitat Suitability Index,1,Suitability index,,1,1,
+83,4,c1,Depth (m),0.37,m,Habitat Suitability Index,0.7508,Suitability index,,0.7508,0.7508,
+83,5,c1,Depth (m),0.57,m,Habitat Suitability Index,0.5377,Suitability index,,0.5377,0.5377,
+83,6,c1,Depth (m),0.67,m,Habitat Suitability Index,0.4361,Suitability index,,0.4361,0.4361,
+83,7,c1,Depth (m),0.8,m,Habitat Suitability Index,0.2852,Suitability index,,0.2852,0.2852,
+83,8,c1,Depth (m),0.91,m,Habitat Suitability Index,0.1508,Suitability index,,0.1508,0.1508,
+83,9,c1,Depth (m),1,m,Habitat Suitability Index,0.1377,Suitability index,,0.1377,0.1377,
+84,1,c1,Velocity (m/s),0,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+84,2,c1,Velocity (m/s),0.09,m/s,Habitat Suitability Index,0.6034,Suitability index,,0.6034,0.6034,
+84,3,c1,Velocity (m/s),0.14,m/s,Habitat Suitability Index,0.7989,Suitability index,,0.7989,0.7989,
+84,4,c1,Velocity (m/s),0.2,m/s,Habitat Suitability Index,0.9397,Suitability index,,0.9397,0.9397,
+84,5,c1,Velocity (m/s),0.26,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+84,6,c1,Velocity (m/s),0.33,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+84,7,c1,Velocity (m/s),0.4,m/s,Habitat Suitability Index,0.9282,Suitability index,,0.9282,0.9282,
+84,8,c1,Velocity (m/s),0.5,m/s,Habitat Suitability Index,0.7672,Suitability index,,0.7672,0.7672,
+84,9,c1,Velocity (m/s),0.7,m/s,Habitat Suitability Index,0.3994,Suitability index,,0.3994,0.3994,
+84,10,c1,Velocity (m/s),0.8,m/s,Habitat Suitability Index,0.2471,Suitability index,,0.2471,0.2471,
+84,11,c1,Velocity (m/s),0.9,m/s,Habitat Suitability Index,0.1466,Suitability index,,0.1466,0.1466,
+84,12,c1,Velocity (m/s),1,m/s,Habitat Suitability Index,0.1006,Suitability index,,0.1006,0.1006,
+84,13,c1,Velocity (m/s),1,m/s,Habitat Suitability Index,0.1006,Suitability index,,0.1006,0.1006,
+85,1,c1,Velocity (m/s),0,m/s,Habitat Suitability Index,0.7989,Suitability index,,0.7989,0.7989,
+85,2,c1,Velocity (m/s),0.07,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+85,3,c1,Velocity (m/s),0.33,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+85,4,c1,Velocity (m/s),0.4,m/s,Habitat Suitability Index,0.931,Suitability index,,0.931,0.931,
+85,5,c1,Velocity (m/s),0.49,m/s,Habitat Suitability Index,0.7931,Suitability index,,0.7931,0.7931,
+85,6,c1,Velocity (m/s),0.71,m/s,Habitat Suitability Index,0.3822,Suitability index,,0.3822,0.3822,
+85,7,c1,Velocity (m/s),0.8,m/s,Habitat Suitability Index,0.2385,Suitability index,,0.2385,0.2385,
+85,8,c1,Velocity (m/s),0.9,m/s,Habitat Suitability Index,0.1408,Suitability index,,0.1408,0.1408,
+85,9,c1,Velocity (m/s),1,m/s,Habitat Suitability Index,0.1006,Suitability index,,0.1006,0.1006,
+86,1,c1,Velocity (m/s),0.03,m/s,Habitat Suitability Index,0,Suitability index,,0,0,
+86,2,c1,Velocity (m/s),0.27,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+86,3,c1,Velocity (m/s),0.61,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+86,4,c1,Velocity (m/s),0.92,m/s,Habitat Suitability Index,0.1967,Suitability index,,0.1967,0.1967,
+86,5,c1,Velocity (m/s),1,m/s,Habitat Suitability Index,0.1705,Suitability index,,0.1705,0.1705,
+87,1,c1,Velocity (m/s),0,m/s,Habitat Suitability Index,0.5237,Suitability index,,0.5237,0.5237,
+87,2,c1,Velocity (m/s),0.04,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+87,3,c1,Velocity (m/s),0.09,m/s,Habitat Suitability Index,1,Suitability index,,1,1,
+87,4,c1,Velocity (m/s),0.12,m/s,Habitat Suitability Index,0.5007,Suitability index,,0.5007,0.5007,
+87,5,c1,Velocity (m/s),0.2,m/s,Habitat Suitability Index,0.4145,Suitability index,,0.4145,0.4145,
+87,6,c1,Velocity (m/s),0.26,m/s,Habitat Suitability Index,0.3455,Suitability index,,0.3455,0.3455,
+87,7,c1,Velocity (m/s),0.3,m/s,Habitat Suitability Index,0.2996,Suitability index,,0.2996,0.2996,
+87,8,c1,Velocity (m/s),0.36,m/s,Habitat Suitability Index,0.2565,Suitability index,,0.2565,0.2565,
+87,9,c1,Velocity (m/s),0.43,m/s,Habitat Suitability Index,0.199,Suitability index,,0.199,0.199,
+87,10,c1,Velocity (m/s),0.46,m/s,Habitat Suitability Index,0.1789,Suitability index,,0.1789,0.1789,
+87,11,c1,Velocity (m/s),0.52,m/s,Habitat Suitability Index,0.1473,Suitability index,,0.1473,0.1473,
+87,12,c1,Velocity (m/s),0.58,m/s,Habitat Suitability Index,0.1128,Suitability index,,0.1128,0.1128,
+87,13,c1,Velocity (m/s),0.61,m/s,Habitat Suitability Index,0.0984,Suitability index,,0.0984,0.0984,
+87,14,c1,Velocity (m/s),0.68,m/s,Habitat Suitability Index,0.0841,Suitability index,,0.0841,0.0841,
+87,15,c1,Velocity (m/s),0.77,m/s,Habitat Suitability Index,0.0639,Suitability index,,0.0639,0.0639,
+87,16,c1,Velocity (m/s),0.91,m/s,Habitat Suitability Index,0.0352,Suitability index,,0.0352,0.0352,
+87,17,c1,Velocity (m/s),1,m/s,Habitat Suitability Index,0.0151,Suitability index,,0.0151,0.0151,
+88,1,c1,6PPD-Quinone Concentration,294.12,ng/L,Survivorship (%),100,% Survivorship,,90,100,0
+88,2,c1,6PPD-Quinone Concentration,6764.71,ng/L,Survivorship (%),96.26,% Survivorship,,80,100,0
+88,3,c1,6PPD-Quinone Concentration,14117.65,ng/L,Survivorship (%),94.98,% Survivorship,,80,98.64,3
+88,4,c1,6PPD-Quinone Concentration,21470.59,ng/L,Survivorship (%),93.26,% Survivorship,,70,98.64,3
+88,5,c1,6PPD-Quinone Concentration,27941.18,ng/L,Survivorship (%),91.27,% Survivorship,,70,98.64,5
+88,6,c1,6PPD-Quinone Concentration,33823.53,ng/L,Survivorship (%),88.95,% Survivorship,,70,98.64,5
+88,7,c1,6PPD-Quinone Concentration,39705.88,ng/L,Survivorship (%),86.02,% Survivorship,,70,98.64,10
+88,8,c1,6PPD-Quinone Concentration,46176.47,ng/L,Survivorship (%),81.89,% Survivorship,,70,95,10
+88,9,c1,6PPD-Quinone Concentration,52352.94,ng/L,Survivorship (%),76.82,% Survivorship,,50,95,10
+88,10,c1,6PPD-Quinone Concentration,57941.18,ng/L,Survivorship (%),71.01,% Survivorship,,50,85,10
+88,11,c1,6PPD-Quinone Concentration,59411.76,ng/L,Survivorship (%),69.26,% Survivorship,,50,85,10
+88,12,c1,6PPD-Quinone Concentration,65588.24,ng/L,Survivorship (%),60.64,% Survivorship,,50,85,6
+88,13,c1,6PPD-Quinone Concentration,69117.65,ng/L,Survivorship (%),54.67,% Survivorship,,50,75,0
+89,1,c1,6PPD-Quinone Concentration,0,ng/L,Survivorship (%),100,% Survivorship,,0,100,0
+89,2,c1,6PPD-Quinone Concentration,5.86,ng/L,Survivorship (%),96.03,% Survivorship,,50,100,3
+89,3,c1,6PPD-Quinone Concentration,10.81,ng/L,Survivorship (%),94.63,% Survivorship,,50,99.53,3
+89,4,c1,6PPD-Quinone Concentration,14.41,ng/L,Survivorship (%),91.82,% Survivorship,,50,99.53,5
+89,5,c1,6PPD-Quinone Concentration,20.27,ng/L,Survivorship (%),86.92,% Survivorship,,50,100,10
+89,6,c1,6PPD-Quinone Concentration,24.77,ng/L,Survivorship (%),82.48,% Survivorship,,29.67,100,10
+89,7,c1,6PPD-Quinone Concentration,27.93,ng/L,Survivorship (%),78.27,% Survivorship,,29.67,100,15
+89,8,c1,6PPD-Quinone Concentration,31.98,ng/L,Survivorship (%),71.26,% Survivorship,,29.67,97.2,20
+89,9,c1,6PPD-Quinone Concentration,35.36,ng/L,Survivorship (%),65.19,% Survivorship,,29.67,97.2,20
+89,10,c1,6PPD-Quinone Concentration,39.41,ng/L,Survivorship (%),57.71,% Survivorship,,29.67,94.39,20
+89,11,c1,6PPD-Quinone Concentration,41.89,ng/L,Survivorship (%),51.64,% Survivorship,,29.67,94.39,25
+89,12,c1,6PPD-Quinone Concentration,45.05,ng/L,Survivorship (%),44.86,% Survivorship,,29.67,94.39,25
+89,13,c1,6PPD-Quinone Concentration,48.42,ng/L,Survivorship (%),38.32,% Survivorship,,0.47,94.39,25
+89,14,c1,6PPD-Quinone Concentration,52.93,ng/L,Survivorship (%),30.14,% Survivorship,,0.47,53.04,25
+89,15,c1,6PPD-Quinone Concentration,54.95,ng/L,Survivorship (%),26.4,% Survivorship,,0.47,53.04,25
+89,16,c1,6PPD-Quinone Concentration,58.11,ng/L,Survivorship (%),21.73,% Survivorship,,0.47,53.04,20
+89,17,c1,6PPD-Quinone Concentration,60.59,ng/L,Survivorship (%),17.99,% Survivorship,,0.47,53.04,20
+89,18,c1,6PPD-Quinone Concentration,64.64,ng/L,Survivorship (%),13.55,% Survivorship,,0.47,53.04,20
+89,19,c1,6PPD-Quinone Concentration,68.69,ng/L,Survivorship (%),9.58,% Survivorship,,0.47,36.68,20
+89,20,c1,6PPD-Quinone Concentration,73.87,ng/L,Survivorship (%),7.01,% Survivorship,,0.47,36.68,10
+89,21,c1,6PPD-Quinone Concentration,80.18,ng/L,Survivorship (%),4.21,% Survivorship,,0.47,27.34,10
+89,22,c1,6PPD-Quinone Concentration,87.84,ng/L,Survivorship (%),2.34,% Survivorship,,0,27.34,10
+89,23,c1,6PPD-Quinone Concentration,99.1,ng/L,Survivorship (%),0.7,% Survivorship,,0,20.79,10
+89,24,c1,6PPD-Quinone Concentration,106.08,ng/L,Survivorship (%),0.23,% Survivorship,,0.23,20.79,10
+90,1,c1,Temperature (Mean Daily Temperature),0,°C,Survivorship (%),0,% Survivorship,,0,100,
+90,2,c1,Temperature (Mean Daily Temperature),1.3,°C,Survivorship (%),1.29,% Survivorship,,0,100,
+90,3,c1,Temperature (Mean Daily Temperature),2,°C,Survivorship (%),20.4,% Survivorship,,0,100,
+90,4,c1,Temperature (Mean Daily Temperature),3,°C,Survivorship (%),47.7,% Survivorship,,0,100,
+90,5,c1,Temperature (Mean Daily Temperature),4,°C,Survivorship (%),75,% Survivorship,,0,100,
+90,6,c1,Temperature (Mean Daily Temperature),4.7,°C,Survivorship (%),94,% Survivorship,,0,100,
+90,7,c1,Temperature (Mean Daily Temperature),6,°C,Survivorship (%),94,% Survivorship,,0,100,
+90,8,c1,Temperature (Mean Daily Temperature),6,°C,Survivorship (%),94,% Survivorship,,0,100,
+90,9,c1,Temperature (Mean Daily Temperature),8,°C,Survivorship (%),94,% Survivorship,,0,100,
+90,10,c1,Temperature (Mean Daily Temperature),10,°C,Survivorship (%),94,% Survivorship,,0,100,
+90,11,c1,Temperature (Mean Daily Temperature),12,°C,Survivorship (%),94,% Survivorship,,0,100,
+90,12,c1,Temperature (Mean Daily Temperature),14,°C,Survivorship (%),94,% Survivorship,,0,100,
+90,13,c1,Temperature (Mean Daily Temperature),14.3,°C,Survivorship (%),93.65,% Survivorship,,0,100,
+90,14,c1,Temperature (Mean Daily Temperature),15,°C,Survivorship (%),76.5,% Survivorship,,0,100,
+90,15,c1,Temperature (Mean Daily Temperature),16,°C,Survivorship (%),52,% Survivorship,,0,100,
+90,16,c1,Temperature (Mean Daily Temperature),17,°C,Survivorship (%),27.5,% Survivorship,,0,100,
+90,17,c1,Temperature (Mean Daily Temperature),18,°C,Survivorship (%),3,% Survivorship,,0,100,
+90,18,c1,Temperature (Mean Daily Temperature),18.1,°C,Survivorship (%),1,% Survivorship,,0,100,
+90,19,c1,Temperature (Mean Daily Temperature),20,°C,Survivorship (%),1,% Survivorship,,0,100,
+91,1,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),8,°C,Survivorship (%),100,% Survivorship,,0,100,
+91,2,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),16,°C,Survivorship (%),100,% Survivorship,,0,100,
+91,3,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),17,°C,Survivorship (%),85,% Survivorship,,0,100,
+91,4,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),18,°C,Survivorship (%),70,% Survivorship,,0,100,
+91,5,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),19,°C,Survivorship (%),55,% Survivorship,,0,100,
+91,6,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),20,°C,Survivorship (%),40,% Survivorship,,0,100,
+91,7,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),21,°C,Survivorship (%),25,% Survivorship,,0,100,
+91,8,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),22,°C,Survivorship (%),10,% Survivorship,,0,100,
+91,9,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),22.6,°C,Survivorship (%),1,% Survivorship,,0,100,
+91,10,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),24,°C,Survivorship (%),1,% Survivorship,,0,100,
+91,11,c1,Temperature (Mean of Daily Maximum Temperatures Aug-Sept),28,°C,Survivorship (%),1,% Survivorship,,0,100,
+92,1,c1,Sediment Increase,1,Unitless,Mean System Capacity (%),100,% Capacity,,0,100,
+92,2,c1,Sediment Increase,1.5,Unitless,Mean System Capacity (%),70,% Capacity,,0,100,
+92,3,c1,Sediment Increase,2.5,Unitless,Mean System Capacity (%),50,% Capacity,,0,100,
+92,4,c1,Sediment Increase,4.4,Unitless,Mean System Capacity (%),20,% Capacity,,0,100,
+92,5,c1,Sediment Increase,10.8,Unitless,Mean System Capacity (%),0,% Capacity,,0,100,
+93,1,c1,Sediment Increase,1,tonnes/ha/year,Mean System Capacity (%),100,% Capacity,,0,100,
+93,2,c1,Sediment Increase,1.5,tonnes/ha/year,Mean System Capacity (%),70,% Capacity,,0,100,
+93,3,c1,Sediment Increase,2.5,tonnes/ha/year,Mean System Capacity (%),50,% Capacity,,0,100,
+93,4,c1,Sediment Increase,4.4,tonnes/ha/year,Mean System Capacity (%),20,% Capacity,,0,100,
+93,5,c1,Sediment Increase,10.8,tonnes/ha/year,Mean System Capacity (%),0,% Capacity,,0,100,
+94,1,c1,Selenium,0,µg/g egg wet weight,Mean System Capacity (%),100,% Capacity,,0,100,
+94,2,c1,Selenium,1.17,µg/g egg wet weight,Mean System Capacity (%),72.51855257,% Capacity,,0,100,
+94,3,c1,Selenium,4.3,µg/g egg wet weight,Mean System Capacity (%),54.08974454,% Capacity,,0,100,
+94,4,c1,Selenium,13,µg/g egg wet weight,Mean System Capacity (%),23.67942532,% Capacity,,0,100,
+94,5,c1,Selenium,20,µg/g egg wet weight,Mean System Capacity (%),0,% Capacity,,0,100,
+94,6,c1,Selenium,31,µg/g egg wet weight,Mean System Capacity (%),0,% Capacity,,0,100,
+95,1,c1,Temperature (7-day Average Daily Maximum),8,°C,Rearing Capacity (%),100,Rearing Capacity % (scaled 1-100),,0,100,
+95,2,c1,Temperature (7-day Average Daily Maximum),18,°C,Rearing Capacity (%),100,Rearing Capacity % (scaled 1-100),,0,100,
+95,3,c1,Temperature (7-day Average Daily Maximum),24,°C,Rearing Capacity (%),0,Rearing Capacity % (scaled 1-100),,0,100,
+95,4,c1,Temperature (7-day Average Daily Maximum),32,°C,Rearing Capacity (%),0,Rearing Capacity % (scaled 1-100),,0,100,
+96,1,c1,Temperature (7-day Average Daily Maximum),8,°C,Survival (%),97.88,% Survival,,0,100,
+96,2,c1,Temperature (7-day Average Daily Maximum),9,°C,Survival (%),97.88,% Survival,,0,100,
+96,3,c1,Temperature (7-day Average Daily Maximum),10,°C,Survival (%),97.88,% Survival,,0,100,
+96,4,c1,Temperature (7-day Average Daily Maximum),11,°C,Survival (%),97.88,% Survival,,0,100,
+96,5,c1,Temperature (7-day Average Daily Maximum),12,°C,Survival (%),97.88,% Survival,,0,100,
+96,6,c1,Temperature (7-day Average Daily Maximum),13,°C,Survival (%),97.88,% Survival,,0,100,
+96,7,c1,Temperature (7-day Average Daily Maximum),14,°C,Survival (%),97.88,% Survival,,0,100,
+96,8,c1,Temperature (7-day Average Daily Maximum),15,°C,Survival (%),97.88,% Survival,,0,100,
+96,9,c1,Temperature (7-day Average Daily Maximum),16,°C,Survival (%),97.88,% Survival,,0,100,
+96,10,c1,Temperature (7-day Average Daily Maximum),17,°C,Survival (%),97.87996,% Survival,,0,100,
+96,11,c1,Temperature (7-day Average Daily Maximum),18,°C,Survival (%),97.87968,% Survival,,0,100,
+96,12,c1,Temperature (7-day Average Daily Maximum),19,°C,Survival (%),97.87764,% Survival,,0,100,
+96,13,c1,Temperature (7-day Average Daily Maximum),20,°C,Survival (%),97.862816,% Survival,,0,100,
+96,14,c1,Temperature (7-day Average Daily Maximum),21,°C,Survival (%),97.754814,% Survival,,0,100,
+96,15,c1,Temperature (7-day Average Daily Maximum),22,°C,Survival (%),96.97436,% Survival,,0,100,
+96,16,c1,Temperature (7-day Average Daily Maximum),23,°C,Survival (%),91.63872,% Survival,,0,100,
+96,17,c1,Temperature (7-day Average Daily Maximum),24,°C,Survival (%),65.39748,% Survival,,0,100,
+96,18,c1,Temperature (7-day Average Daily Maximum),25,°C,Survival (%),21.175673,% Survival,,0,100,
+96,19,c1,Temperature (7-day Average Daily Maximum),26,°C,Survival (%),3.5701032,% Survival,,0,100,
+96,20,c1,Temperature (7-day Average Daily Maximum),27,°C,Survival (%),0.5054464,% Survival,,0,100,
+96,21,c1,Temperature (7-day Average Daily Maximum),28,°C,Survival (%),0.0696179,% Survival,,0,100,
+96,22,c1,Temperature (7-day Average Daily Maximum),29,°C,Survival (%),0.00955,% Survival,,0,100,
+96,23,c1,Temperature (7-day Average Daily Maximum),30,°C,Survival (%),0.00131,% Survival,,0,100,
+97,1,c1,Temperature,0,°C,Mean System Capacity (%),0,% Capacity,,0,100,
+97,2,c1,Temperature,1,°C,Mean System Capacity (%),0,% Capacity,,0,100,
+97,3,c1,Temperature,2,°C,Mean System Capacity (%),0,% Capacity,,0,100,
+97,4,c1,Temperature,3,°C,Mean System Capacity (%),0,% Capacity,,0,100,
+97,5,c1,Temperature,4,°C,Mean System Capacity (%),0,% Capacity,,0,100,
+97,6,c1,Temperature,5,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+97,7,c1,Temperature,6,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+97,8,c1,Temperature,7,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+97,9,c1,Temperature,8,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+97,10,c1,Temperature,9,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+97,11,c1,Temperature,10,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+97,12,c1,Temperature,11,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+97,13,c1,Temperature,12,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+97,14,c1,Temperature,13,°C,Mean System Capacity (%),75,% Capacity,,0,100,
+97,15,c1,Temperature,14,°C,Mean System Capacity (%),50,% Capacity,,0,100,
+97,16,c1,Temperature,15,°C,Mean System Capacity (%),25,% Capacity,,0,100,
+97,17,c1,Temperature,16,°C,Mean System Capacity (%),0,% Capacity,,0,100,
+97,18,c1,Temperature,17,°C,Mean System Capacity (%),0,% Capacity,,0,100,
+97,19,c1,Temperature,18,°C,Mean System Capacity (%),0,% Capacity,,0,100,
+98,1,c1,Temperature,10,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+98,2,c1,Temperature,11,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+98,3,c1,Temperature,12,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+98,4,c1,Temperature,13,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+98,5,c1,Temperature,14,°C,Mean System Capacity (%),100,% Capacity,,0,100,
+98,6,c1,Temperature,15,°C,Mean System Capacity (%),80,% Capacity,,0,100,
+98,7,c1,Temperature,16,°C,Mean System Capacity (%),40,% Capacity,,0,100,
+98,8,c1,Temperature,17,°C,Mean System Capacity (%),10,% Capacity,,0,100,
+98,9,c1,Temperature,17.5,°C,Mean System Capacity (%),0,% Capacity,,0,100,
+98,10,c1,Temperature,18,°C,Mean System Capacity (%),0,% Capacity,,0,100,
+98,11,c1,Temperature,19,°C,Mean System Capacity (%),0,% Capacity,,0,100,
+98,12,c1,Temperature,20,°C,Mean System Capacity (%),0,% Capacity,,0,100,
+99,1,c1,Substrate Fine Coverage (<0.85mm),6.5,Rank Score,Survivorship (%),99.5,% Survival,,0,100,
+99,2,c1,Substrate Fine Coverage (<0.85mm),8,Rank Score,Survivorship (%),77.6,% Survival,,0,100,
+99,3,c1,Substrate Fine Coverage (<0.85mm),10,Rank Score,Survivorship (%),59.4,% Survival,,0,100,
+99,4,c1,Substrate Fine Coverage (<0.85mm),15,Rank Score,Survivorship (%),36.6,% Survival,,0,100,
+99,5,c1,Substrate Fine Coverage (<0.85mm),20,Rank Score,Survivorship (%),25.9,% Survival,,0,100,
+99,6,c1,Substrate Fine Coverage (<0.85mm),25,Rank Score,Survivorship (%),19.9,% Survival,,0,100,
+99,7,c1,Substrate Fine Coverage (<0.85mm),30,Rank Score,Survivorship (%),16,% Survival,,0,100,
+99,8,c1,Substrate Fine Coverage (<0.85mm),35,Rank Score,Survivorship (%),13.3,% Survival,,0,100,
+99,9,c1,Substrate Fine Coverage (<0.85mm),40,Rank Score,Survivorship (%),11.3,% Survival,,0,100,
+99,10,c1,Substrate Fine Coverage (<0.85mm),45,Rank Score,Survivorship (%),9.8,% Survival,,0,100,
+99,11,c1,Substrate Fine Coverage (<0.85mm),50,Rank Score,Survivorship (%),8.7,% Survival,,0,100,
+99,12,c1,Substrate Fine Coverage (<0.85mm),55,Rank Score,Survivorship (%),7.7,% Survival,,0,100,
+100,1,c1,Substrate particles,0,% smaller than 6.35mm,Survival (%),97.13,% Survival,,97.13,97.13,
+100,2,c1,Substrate particles,2.74,% smaller than 6.35mm,Survival (%),97.45,% Survival,,97.45,97.45,
+100,3,c1,Substrate particles,6.86,% smaller than 6.35mm,Survival (%),97.45,% Survival,,97.45,97.45,
+100,4,c1,Substrate particles,12.1,% smaller than 6.35mm,Survival (%),97.45,% Survival,,97.45,97.45,
+100,5,c1,Substrate particles,15.09,% smaller than 6.35mm,Survival (%),96.82,% Survival,,96.82,96.82,
+100,6,c1,Substrate particles,18.59,% smaller than 6.35mm,Survival (%),95.86,% Survival,,95.86,95.86,
+100,7,c1,Substrate particles,21.95,% smaller than 6.35mm,Survival (%),94.27,% Survival,,94.27,94.27,
+100,8,c1,Substrate particles,25.57,% smaller than 6.35mm,Survival (%),91.08,% Survival,,91.08,91.08,
+100,9,c1,Substrate particles,28.94,% smaller than 6.35mm,Survival (%),85.99,% Survival,,85.99,85.99,
+100,10,c1,Substrate particles,31.31,% smaller than 6.35mm,Survival (%),81.21,% Survival,,81.21,81.21,
+100,11,c1,Substrate particles,33.43,% smaller than 6.35mm,Survival (%),75.16,% Survival,,75.16,75.16,
+100,12,c1,Substrate particles,35.18,% smaller than 6.35mm,Survival (%),69.75,% Survival,,69.75,69.75,
+100,13,c1,Substrate particles,36.8,% smaller than 6.35mm,Survival (%),64.01,% Survival,,64.01,64.01,
+100,14,c1,Substrate particles,38.79,% smaller than 6.35mm,Survival (%),55.41,% Survival,,55.41,55.41,
+100,15,c1,Substrate particles,40.17,% smaller than 6.35mm,Survival (%),48.41,% Survival,,48.41,48.41,
+100,16,c1,Substrate particles,42.29,% smaller than 6.35mm,Survival (%),39.49,% Survival,,39.49,39.49,
+100,17,c1,Substrate particles,44.91,% smaller than 6.35mm,Survival (%),29.3,% Survival,,29.3,29.3,
+100,18,c1,Substrate particles,48.02,% smaller than 6.35mm,Survival (%),18.47,% Survival,,18.47,18.47,
+100,19,c1,Substrate particles,50.64,% smaller than 6.35mm,Survival (%),12.1,% Survival,,12.1,12.1,
+100,20,c1,Substrate particles,53.51,% smaller than 6.35mm,Survival (%),7.01,% Survival,,7.01,7.01,
+100,21,c1,Substrate particles,56.26,% smaller than 6.35mm,Survival (%),3.82,% Survival,,3.82,3.82,
+100,22,c1,Substrate particles,58.25,% smaller than 6.35mm,Survival (%),2.87,% Survival,,2.87,2.87,
+100,23,c1,Substrate particles,59.88,% smaller than 6.35mm,Survival (%),2.55,% Survival,,2.55,2.55,
+100,24,c1,Substrate particles,59.88,% smaller than 6.35mm,Survival (%),2.55,% Survival,,2.55,2.55,
+101,1,c1,Substrate particles,0,% smaller than 6.35mm,Survival (%),94.66,% Survival,,94.66,94.66,0
+101,2,c1,Substrate particles,3.46,% smaller than 6.35mm,Survival (%),93.95,% Survival,,93.95,93.95,0.71
+101,3,c1,Substrate particles,7.21,% smaller than 6.35mm,Survival (%),93.24,% Survival,,93.24,93.24,6.41
+101,4,c1,Substrate particles,11.92,% smaller than 6.35mm,Survival (%),91.81,% Survival,,91.81,91.81,4.98
+101,5,c1,Substrate particles,15.24,% smaller than 6.35mm,Survival (%),90.39,% Survival,,90.39,90.39,11.03
+101,6,c1,Substrate particles,22.59,% smaller than 6.35mm,Survival (%),85.05,% Survival,,85.05,85.05,15.66
+101,7,c1,Substrate particles,27.3,% smaller than 6.35mm,Survival (%),79.36,% Survival,,79.36,79.36,21
+101,8,c1,Substrate particles,31.32,% smaller than 6.35mm,Survival (%),71.53,% Survival,,71.53,71.53,13.17
+101,9,c1,Substrate particles,35.47,% smaller than 6.35mm,Survival (%),61.57,% Survival,,61.57,61.57,16.73
+101,10,c1,Substrate particles,39.91,% smaller than 6.35mm,Survival (%),47.33,% Survival,,47.33,47.33,27.76
+101,11,c1,Substrate particles,43.23,% smaller than 6.35mm,Survival (%),36.65,% Survival,,36.65,36.65,17.08
+101,12,c1,Substrate particles,46.7,% smaller than 6.35mm,Survival (%),27.4,% Survival,,27.4,27.4,18.15
+101,13,c1,Substrate particles,50.3,% smaller than 6.35mm,Survival (%),18.51,% Survival,,18.51,18.51,9.25
+101,14,c1,Substrate particles,54.87,% smaller than 6.35mm,Survival (%),10.68,% Survival,,10.68,10.68,5.34
+101,15,c1,Substrate particles,59.86,% smaller than 6.35mm,Survival (%),6.41,% Survival,,6.41,6.41,0
+102,1,c1,Temperature,8,°C,Growth Rate (%),1.1969,% Growth Rate,,0.64,1.77,0
+102,2,c1,Temperature,9,°C,Growth Rate (%),1.5549,% Growth Rate,,1.02,2.09,0.16
+102,3,c1,Temperature,10,°C,Growth Rate (%),1.8433,% Growth Rate,,1.29,2.45,0.28
+102,4,c1,Temperature,11,°C,Growth Rate (%),2.0621,% Growth Rate,,1.52,2.58,0.22
+102,5,c1,Temperature,12,°C,Growth Rate (%),2.2113,% Growth Rate,,1.66,2.76,0.23
+102,6,c1,Temperature,13,°C,Growth Rate (%),2.2909,% Growth Rate,,1.76,2.83,0.21
+102,7,c1,Temperature,14,°C,Growth Rate (%),2.3009,% Growth Rate,,1.76,2.84,0.21
+102,8,c1,Temperature,15,°C,Growth Rate (%),2.2413,% Growth Rate,,1.73,2.78,0.22
+102,9,c1,Temperature,16,°C,Growth Rate (%),2.1121,% Growth Rate,,1.61,2.65,0.13
+102,10,c1,Temperature,17,°C,Growth Rate (%),1.9133,% Growth Rate,,1.4,2.44,0.18
+102,11,c1,Temperature,18,°C,Growth Rate (%),1.6449,% Growth Rate,,1.13,2.24,0.16
+102,12,c1,Temperature,19,°C,Growth Rate (%),1.3069,% Growth Rate,,0.76,1.88,0.14
+102,13,c1,Temperature,20,°C,Growth Rate (%),0.8993,% Growth Rate,,0.35,1.49,0
+103,1,c1,Temperature,8,°C,Growth Rate (%),1.7349,% Growth Rate,,0.95,2.5,0.35
+103,2,c1,Temperature,9,°C,Growth Rate (%),1.8922,% Growth Rate,,1.1,2.63,0.36
+103,3,c1,Temperature,10,°C,Growth Rate (%),2.0149,% Growth Rate,,1.22,2.81,0.3
+103,4,c1,Temperature,11,°C,Growth Rate (%),2.103,% Growth Rate,,1.34,2.85,0.25
+103,5,c1,Temperature,12,°C,Growth Rate (%),2.1565,% Growth Rate,,1.42,2.91,0.25
+103,6,c1,Temperature,13,°C,Growth Rate (%),2.1754,% Growth Rate,,1.44,2.91,0.26
+103,7,c1,Temperature,14,°C,Growth Rate (%),2.1597,% Growth Rate,,1.43,2.91,0.23
+103,8,c1,Temperature,15,°C,Growth Rate (%),2.1094,% Growth Rate,,1.4,2.85,0.2
+103,9,c1,Temperature,16,°C,Growth Rate (%),2.0245,% Growth Rate,,1.29,2.76,0.24
+103,10,c1,Temperature,17,°C,Growth Rate (%),1.905,% Growth Rate,,1.23,2.67,0.23
+103,11,c1,Temperature,18,°C,Growth Rate (%),1.7509,% Growth Rate,,1,2.42,0.3
+103,12,c1,Temperature,19,°C,Growth Rate (%),1.5622,% Growth Rate,,0.87,2.28,0.21
+103,13,c1,Temperature,20,°C,Growth Rate (%),1.3389,% Growth Rate,,0.65,2.14,0.35
+103,14,c1,Temperature,21,°C,Growth Rate (%),1.081,% Growth Rate,,0.34,1.9,0.28
+103,15,c1,Temperature,22,°C,Growth Rate (%),0.7885,% Growth Rate,,0.04,1.61,0.4
+103,16,c1,Temperature,23,°C,Growth Rate (%),0.4614,% Growth Rate,,0.48,1.29,0.41
+103,17,c1,Temperature,24,°C,Growth Rate (%),0.0997,% Growth Rate,,0.13,0.87,0.32
+104,1,c1,Temperature,8,°C,Survival (%),97.8846,% Survival,,76.6,100,3.65
+104,2,c1,Temperature,9,°C,Survival (%),97.8846,% Survival,,76.6,100,4
+104,3,c1,Temperature,10,°C,Survival (%),97.8846,% Survival,,76.96,100,3.65
+104,4,c1,Temperature,11,°C,Survival (%),97.8846,% Survival,,76.96,100,3.29
+104,5,c1,Temperature,12,°C,Survival (%),97.8846,% Survival,,76.25,100,2.94
+104,6,c1,Temperature,13,°C,Survival (%),97.8846,% Survival,,76.25,100,3.29
+104,7,c1,Temperature,14,°C,Survival (%),97.8846,% Survival,,76.25,100,3.65
+104,8,c1,Temperature,15,°C,Survival (%),97.8846,% Survival,,76.25,100,4
+104,9,c1,Temperature,16,°C,Survival (%),97.88459,% Survival,,76.6,100,3.65
+104,10,c1,Temperature,17,°C,Survival (%),97.88455,% Survival,,76.6,100,2.94
+104,11,c1,Temperature,18,°C,Survival (%),97.88428,% Survival,,76.6,100,2.94
+104,12,c1,Temperature,19,°C,Survival (%),97.88224,% Survival,,76.6,100,2.94
+104,13,c1,Temperature,20,°C,Survival (%),97.86742,% Survival,,76.6,100,2.94
+104,14,c1,Temperature,21,°C,Survival (%),97.759415,% Survival,,76.6,100,2.94
+104,15,c1,Temperature,22,°C,Survival (%),96.97891,% Survival,,75.89,100,3.29
+104,16,c1,Temperature,23,°C,Survival (%),91.64302,% Survival,,73.4,100,5.43
+104,17,c1,Temperature,24,°C,Survival (%),65.40055,% Survival,,39.95,93.46,11.12
+104,18,c1,Temperature,25,°C,Survival (%),21.176668,% Survival,,0,51.82,8.27
+104,19,c1,Temperature,26,°C,Survival (%),3.570271,% Survival,,4,27.62,2.94
+104,20,c1,Temperature,27,°C,Survival (%),0.50547016,% Survival,,0.44,21.57,0.09
+104,21,c1,Temperature,28,°C,Survival (%),0.06962114,% Survival,,0,21.22,0.8
+105,1,c1,Temperature,8,°C,Survival (%),99.0768,% Survival,,63.75,99.96,5.8
+105,2,c1,Temperature,9,°C,Survival (%),99.0768,% Survival,,63.75,99.96,5.8
+105,3,c1,Temperature,10,°C,Survival (%),99.07678,% Survival,,63.75,99.96,5.8
+105,4,c1,Temperature,11,°C,Survival (%),99.07672,% Survival,,63.75,99.96,6.16
+105,5,c1,Temperature,12,°C,Survival (%),99.07639,% Survival,,63.75,99.96,6.52
+105,6,c1,Temperature,13,°C,Survival (%),99.07472,% Survival,,63.75,100,6.52
+105,7,c1,Temperature,14,°C,Survival (%),99.06623,% Survival,,63.75,100,7.23
+105,8,c1,Temperature,15,°C,Survival (%),99.023094,% Survival,,63.75,100,7.23
+105,9,c1,Temperature,16,°C,Survival (%),98.80446,% Survival,,63.75,100,6.88
+105,10,c1,Temperature,17,°C,Survival (%),97.70805,% Survival,,63.39,100,6.88
+105,11,c1,Temperature,18,°C,Survival (%),92.49185,% Survival,,55.89,97.46,12.59
+105,12,c1,Temperature,19,°C,Survival (%),72.75273,% Survival,,15.54,94.24,18.3
+105,13,c1,Temperature,20,°C,Survival (%),34.899677,% Survival,,0.54,66.03,2.23
+105,14,c1,Temperature,21,°C,Survival (%),9.576574,% Survival,,0,44.96,1.16
+105,15,c1,Temperature,22,°C,Survival (%),2.042934,% Survival,,0,38.53,0.09
+105,16,c1,Temperature,23,°C,Survival (%),0.40874502,% Survival,,0,33.88,0.98
+105,17,c1,Temperature,24,°C,Survival (%),0.08069357,% Survival,,0,33.88,2.59
+105,18,c1,Temperature,25,°C,Survival (%),0.015887957,% Survival,,0,33.53,2.59
+105,19,c1,Temperature,26,°C,Survival (%),0.003126576,% Survival,,0,33.88,2.59
+105,20,c1,Temperature,27,°C,Survival (%),0.00061521,% Survival,,0,33.88,3.66
+105,21,c1,Temperature,28,°C,Survival (%),0.00012105,% Survival,,0,34.6,3.66
+106,1,c1,Turbidity (by riffle depth 0.1m),0,NTU,Density,1,Scaler,,1,1,
+106,2,c1,Turbidity (by riffle depth 0.1m),10.32,NTU,Density,0.95,Scaler,,0.95,0.95,
+106,3,c1,Turbidity (by riffle depth 0.1m),19,NTU,Density,0.9,Scaler,,0.9,0.9,
+106,4,c1,Turbidity (by riffle depth 0.1m),36.38,NTU,Density,0.82,Scaler,,0.82,0.82,
+106,5,c1,Turbidity (by riffle depth 0.1m),52.49,NTU,Density,0.75,Scaler,,0.75,0.75,
+106,6,c1,Turbidity (by riffle depth 0.1m),67.15,NTU,Density,0.69,Scaler,,0.69,0.69,
+106,7,c1,Turbidity (by riffle depth 0.1m),80,NTU,Density,0.64,Scaler,,0.64,0.64,
+107,1,c1,Turbidity (by riffle depth 0.3m),0,NTU,Density,1,Scaler,,0,1,
+107,2,c1,Turbidity (by riffle depth 0.3m),7.78,NTU,Density,0.88,Scaler,,0,1,
+107,3,c1,Turbidity (by riffle depth 0.3m),13.94,NTU,Density,0.8,Scaler,,0,1,
+107,4,c1,Turbidity (by riffle depth 0.3m),20.27,NTU,Density,0.72,Scaler,,0,1,
+107,5,c1,Turbidity (by riffle depth 0.3m),28.6,NTU,Density,0.62,Scaler,,0,1,
+107,6,c1,Turbidity (by riffle depth 0.3m),37.83,NTU,Density,0.53,Scaler,,0,1,
+107,7,c1,Turbidity (by riffle depth 0.3m),44.34,NTU,Density,0.48,Scaler,,0,1,
+107,8,c1,Turbidity (by riffle depth 0.3m),51.58,NTU,Density,0.42,Scaler,,0,1,
+107,9,c1,Turbidity (by riffle depth 0.3m),60.27,NTU,Density,0.37,Scaler,,0,1,
+107,10,c1,Turbidity (by riffle depth 0.3m),68.05,NTU,Density,0.32,Scaler,,0,1,
+107,11,c1,Turbidity (by riffle depth 0.3m),74.93,NTU,Density,0.29,Scaler,,0,1,
+107,12,c1,Turbidity (by riffle depth 0.3m),80,NTU,Density,0.27,Scaler,,0,1,
+108,1,c1,Turbidity (by riffle depth 0.5m),0,NTU,Density,1,Scaler,,0,1,
+108,2,c1,Turbidity (by riffle depth 0.5m),4.52,NTU,Density,0.88,Scaler,,0,1,
+108,3,c1,Turbidity (by riffle depth 0.5m),10.32,NTU,Density,0.75,Scaler,,0,1,
+108,4,c1,Turbidity (by riffle depth 0.5m),17.01,NTU,Density,0.63,Scaler,,0,1,
+108,5,c1,Turbidity (by riffle depth 0.5m),23.71,NTU,Density,0.52,Scaler,,0,1,
+108,6,c1,Turbidity (by riffle depth 0.5m),30.23,NTU,Density,0.43,Scaler,,0,1,
+108,7,c1,Turbidity (by riffle depth 0.5m),38.19,NTU,Density,0.35,Scaler,,0,1,
+108,8,c1,Turbidity (by riffle depth 0.5m),46.88,NTU,Density,0.27,Scaler,,0,1,
+108,9,c1,Turbidity (by riffle depth 0.5m),56.29,NTU,Density,0.21,Scaler,,0,1,
+108,10,c1,Turbidity (by riffle depth 0.5m),65.7,NTU,Density,0.16,Scaler,,0,1,
+108,11,c1,Turbidity (by riffle depth 0.5m),74.93,NTU,Density,0.12,Scaler,,0,1,
+108,12,c1,Turbidity (by riffle depth 0.5m),80,NTU,Density,0.11,Scaler,,0,1,
+109,1,c1,Flow Withdrawal (February and August),0,%,Mean System Capacity (%),100,% Capacity,February,0,100,
+109,2,c1,Flow Withdrawal (February and August),10,%,Mean System Capacity (%),90,% Capacity,February,0,100,
+109,3,c1,Flow Withdrawal (February and August),20,%,Mean System Capacity (%),80,% Capacity,February,0,100,
+109,4,c1,Flow Withdrawal (February and August),30,%,Mean System Capacity (%),70,% Capacity,February,0,100,
+109,5,c1,Flow Withdrawal (February and August),40,%,Mean System Capacity (%),60,% Capacity,February,0,100,
+109,6,c1,Flow Withdrawal (February and August),50,%,Mean System Capacity (%),50,% Capacity,February,0,100,
+109,7,c1,Flow Withdrawal (February and August),60,%,Mean System Capacity (%),40,% Capacity,February,0,100,
+109,8,c1,Flow Withdrawal (February and August),70,%,Mean System Capacity (%),30,% Capacity,February,0,100,
+109,9,c1,Flow Withdrawal (February and August),80,%,Mean System Capacity (%),20,% Capacity,February,0,100,
+109,10,c1,Flow Withdrawal (February and August),90,%,Mean System Capacity (%),10,% Capacity,February,0,100,
+109,11,c1,Flow Withdrawal (February and August),100,%,Mean System Capacity (%),0,% Capacity,February,0,100,
+109,12,c2,Flow Withdrawal (February and August),0,%,Mean System Capacity (%),100,% Capacity,August,0,100,
+109,13,c2,Flow Withdrawal (February and August),10,%,Mean System Capacity (%),96,% Capacity,August,0,100,
+109,14,c2,Flow Withdrawal (February and August),20,%,Mean System Capacity (%),90,% Capacity,August,0,100,
+109,15,c2,Flow Withdrawal (February and August),30,%,Mean System Capacity (%),82,% Capacity,August,0,100,
+109,16,c2,Flow Withdrawal (February and August),40,%,Mean System Capacity (%),74,% Capacity,August,0,100,
+109,17,c2,Flow Withdrawal (February and August),50,%,Mean System Capacity (%),64,% Capacity,August,0,100,
+109,18,c2,Flow Withdrawal (February and August),60,%,Mean System Capacity (%),54,% Capacity,August,0,100,
+109,19,c2,Flow Withdrawal (February and August),70,%,Mean System Capacity (%),40,% Capacity,August,0,100,
+109,20,c2,Flow Withdrawal (February and August),80,%,Mean System Capacity (%),28,% Capacity,August,0,100,
+109,21,c2,Flow Withdrawal (February and August),90,%,Mean System Capacity (%),13.6,% Capacity,August,0,100,
+109,22,c2,Flow Withdrawal (February and August),100,%,Mean System Capacity (%),0,% Capacity,August,0,100,
+110,1,c1,Whirling Disease Risk Factor,0,Unitless,Mean System Capacity (%),100,% Capacity,,0,100,
+110,2,c1,Whirling Disease Risk Factor,1,Unitless,Mean System Capacity (%),80,% Capacity,,0,100,
+110,3,c1,Whirling Disease Risk Factor,2,Unitless,Mean System Capacity (%),60,% Capacity,,0,100,
+110,4,c1,Whirling Disease Risk Factor,3,Unitless,Mean System Capacity (%),40,% Capacity,,0,100,
+110,5,c1,Whirling Disease Risk Factor,4,Unitless,Mean System Capacity (%),20,% Capacity,,0,100,
+110,6,c1,Whirling Disease Risk Factor,5,Unitless,Mean System Capacity (%),0,% Capacity,,0,100,
+111,1,c1,Substrate in Cobble (%),0,%,Density,0.2,Scaler,,0,1,
+111,2,c1,Substrate in Cobble (%),0.15,%,Density,1,Scaler,,0,1,
+111,3,c1,Substrate in Cobble (%),1,%,Density,1,Scaler,,0,1,
+112,1,c1,Wood Cover,1,Wood Complexity Rating,Density,0.32065216,Scaler,,0,1,
+112,2,c1,Wood Cover,4,Wood Complexity Rating,Density,1,Scaler,,0,1,
+112,3,c1,Wood Cover,5,Wood Complexity Rating,Density,1,Scaler,,0,1,
