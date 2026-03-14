@@ -1,7 +1,9 @@
 # files
 .Renviron
 .RData
+.Rprofile
 
 # folders
-_notes/*
+_notes
 /data/postgres_backups/*
+/renv
