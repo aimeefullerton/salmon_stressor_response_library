@@ -48,6 +48,44 @@ renv::snapshot()            # update renv.lock for local development
 rsconnect::writeManifest()  # update manifest.json for Posit Connect deployment
 ```
 
+Then commit both files together:
+
+```bash
+git add renv.lock manifest.json
+git commit -m "update dependencies"
+git push
+```
+
+## CI/CD Enforcement
+
+A GitHub Actions workflow (`.github/workflows/check-dependencies.yml`) automatically validates that both files are in sync on every push and pull request. It:
+
+- Restores the `renv` library and checks that `renv.lock` matches the project's actual dependencies
+- Regenerates `manifest.json` and checks that the committed version matches
+
+If either check fails, the workflow exits with a clear message telling you exactly which command to run locally to fix it. **The CI never silently rewrites these files** — that responsibility stays with the developer.
+
+The `main` and `staging` branches are protected: the `check-deps` status check must pass before any pull request can be merged. This ensures that out-of-sync dependency files can never make it into staging or production.
+
+### Full developer workflow when adding or updating a package
+
+```
+1. Install the package locally
+   renv::install("packageName")
+
+2. Update both dependency files
+   renv::snapshot()
+   rsconnect::writeManifest()
+
+3. Commit everything together
+   git add renv.lock manifest.json
+   git commit -m "add packageName dependency"
+   git push
+
+4. GitHub Actions validates the files  ← fails loudly if steps 2-3 were skipped
+5. PR can be merged to staging/main once the check passes
+```
+
 ## Summary
 
 | | `renv.lock` | `manifest.json` |
