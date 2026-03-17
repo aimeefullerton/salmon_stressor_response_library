@@ -3827,6 +3827,9 @@
     "_notes/sql_queries.txt": {
       "checksum": "8a82aae483a7fc454448ff0f74a36241"
     },
+    ".gitattributes": {
+      "checksum": "c0a42253ba94ae18f5d75b414c5b3b4e"
+    },
     ".github/workflows/check-dependencies.yml": {
       "checksum": "b0afde659b9492a8f1faf8b09fab5bca"
     },
@@ -3843,7 +3846,7 @@
       "checksum": "459c349c9227bab10b03c2616446171e"
     },
     ".Rprofile": {
-      "checksum": "0db3591ba6829d9e6204e55afa88caae"
+      "checksum": "9552a6c212aad9fc2b023a0ea7f32162"
     },
     "app.R": {
       "checksum": "93970e5798eb59eee6e554e1fda639ef"
