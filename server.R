@@ -28,18 +28,31 @@ server <- function(input, output, session) {
     data <- data.frame()
   } else {
     data <- dbGetQuery(db, "SELECT * FROM stressor_responses ORDER BY article_id ASC")
+
+    # Parse Postgres text[] columns into R character vectors
+    pq_array_cols <- names(data)[sapply(data, inherits, "pq__text")]
+    data[pq_array_cols] <- lapply(data[pq_array_cols], function(col) {
+      lapply(col, function(x) {
+        if (is.null(x) || is.na(x) || !nzchar(x)) return(character(0))
+        x <- gsub("^\\{|\\}$", "", x)
+        parts <- strsplit(x, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", perl = TRUE)[[1]]
+        parts <- gsub('^"|"$', "", trimws(parts))
+        parts[parts != "NULL" & nzchar(parts)]
+      })
+    })
   }
 
   # ── Filter dropdowns ───────────────────────────────────────────────────────
   getCategoryChoices <- function(column_name) {
+    # Use unnest() so each array element becomes its own distinct row
     tryCatch(
       dbGetQuery(
         db,
         sprintf(
-          "SELECT DISTINCT %s FROM stressor_responses WHERE %s IS NOT NULL ORDER BY %s",
-          column_name, column_name, column_name
+          "SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL ORDER BY val",
+          column_name, column_name
         )
-      )[[column_name]],
+      )[["val"]],
       error = function(e) character(0)
     )
   }
@@ -111,67 +124,64 @@ server <- function(input, output, session) {
     lapply(ids, function(mid) {
       mid_str <- as.character(mid)
 
-      # ── Open modal ────────────────────────────────────────────────────────
-      # always re-register (safe, modal UI is recreated each time)
+      # ── Open modal ──────────────────────────────────────────────────────────
       observeEvent(input[[paste0("view_article_", mid)]],
         {
+          paper_row <- paginated_data()[paginated_data()$article_id == mid, , drop = FALSE]
+
           showModal(modalDialog(
             title     = paste("Article", mid),
             render_article_ui(mid, paginated_data()),
             easyClose = TRUE,
             size      = "l"
           ))
+
           if (!mid_str %in% initialized_articles) {
-            render_article_server(input, output, session, mid, db)
+            render_article_server(input, output, session, mid, paper_row, db)
+
+            # ── Expand all ────────────────────────────────────────────────────
+            observeEvent(input[[paste0("expand_all_", mid)]],
+              {
+                shinyjs::show(paste0("metadata_section_", mid))
+                shinyjs::show(paste0("description_section_", mid))
+                shinyjs::show(paste0("citations_section_", mid))
+                shinyjs::show(paste0("csv_section_", mid))
+                shinyjs::show(paste0("interactive_plot_section_", mid))
+              },
+              ignoreInit = TRUE
+            )
+
+            # ── Collapse all ──────────────────────────────────────────────────
+            observeEvent(input[[paste0("collapse_all_", mid)]],
+              {
+                shinyjs::hide(paste0("metadata_section_", mid))
+                shinyjs::hide(paste0("description_section_", mid))
+                shinyjs::hide(paste0("citations_section_", mid))
+                shinyjs::hide(paste0("csv_section_", mid))
+                shinyjs::hide(paste0("interactive_plot_section_", mid))
+              },
+              ignoreInit = TRUE
+            )
+
+            # ── Section toggles ───────────────────────────────────────────────
+            for (section in c("metadata", "description", "citations", "csv", "interactive_plot")) {
+              local({
+                s <- section
+                m <- mid
+                observeEvent(input[[paste0("toggle_", s, "_", m)]],
+                  {
+                    shinyjs::toggle(paste0(s, "_section_", m))
+                  },
+                  ignoreInit = TRUE
+                )
+              })
+            }
+
             initialized_articles <<- c(initialized_articles, mid_str)
           }
         },
         ignoreInit = TRUE
       )
-
-      # guard all per-article observers with the same initialized_articles check
-      if (!mid_str %in% initialized_articles) {
-        # ── Expand all ────────────────────────────────────────────────────────
-        observeEvent(input[[paste0("expand_all_", mid)]],
-          {
-            shinyjs::show(paste0("metadata_section_", mid))
-            shinyjs::show(paste0("description_section_", mid))
-            shinyjs::show(paste0("citations_section_", mid))
-            shinyjs::show(paste0("csv_section_", mid))
-            shinyjs::show(paste0("interactive_plot_section_", mid))
-          },
-          ignoreInit = TRUE
-        )
-        # ── Collapse all ──────────────────────────────────────────────────────
-        observeEvent(input[[paste0("collapse_all_", mid)]],
-          {
-            shinyjs::hide(paste0("metadata_section_", mid))
-            shinyjs::hide(paste0("description_section_", mid))
-            shinyjs::hide(paste0("citations_section_", mid))
-            shinyjs::hide(paste0("csv_section_", mid))
-            shinyjs::hide(paste0("interactive_plot_section_", mid))
-          },
-          ignoreInit = TRUE
-        )
-
-        # ── Section toggles ───────────────────────────────────────────────────
-        # shinyjs::toggle + arrow label updates are both handled in
-        # render_article_server.R so they stay in sync. Only the
-        # show/hide calls for expand/collapse all remain here.
-        for (section in c("metadata", "description", "citations", "csv", "interactive_plot")) {
-          local({
-            s <- section
-            m <- mid
-            observeEvent(input[[paste0("toggle_", s, "_", m)]],
-              {
-                shinyjs::toggle(paste0(s, "_section_", m))
-              },
-              ignoreInit = TRUE
-            )
-          })
-        }
-        # Note: updateActionLink for arrow labels is in render_article_server.R
-      }
     })
   })
 }

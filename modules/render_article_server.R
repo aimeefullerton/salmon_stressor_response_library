@@ -8,33 +8,22 @@ library(plotly)
 library(RPostgres)
 library(pool)
 
-render_article_server <- function(input, output, session, paper_id, db) {
-  if (missing(db)) {
-    stop("Database connection (db) is missing!")
-  }
+render_article_server <- function(input, output, session, paper_id, paper_row, db) {
+  # ── Get article data from server.R ────────────────────────────────────────────
 
-  # ── Fetch article data ─────────────────────────────────────────────────────
-  paper <- dbGetQuery(db,
-    "SELECT * FROM stressor_responses WHERE article_id = $1",
-    params = list(paper_id)
-  )
-
-  if (nrow(paper) == 0) {
+  if (missing(paper_row) || is.null(paper_row) || nrow(paper_row) == 0) {
     return(NULL)
   }
 
-  # Parse pq__text (Postgres text[] arrays) into clean comma-separated strings
-  pq_text_cols <- names(paper)[sapply(paper, inherits, "pq__text")]
-  paper[pq_text_cols] <- lapply(paper[pq_text_cols], function(col) {
-    sapply(col, function(x) {
-      if (is.na(x) || !nzchar(x)) return(NA_character_)
-      # Strip outer braces, split on commas, clean quotes and whitespace
-      x <- gsub("^\\{|\\}$", "", x)               # remove { }
-      parts <- strsplit(x, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", perl = TRUE)[[1]]
-      parts <- gsub('^"|"$', "", trimws(parts))    # remove surrounding quotes
-      parts <- parts[parts != "NULL" & nzchar(parts)]
-      paste(parts, collapse = ", ")
-    })
+  paper <- paper_row
+
+  # Collapse pre-parsed text[] list columns into display strings
+  list_cols <- names(paper)[sapply(paper, is.list)]
+  paper[list_cols] <- lapply(paper[list_cols], function(col) {
+    vapply(col, function(x) {
+      if (length(x) == 0 || all(is.na(x))) NA_character_
+      else paste(x[!is.na(x)], collapse = ", ")
+    }, character(1))
   })
 
   paper <- paper[1, , drop = FALSE]
