@@ -22,7 +22,22 @@ render_article_server <- function(input, output, session, paper_id, db) {
   if (nrow(paper) == 0) {
     return(NULL)
   }
-  paper <- paper[1, ]
+
+  # Parse pq__text (Postgres text[] arrays) into clean comma-separated strings
+  pq_text_cols <- names(paper)[sapply(paper, inherits, "pq__text")]
+  paper[pq_text_cols] <- lapply(paper[pq_text_cols], function(col) {
+    sapply(col, function(x) {
+      if (is.na(x) || !nzchar(x)) return(NA_character_)
+      # Strip outer braces, split on commas, clean quotes and whitespace
+      x <- gsub("^\\{|\\}$", "", x)               # remove { }
+      parts <- strsplit(x, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", perl = TRUE)[[1]]
+      parts <- gsub('^"|"$', "", trimws(parts))    # remove surrounding quotes
+      parts <- parts[parts != "NULL" & nzchar(parts)]
+      paste(parts, collapse = ", ")
+    })
+  })
+
+  paper <- paper[1, , drop = FALSE]
 
   # ── Toggle button labels ───────────────────────────────────────────────────
   # Used by updateActionLink in server.R's expand/collapse handlers
@@ -124,7 +139,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
   }
 
   # ── Parse citations ────────────────────────────────────────────────────────
-  paper$citations <- parse_jsonb(paper$citations)
+  citations_data <- parse_jsonb(paper$citations)
 
   # ── Render metadata ────────────────────────────────────────────────────────
   output[[paste0("article_title_", paper_id)]] <- renderText({
@@ -135,14 +150,13 @@ render_article_server <- function(input, output, session, paper_id, db) {
   output[[paste0("stressor_name_", paper_id)]] <- renderText(safe_get(paper, "stressor_name"))
   output[[paste0("response_", paper_id)]] <- renderText(safe_get(paper, "response"))
   output[[paste0("specific_stressor_metric_", paper_id)]] <- renderText(safe_get(paper, "specific_stressor_metric"))
-  output[[paste0("stressor_units_", paper_id)]] <- renderText(safe_get(paper, "stressor_units"))
   output[[paste0("life_stage_", paper_id)]] <- renderText(safe_get(paper, "life_stages"))
   output[[paste0("overview_", paper_id)]] <- renderText(safe_get(paper, "overview"))
   output[[paste0("function_derivation_", paper_id)]] <- renderText(safe_get(paper, "function_derivation"))
 
   # ── Render citations ───────────────────────────────────────────────────────
   output[[paste0("citations_", paper_id)]] <- renderUI({
-    citations <- paper$citations
+    citations <- citations_data
 
     if (is.null(citations) || length(citations) == 0) {
       return(tags$p("No citations available."))
