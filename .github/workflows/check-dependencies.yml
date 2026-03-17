@@ -2,98 +2,41 @@ name: Check Dependency Files
 
 on:
   push:
-   branches: ['*']
+    branches: ["*"]
   pull_request:
-   branches: [main, staging]
+    branches: [main, staging]
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   check-deps:
-   runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-   steps:
-    - name: Checkout repo
-      uses: actions/checkout@v6
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
 
-    - name: Set up R
-      uses: r-lib/actions/setup-r@v2
-      with:
-        r-version: '4.5.3'
-        use-public-rspm: true
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "4.5.3"
+          use-public-rspm: true
 
-    - name: Install system dependencies for RPostgres
-      run: sudo apt-get install -y libpq-dev
+      - name: Install system dependencies
+        run: sudo apt-get install -y libpq-dev
 
-    - name: Set up renv
-      uses: r-lib/actions/setup-renv@v2
-      with:
-        cache-version: 1
+      - name: Set up renv
+        uses: r-lib/actions/setup-renv@v2
+        with:
+          cache-version: 1
 
-    - name: Check renv is in sync
-      run: |
-        Rscript -e '
-          status <- renv::status()
-          if (!isTRUE(status$synchronized)) {
-            message("renv is out of sync. Please run renv::snapshot() locally and commit renv.lock")
-            quit(status = 1)
-          }
-        '
-
-    - name: Install rsconnect
-      run: Rscript -e 'install.packages("rsconnect")'
-
-    - name: Diagnose manifest diff
-      run: |
-        Rscript -e 'rsconnect::writeManifest()'
-        echo "=== git diff of manifest.json ==="
-        git diff manifest.json
-        echo "=== .Rprofile line endings ==="
-        cat -A .Rprofile
-        echo "=== .Rprofile file info ==="
-        file .Rprofile
-        echo "=== git attributes ==="
-        git check-attr text eol -- .Rprofile
-        echo "=== git ls-files .Rprofile ==="
-        git ls-files --eol .Rprofile
-
-    - name: Check manifest.json is up to date
-      run: |
-        Rscript -e 'rsconnect::writeManifest()'
-        if ! git diff --quiet manifest.json; then
-          echo "manifest.json is out of date. Please run        rsconnect::writeManifest() locally and commit the result."
-          exit 1
-        fi
-
-# The manifest check works by regenerating it in CI and then checking if git sees any diff — if the committed version matches what was just generated, there's no diff and the check passes.
-
-# ---
-
-# ## Branch protection rules
-
-# Go to your repo on GitHub: **Settings → Branches → Add branch protection rule**
-
-# Set this up for both `main` and `staging`:
-
-# | Setting | Value |
-# |---|---|
-# | Branch name pattern | `main` (repeat for `staging`) |
-# | Require status checks to pass | ✅ enabled |
-# | Status check to require | `check-deps` (the job name) |
-# | Require branches to be up to date | ✅ enabled |
-# | Require a pull request before merging | ✅ recommended |
-# | Do not allow bypassing the above | ✅ recommended |
-
-# This means **no one can merge to `main` or `staging`** — not even admins — unless the dependency check passes.
-
-# ---
-
-# ## The resulting developer workflow
-# 1. Add/update a package locally
-# 2. renv::snapshot()               # update renv.lock
-# 3. rsconnect::writeManifest()     # update manifest.json
-# 4. git add renv.lock manifest.json
-# 5. git commit && git push
-# 6. GitHub Actions runs the check  # passes if files are in sync
-# 7. PR can now be merged to staging/main
+      - name: Check renv is in sync
+        run: |
+          Rscript -e '
+            status <- renv::status()
+            if (!isTRUE(status$synchronized)) {
+              message("renv is out of sync. Please run renv::snapshot() locally and commit renv.lock.")
+              quit(status = 1)
+            }
+          '

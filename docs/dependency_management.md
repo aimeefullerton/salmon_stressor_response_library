@@ -39,33 +39,63 @@ It is updated by running:
 rsconnect::writeManifest()
 ```
 
-## Keeping both files in sync
+## Keeping files up to date
 
-When you add or update packages, update both files before pushing to GitHub:
+### `renv.lock` — update on every package change
+
+When you add or update packages, run `renv::snapshot()` and commit the result before pushing:
 
 ```r
-renv::snapshot()            # update renv.lock for local development
-rsconnect::writeManifest()  # update manifest.json for Posit Connect deployment
+renv::snapshot()
 ```
 
-Then commit both files together:
+```bash
+git add renv.lock
+git commit -m "update dependencies"
+git push
+```
+
+### `manifest.json` — update before deploying
+
+`manifest.json` is environment-specific — it records machine-level metadata (locale, package source, build details) that varies between machines and CI environments. For this reason it is **not validated in CI** and does not need to be updated on every commit. Instead, run `rsconnect::writeManifest()` locally before deploying to Posit Connect:
+
+```r
+rsconnect::writeManifest()
+```
 
 ```bash
-git add renv.lock manifest.json
-git commit -m "update dependencies"
+git add manifest.json
+git commit -m "update manifest for deployment"
 git push
 ```
 
 ## CI/CD Enforcement
 
-A GitHub Actions workflow (`.github/workflows/check-dependencies.yml`) automatically validates that both files are in sync on every push and pull request. It:
+A GitHub Actions workflow (`.github/workflows/check-dependencies.yml`) automatically validates that `renv.lock` is in sync on every push and pull request. It:
 
-- Restores the `renv` library and checks that `renv.lock` matches the project's actual dependencies
-- Regenerates `manifest.json` and checks that the committed version matches
+- Restores the `renv` library from `renv.lock`
+- Checks that `renv.lock` matches the project's actual dependencies
 
-If either check fails, the workflow exits with a clear message telling you exactly which command to run locally to fix it. **The CI never silently rewrites these files** — that responsibility stays with the developer.
+If the check fails, the workflow exits with a clear message telling you to run `renv::snapshot()` locally and commit the result. **CI never silently rewrites these files** — that responsibility stays with the developer.
 
-The `main` and `staging` branches are protected: the `check-deps` status check must pass before any pull request can be merged. This ensures that out-of-sync dependency files can never make it into staging or production.
+> **Note:** `manifest.json` is not validated in CI. Because it records environment-specific metadata (locale, package source, build timestamps), it will always differ between machines and cannot be reliably compared in CI. It is the deploying developer's responsibility to run `rsconnect::writeManifest()` before pushing a deployment.
+
+### Branch protection
+
+The `main` and `staging` branches are protected so that the `check-deps` status check must pass before any pull request can be merged. This ensures that an out-of-sync `renv.lock` can never make it into staging or production.
+
+To configure or verify branch protection, go to **Settings → Branches → Add branch protection rule** in GitHub and apply the following settings to both `main` and `staging`:
+
+| Setting | Value |
+|---|---|
+| Branch name pattern | `main` (repeat for `staging`) |
+| Require status checks to pass | ✅ enabled |
+| Status check to require | `check-deps` |
+| Require branches to be up to date | ✅ enabled |
+| Require a pull request before merging | ✅ recommended |
+| Do not allow bypassing the above | ✅ recommended |
+
+With "Do not allow bypassing" enabled, no one — including admins — can merge to `main` or `staging` unless the check passes.
 
 ### Full developer workflow when adding or updating a package
 
@@ -73,17 +103,22 @@ The `main` and `staging` branches are protected: the `check-deps` status check m
 1. Install the package locally
    renv::install("packageName")
 
-2. Update both dependency files
+2. Update renv.lock
    renv::snapshot()
-   rsconnect::writeManifest()
 
-3. Commit everything together
-   git add renv.lock manifest.json
+3. Commit and push
+   git add renv.lock
    git commit -m "add packageName dependency"
    git push
 
-4. GitHub Actions validates the files  ← fails loudly if steps 2-3 were skipped
+4. GitHub Actions validates renv.lock  ← fails loudly if steps 2-3 were skipped
 5. PR can be merged to staging/main once the check passes
+
+6. Before deploying to Posit Connect, update manifest.json
+   rsconnect::writeManifest()
+   git add manifest.json
+   git commit -m "update manifest for deployment"
+   git push
 ```
 
 ## Summary
