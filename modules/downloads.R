@@ -5,22 +5,28 @@ library(RPostgres)
 library(pool)
 
 setup_download_csv <- function(output, paginated_data, db_path, input, session) {
+
+  # Flatten list columns (text[]) into comma-separated strings for CSV export
+  flatten_for_export <- function(df) {
+    list_cols <- names(df)[sapply(df, is.list)]
+    df[list_cols] <- lapply(df[list_cols], function(col) {
+      vapply(col, function(x) {
+        if (length(x) == 0 || all(is.na(x))) NA_character_
+        else paste(x[!is.na(x)], collapse = ", ")
+      }, character(1))
+    })
+    df
+  }
+
   # Identify which rows are selected
   get_selected_rows <- reactive({
     df <- paginated_data()
-    # Safely handle the case where the dataframe is empty
-    if (nrow(df) == 0) {
-      return(logical(0))
-    }
-
+    if (nrow(df) == 0) return(logical(0))
     sapply(df$article_id, function(id) {
-      inp <- paste0("select_article_", id)
-      # Check if the input exists and is TRUE
-      isTRUE(input[[inp]]) # was: !is.null(input[[inp]]) && input[[inp]]
+      isTRUE(input[[paste0("select_article_", id)]])
     })
   })
 
-  # Use observeEvent to trigger a change in the radio buttons when the selected rows change
   observeEvent(get_selected_rows(), {
     if (any(get_selected_rows())) {
       updateRadioButtons(session = session, inputId = "download_option", selected = "selected")
@@ -29,12 +35,10 @@ setup_download_csv <- function(output, paginated_data, db_path, input, session) 
     }
   })
 
-
-  # Assign data to be downloaded
   output$download_csv <- downloadHandler(
     filename = function() {
       prefix <- switch(input$download_option,
-        all = "all_stressor_responses",
+        all      = "all_stressor_responses",
         filtered = "filtered_stressor_responses",
         selected = "selected_stressor_responses",
         "download"
@@ -44,21 +48,16 @@ setup_download_csv <- function(output, paginated_data, db_path, input, session) 
     contentType = "text/csv",
     content = function(file) {
       df <- switch(input$download_option,
-        all = {
-          tryCatch(
-            {
-              # use pool db connection from global.R
-              dbReadTable(pool, "stressor_responses")
-            },
-            error = function(e) {
-              showNotification("Failed to read from database.", type = "error")
-              return(data.frame())
-            }
-          )
-        },
+        all = tryCatch(
+          dbReadTable(pool, "stressor_responses"),
+          error = function(e) {
+            showNotification("Failed to read from database.", type = "error")
+            data.frame()
+          }
+        ),
         filtered = paginated_data(),
         selected = {
-          sel <- get_selected_rows(paginated_data())
+          sel <- get_selected_rows()
           paginated_data()[sel, , drop = FALSE]
         },
         data.frame()
@@ -70,7 +69,7 @@ setup_download_csv <- function(output, paginated_data, db_path, input, session) 
         return()
       }
 
-      write.csv(df, file, row.names = FALSE)
+      write.csv(flatten_for_export(df), file, row.names = FALSE)
     }
   )
 }
