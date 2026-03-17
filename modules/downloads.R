@@ -13,7 +13,7 @@ setup_download_csv <- function(output, paginated_data, db_path, input, session) 
       return(logical(0))
     }
 
-    sapply(df$main_id, function(id) {
+    sapply(df$article_id, function(id) {
       inp <- paste0("select_article_", id)
       # Check if the input exists and is TRUE
       isTRUE(input[[inp]]) # was: !is.null(input[[inp]]) && input[[inp]]

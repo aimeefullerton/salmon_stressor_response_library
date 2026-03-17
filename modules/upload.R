@@ -94,7 +94,7 @@ upload_ui <- function(id) {
 
       # New Metadata Fields
       fluidRow(
-        column(3, offset = 3, pickerInput(ns("research_article_type"), "Research Article Type", NULL, multiple = TRUE, options = picker_opts)),
+        column(3, offset = 3, pickerInput(ns("article_type"), "Research Article Type", NULL, multiple = TRUE, options = picker_opts)),
         column(3, pickerInput(ns("location_country"), "Country", NULL, multiple = TRUE, options = picker_opts))
       ),
       fluidRow(
@@ -108,29 +108,29 @@ upload_ui <- function(id) {
 
       # Description Fields
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("description_overview"), "Detailed SR Function Description",
+        column(6, offset = 3, textAreaInput(ns("overview"), "Detailed SR Function Description",
           placeholder = "Describe importance and why it is being included. Include key pieces of information, such as the original source formula, function derivation, pathways of effect etc.", height = "200px", width = "800px"
         ))
       ),
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("description_function_derivation"), "Function Derivation",
+        column(6, offset = 3, textAreaInput(ns("function_derivation"), "Function Derivation",
           placeholder = "Describe the source of the function (e.g., expert opinion, mechanistic or theory based, correlative model etc.)", height = "200px", width = "800px"
         ))
       ),
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("description_transferability_of_function"), "Transferability of Function",
+        column(6, offset = 3, textAreaInput(ns("transferability_of_function"), "Transferability of Function",
           placeholder = "Describe notes regarding the transferability of the function to other species and systems.", height = "200px", width = "800px"
         ))
       ),
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("description_source_of_stressor_data1"), "Source of Stressor Data",
+        column(6, offset = 3, textAreaInput(ns("source_of_stressor_data1"), "Source of Stressor Data",
           placeholder = "Describe the source of stressor data needed to apply the function", height = "200px", width = "800px"
         ))
       ),
 
       # Vital Rate Tab
       fluidRow(
-        column(3, offset = 3, textInput(ns("vital_rate"), "Vital Rate (Process)", placeholder = "Enter vital rate details")),
+        column(3, offset = 3, textInput(ns("response"), "Response", placeholder = "Enter vital rate details")),
         column(3, textInput(ns("season"), "Season", placeholder = "Describe seasonal timing"))
       ),
       fluidRow(
@@ -187,7 +187,7 @@ upload_server <- function(id, db_conn = pool) {
       "geography" = "geographies",
       "life_stage" = "life_stages",
       "activity" = "activities",
-      "research_article_type" = "research_article_types",
+      "article_type" = "article_types",
       "location_country" = "location_countries",
       "location_state_province" = "location_states_provinces",
       "location_watershed_lab" = "location_watersheds_labs",
@@ -379,12 +379,12 @@ upload_server <- function(id, db_conn = pool) {
             "INSERT INTO stressor_responses (
               title, stressor_name, specific_stressor_metric, stressor_units,
               species_common_name, genus_latin, species_latin, geography,
-              life_stages, activity, research_article_type, location_country,
+              life_stages, activity, article_type, location_country,
               location_state_province, location_watershed_lab, location_river_creek,
-              broad_stressor_name, description_overview, description_function_derivation,
-              description_transferability_of_function, description_source_of_stressor_data1,
-              vital_rate, season, activity_details, stressor_magnitude, poe_chain,
-              covariates_dependencies, citations_citation_text, citations_citation_links,
+              broad_stressor_name, overview, function_derivation,
+              transferability_of_function, source_of_stressor_data1,
+              response, season, activity_details, stressor_magnitude, poe_chain,
+              covariates_dependencies, citation_text, citation_links,
               citation_link, revision_log, csv_data_json
             ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28, $29, $30, $31::jsonb)",
             params = list(
@@ -398,17 +398,17 @@ upload_server <- function(id, db_conn = pool) {
               paste(input$geography, collapse = ", "),
               paste(input$life_stage, collapse = ", "),
               paste(input$activity, collapse = ", "),
-              paste(input$research_article_type, collapse = ", "),
+              paste(input$article_type, collapse = ", "),
               paste(input$location_country, collapse = ", "),
               paste(input$location_state_province, collapse = ", "),
               paste(input$location_watershed_lab, collapse = ", "),
               paste(input$location_river_creek, collapse = ", "),
               paste(input$broad_stressor_name, collapse = ", "),
-              input$description_overview,
-              input$description_function_derivation,
-              input$description_transferability_of_function,
-              input$description_source_of_stressor_data1,
-              input$vital_rate,
+              input$overview,
+              input$function_derivation,
+              input$transferability_of_function,
+              input$source_of_stressor_data1,
+              input$response,
               input$season,
               input$activity_details,
               input$stressor_magnitude,
@@ -452,7 +452,7 @@ upload_server <- function(id, db_conn = pool) {
 
           # Clear text inputs and textareas
           text_inputs <- c(
-            "title", "stressor_units", "vital_rate", "season",
+            "title", "stressor_units", "response", "season",
             "activity_details", "stressor_magnitude", "poe_chain",
             "key_covariates", "citation_url", "citation_link_text"
           )
@@ -466,9 +466,9 @@ upload_server <- function(id, db_conn = pool) {
           }
 
           textarea_inputs <- c(
-            "description_overview", "description_function_derivation",
-            "description_transferability_of_function",
-            "description_source_of_stressor_data1", "citation_text",
+            "overview", "function_derivation",
+            "transferability_of_function",
+            "source_of_stressor_data1", "citation_text",
             "revision_log"
           )
           for (tid in textarea_inputs) {
@@ -660,7 +660,7 @@ upload_server <- function(id, db_conn = pool) {
         paste(input$activity, collapse = ", ")
       })
       output$preview_article <- renderText({
-        paste(input$research_article_type, collapse = ", ")
+        paste(input$article_type, collapse = ", ")
       })
       output$preview_country <- renderText({
         paste(input$location_country, collapse = ", ")
@@ -678,19 +678,19 @@ upload_server <- function(id, db_conn = pool) {
         paste(input$broad_stressor_name, collapse = ", ")
       })
       output$preview_overview <- renderText({
-        input$description_overview
+        input$overview
       })
       output$preview_derivation <- renderText({
-        input$description_function_derivation
+        input$function_derivation
       })
       output$preview_transferability <- renderText({
-        input$description_transferability_of_function
+        input$transferability_of_function
       })
       output$preview_datasource <- renderText({
-        input$description_source_of_stressor_data1
+        input$source_of_stressor_data1
       })
       output$preview_vital <- renderText({
-        input$vital_rate
+        input$response
       })
       output$preview_season <- renderText({
         input$season

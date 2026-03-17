@@ -9,106 +9,104 @@ library(RPostgres)
 library(pool)
 
 render_article_server <- function(input, output, session, paper_id, db) {
-  # Ensure database connection is provided
   if (missing(db)) {
     stop("Database connection (db) is missing!")
   }
 
-  # Fetch article data from db
+  # ── Fetch article data ─────────────────────────────────────────────────────
   paper <- dbGetQuery(db,
-    "SELECT * FROM stressor_responses WHERE main_id = $1",
+    "SELECT * FROM stressor_responses WHERE article_id = $1",
     params = list(paper_id)
   )
 
-  # Check if article data exists
   if (nrow(paper) == 0) {
     return(NULL)
   }
+  paper <- paper[1, ]
 
-  paper <- paper[1, ] # Ensure single-row data
-
-  output$article_title <- renderText({
-    # if you want a fallback when title is missing:
-    if (is.na(paper$title) || paper$title == "") {
-      "Untitled Article"
-    } else {
-      paper$title
-    }
-  })
-
-  # vector of all section div IDs
-  all_ids <- c(
-    "metadata_section", "description_section", "citations_section",
-    "images_section", "csv_section", "plot_section", "interactive_plot_section"
+  # ── Toggle button labels ───────────────────────────────────────────────────
+  # Used by updateActionLink in server.R's expand/collapse handlers
+  # to keep the ▲/▼ arrow in sync with section visibility.
+  base_labels <- setNames(
+    c(
+      "Article Metadata",
+      "Description & Function Details",
+      "Citation(s)",
+      "Stressor Response Data",
+      "Stressor Response Chart"
+    ),
+    c(
+      paste0("toggle_metadata_", paper_id),
+      paste0("toggle_description_", paper_id),
+      paste0("toggle_citations_", paper_id),
+      paste0("toggle_csv_", paper_id),
+      paste0("toggle_interactive_plot_", paper_id)
+    )
   )
 
-  # expand all
-
-  # a named vector of base labels:
-  base_labels <- c(
-    toggle_metadata = "Article Metadata",
-    toggle_description = "Description & Function Details",
-    toggle_citations = "Citation(s)",
-    toggle_images = "Images",
-    toggle_csv = "Stressor Response Data",
-    toggle_plot = "Stressor Response Chart",
-    toggle_interactive_plot = "Interactive Plot"
+  # Track visibility state for each section (all start hidden)
+  section_visible <- setNames(
+    lapply(names(base_labels), function(x) FALSE),
+    names(base_labels)
   )
 
-  observeEvent(input$expand_all, {
-    lapply(all_ids, show)
-    for (id in names(base_labels)) {
-      updateActionLink(
-        session, id,
-        label = paste0(base_labels[id], " ▲")
-      )
-    }
-  })
-
-  observeEvent(input$collapse_all, {
-    lapply(all_ids, hide)
-    for (id in names(base_labels)) {
-      updateActionLink(
-        session, id,
-        label = paste0(base_labels[id], " ▼")
-      )
-    }
-  })
-
-  # Function to safely parse JSON fields
-  safe_fromJSON <- function(x) {
-    # bail early on NULL, NA, empty, or literal "NULL"/"[]"
-    if (is.null(x) ||
-      (length(x) == 1 && is.na(x)) ||
-      !nzchar(x) ||
-      x %in% c("NULL", "[]")) {
-      return(NULL)
-    }
-    # else try to parse
-    parsed <- tryCatch(jsonlite::fromJSON(x), error = function(e) NULL)
-
-    # Handle double-encoded JSON where the DB stored a JSON string literal
-    # (e.g., '"[{...}]"') — jsonlite::fromJSON will return an atomic
-    # character scalar containing the JSON; detect that and parse again.
-    if (!is.null(parsed) && is.character(parsed) && length(parsed) == 1) {
-      trimmed <- trimws(parsed)
-      if (nzchar(trimmed) && (startsWith(trimmed, "[") || startsWith(trimmed, "{"))) {
-        parsed2 <- tryCatch(jsonlite::fromJSON(trimmed), error = function(e) NULL)
-        if (!is.null(parsed2)) parsed <- parsed2
-      }
-    }
-
-    # if it ends up being atomic, wrap as list
-    if (!is.null(parsed) && !is.list(parsed)) {
-      parsed <- list(parsed)
-    }
-
-    parsed
+  # Helper: flip arrow label based on current visibility
+  update_arrow <- function(toggle_id, visible) {
+    arrow <- if (visible) " ▲" else " ▼"
+    updateActionLink(session, toggle_id, label = paste0(base_labels[[toggle_id]], arrow))
   }
 
-  paper$citations <- safe_fromJSON(paper$citations_citation_text)
-  paper$citation_links <- safe_fromJSON(paper$citations_citation_links)
-  paper$images <- safe_fromJSON(paper$images)
+  # Expand all — show all sections and update all arrows to ▲
+  observeEvent(input[[paste0("expand_all_", paper_id)]],
+    {
+      for (id in names(base_labels)) {
+        section_visible[[id]] <<- TRUE
+        update_arrow(id, TRUE)
+      }
+    },
+    ignoreInit = TRUE
+  )
+
+  # Collapse all — hide all sections and update all arrows to ▼
+  observeEvent(input[[paste0("collapse_all_", paper_id)]],
+    {
+      for (id in names(base_labels)) {
+        section_visible[[id]] <<- FALSE
+        update_arrow(id, FALSE)
+      }
+    },
+    ignoreInit = TRUE
+  )
+
+  # Individual section toggles — flip state and update arrow
+  # Note: shinyjs::toggle() is called in server.R; here we only sync the label
+  for (toggle_id in names(base_labels)) {
+    local({
+      tid <- toggle_id # capture for closure
+      observeEvent(input[[tid]],
+        {
+          section_visible[[tid]] <<- !section_visible[[tid]]
+          update_arrow(tid, section_visible[[tid]])
+        },
+        ignoreInit = TRUE
+      )
+    })
+  }
+
+  # ── Helper functions ───────────────────────────────────────────────────────
+  parse_jsonb <- function(x) {
+    if (is.null(x) || length(x) == 0 || is.na(x) || !nzchar(trimws(x)) || x == "[]") {
+      return(NULL)
+    }
+    parsed <- tryCatch(jsonlite::fromJSON(x, simplifyDataFrame = FALSE), error = function(e) NULL)
+    if (is.null(parsed) || length(parsed) == 0) {
+      return(NULL)
+    }
+    if (is.data.frame(parsed)) {
+      parsed <- lapply(seq_len(nrow(parsed)), function(i) as.list(parsed[i, ]))
+    }
+    parsed
+  }
 
   safe_get <- function(df, col) {
     if (col %in% names(df)) {
@@ -125,495 +123,216 @@ render_article_server <- function(input, output, session, paper_id, db) {
     return(round(col, 2))
   }
 
-  # Render metadata fields
-  output$species_name <- renderText(safe_get(paper, "species_common_name"))
-  output$genus_latin <- renderText(safe_get(paper, "genus_latin"))
-  output$stressor_name <- renderText(safe_get(paper, "stressor_name"))
-  output$specific_stressor_metric <- renderText(safe_get(paper, "specific_stressor_metric"))
-  output$stressor_units <- renderText(safe_get(paper, "stressor_units"))
-  output$life_stage <- renderText(safe_get(paper, "life_stages"))
-  output$description_overview <- renderText(safe_get(paper, "description_overview"))
-  output$function_derivation <- renderText(safe_get(paper, "description_function_derivation"))
+  # ── Parse citations ────────────────────────────────────────────────────────
+  paper$citations <- parse_jsonb(paper$citations)
 
-  # Render citations
-  output$citations <- renderUI({
-    citation_texts <- safe_get(paper, "citations_citation_text")
-    if (!is.null(citation_texts) && is.character(citation_texts) && nzchar(citation_texts)) {
-      citation_texts <- unlist(strsplit(citation_texts, "\\\r\\\n\\\r\\\n"))
-    } else {
-      citation_texts <- NULL
+  # ── Render metadata ────────────────────────────────────────────────────────
+  output[[paste0("article_title_", paper_id)]] <- renderText({
+    if (is.na(paper$title) || paper$title == "") "Untitled Article" else paper$title
+  })
+  output[[paste0("species_name_", paper_id)]] <- renderText(safe_get(paper, "species_common_name"))
+  output[[paste0("genus_latin_", paper_id)]] <- renderText(safe_get(paper, "genus_latin"))
+  output[[paste0("stressor_name_", paper_id)]] <- renderText(safe_get(paper, "stressor_name"))
+  output[[paste0("response_", paper_id)]] <- renderText(safe_get(paper, "response"))
+  output[[paste0("specific_stressor_metric_", paper_id)]] <- renderText(safe_get(paper, "specific_stressor_metric"))
+  output[[paste0("stressor_units_", paper_id)]] <- renderText(safe_get(paper, "stressor_units"))
+  output[[paste0("life_stage_", paper_id)]] <- renderText(safe_get(paper, "life_stages"))
+  output[[paste0("overview_", paper_id)]] <- renderText(safe_get(paper, "overview"))
+  output[[paste0("function_derivation_", paper_id)]] <- renderText(safe_get(paper, "function_derivation"))
+
+  # ── Render citations ───────────────────────────────────────────────────────
+  output[[paste0("citations_", paper_id)]] <- renderUI({
+    citations <- paper$citations
+
+    if (is.null(citations) || length(citations) == 0) {
+      return(tags$p("No citations available."))
     }
-    citation_links_raw <- safe_get(paper, "citations_citation_links")
-    citation_links <- safe_fromJSON(citation_links_raw)
-    if (!is.list(citation_links) || length(citation_links) == 0) {
-      citation_links <- vector("list", length(citation_texts))
-    }
+
     tagList(
-      if (!is.null(citation_texts) && length(citation_texts) > 0) {
-        lapply(seq_along(citation_texts), function(i) {
-          citation_text <- citation_texts[i]
-          link <- if (i <= length(citation_links) && is.list(citation_links[[i]]) && "url" %in% names(citation_links[[i]])) {
-            citation_links[[i]]$url
-          } else {
-            NULL
+      lapply(citations, function(cite) {
+        text <- cite[["text"]]
+        url <- cite[["url"]]
+        title <- cite[["title"]]
+
+        link_label <- if (!is.null(title) && nzchar(trimws(title))) trimws(title) else "Read More"
+
+        tags$div(
+          class = "citation-entry",
+          if (!is.null(text) && nzchar(trimws(text))) tags$p(trimws(text)),
+          if (!is.null(url) && nzchar(trimws(url))) {
+            tags$a(
+              href   = trimws(url),
+              link_label,
+              target = "_blank",
+              class  = "btn btn-primary btn-sm"
+            )
           }
-          tags$div(
-            tags$p(citation_text),
-            if (!is.null(link) && nzchar(link)) {
-              tags$a(href = link, "Read More", target = "_blank", class = "btn btn-primary btn-sm")
-            }
-          )
-        })
-      } else {
-        tags$p("No citations available.")
-      }
+        )
+      })
     )
   })
 
-  # Render images
-  output$article_images <- renderUI({
-    # Log the raw images data for debugging
-    cat("\n image raw:\n")
-    print(paper$images)
+  # ── Fetch CSV data from csv_data table ─────────────────────────────────────
+  csv_rows <- dbGetQuery(db,
+    "SELECT
+       row_index, curve_id, stressor_label, stressor_x, units_x,
+       response_label, response_y, units_y, stressor_value,
+       lower_limit, upper_limit, sd
+     FROM csv_data
+     WHERE article_id = $1
+     ORDER BY row_index ASC",
+    params = list(paper_id)
+  )
 
-    image_url <- NULL
-
-    if (is.list(paper$images) && !is.null(paper$images$image_url)) {
-      image_url <- paper$images$image_url
-    } else if (is.character(paper$images) && nzchar(paper$images)) {
-      image_url <- paper$images
-    }
-
-    if (!is.null(image_url) && nzchar(image_url)) {
-      tags$figure(
-        tags$img(src = image_url, width = "60%", alt = "Article Image"),
-        tags$figcaption("Figure extracted from the database.")
-      )
-    } else {
-      tags$p("No images available.")
-    }
-  })
-
-  # ===========================================================
-  # PARSE CSV DATA
-  # ===========================================================
-  csv_data_raw <- safe_fromJSON(paper$csv_data_json)
-
-  if (!is.null(csv_data_raw)) {
-    # Check if this is the NEW format with column metadata
-    # Must be a list, have both 'columns' and 'data' fields, and 'data' should not be NULL
-    if (is.list(csv_data_raw) &&
-      !is.null(csv_data_raw$columns) &&
-      !is.null(csv_data_raw$data) &&
-      "columns" %in% names(csv_data_raw) &&
-      "data" %in% names(csv_data_raw)) {
-      # NEW FORMAT: Extract data and preserve original column order
-      csv_data <- csv_data_raw$data
-      original_column_order <- csv_data_raw$columns
-
-      # Convert to dataframe
-      df_raw <- as.data.frame(csv_data, stringsAsFactors = FALSE)
-
-      # Apply the preserved column order if valid
-      if (!is.null(original_column_order) &&
-        is.character(original_column_order) &&
-        length(original_column_order) > 0 &&
-        all(original_column_order %in% names(df_raw))) {
-        df_raw <- df_raw[, original_column_order, drop = FALSE]
-      }
-    } else {
-      # OLD FORMAT: Data is directly in csv_data_raw (backwards compatible)
-      # This handles both data frames and lists that can be converted to data frames
-      df_raw <- as.data.frame(csv_data_raw, stringsAsFactors = FALSE)
-    }
-    # preserve original names but make them safe for R indexing
-    names(df_raw) <- make.names(names(df_raw))
-
-    # Define canonical required/optional column names (lowercase)
-    required_cols <- c("curve.id", "stressor.label", "stressor.x", "units.x", "response.label", "response.y", "units.y")
-    optional_cols <- c("stressor.value", "lower.limit", "upper.limit", "sd")
-
-    nm_lower <- tolower(names(df_raw))
-
-    # If this looks like a 'new' csv (contains at least one required canonical name),
-    # normalize to the canonical order and ensure optional columns exist.
-    if (any(required_cols %in% nm_lower)) {
-      # Build mapping of canonical -> actual column name (if present)
-      col_order <- c()
-      for (rc in required_cols) {
-        match_idx <- which(nm_lower == rc)
-        if (length(match_idx) == 1) {
-          col_order <- c(col_order, names(df_raw)[match_idx])
-        }
-      }
-      for (oc in optional_cols) {
-        match_idx <- which(nm_lower == oc)
-        if (length(match_idx) == 1) {
-          col_order <- c(col_order, names(df_raw)[match_idx])
-        } else {
-          # Add NA column for missing optional column
-          df_raw[[oc]] <- NA
-          col_order <- c(col_order, oc)
-        }
-      }
-
-      # Reorder dataframe to canonical order (only include columns we have)
-      existing_cols <- intersect(col_order, names(df_raw))
-      df <- df_raw[, existing_cols, drop = FALSE]
-
-      # Convert stressor.x and response.y to numeric (if present by canonical names)
-      nm_lower_df <- tolower(names(df))
-      if ("stressor.x" %in% nm_lower_df) {
-        df[[which(nm_lower_df == "stressor.x")]] <- suppressWarnings(as.numeric(df[[which(nm_lower_df == "stressor.x")]]))
-      }
-      if ("response.y" %in% nm_lower_df) {
-        df[[which(nm_lower_df == "response.y")]] <- suppressWarnings(as.numeric(df[[which(nm_lower_df == "response.y")]]))
-      }
-
-      # Keep rows where both X and Y are numeric (if both exist)
-      if ("stressor.x" %in% nm_lower_df && "response.y" %in% nm_lower_df) {
-        x_i <- which(nm_lower_df == "stressor.x")
-        y_i <- which(nm_lower_df == "response.y")
-        keep_rows <- !is.na(df[[x_i]]) & !is.na(df[[y_i]])
-        df <- df[keep_rows, , drop = FALSE]
-
-        # Sort by curve.id first, then by stressor.x, within each curve
-        # This ensures each curve's points are in the correct order for plotting
-        if ("curve.id" %in% nm_lower_df) {
-          curve_i <- which(nm_lower_df == "curve.id")
-          # Use order() with two columns to sort by curve.id, then stressor.x
-          df <- df[order(df[[curve_i]], df[[x_i]]), , drop = FALSE]
-        } else {
-          # Single curve case: just sort by stressor.x
-          df <- df[order(df[[x_i]]), , drop = FALSE]
-        }
-      }
-    } else {
-      # Fallback historical behavior: find the two most-numeric columns and use them as X/Y
-      df <- df_raw
-      numeric_counts <- sapply(df, function(col) sum(!is.na(suppressWarnings(as.numeric(col)))))
-      if (length(numeric_counts) < 2 || max(numeric_counts) == 0) {
-        # Cannot proceed - no numeric data
-        df <- data.frame(
-          Error = "CSV data does not contain sufficient numeric columns for plotting."
-        )
-      } else {
-        # Sort by descending numeric content
-        top2_idx <- order(numeric_counts, decreasing = TRUE)[1:2]
-        x_idx <- top2_idx[1]
-        y_idx <- top2_idx[2]
-
-        df[[x_idx]] <- suppressWarnings(as.numeric(df[[x_idx]]))
-        df[[y_idx]] <- suppressWarnings(as.numeric(df[[y_idx]]))
-
-        # Remove rows with NA in either column
-        keep_rows <- !is.na(df[[x_idx]]) & !is.na(df[[y_idx]])
-        df <- df[keep_rows, , drop = FALSE]
-
-        # Sort by X values
-        df <- df[order(df[[x_idx]]), , drop = FALSE]
-
-        # Rename top2 columns to standard names
-        colnames(df)[x_idx] <- "stressor.x"
-        colnames(df)[y_idx] <- "response.y"
-      }
-    }
+  if (nrow(csv_rows) > 0) {
+    df <- csv_rows
+    # Normalize to dot-separated names so plotting/table logic is consistent
+    names(df) <- gsub("_", ".", names(df))
+    df$stressor.x <- suppressWarnings(as.numeric(df$stressor.x))
+    df$response.y <- suppressWarnings(as.numeric(df$response.y))
+    df <- df[!is.na(df$stressor.x) & !is.na(df$response.y), , drop = FALSE]
   } else {
-    # No CSV data
     df <- data.frame(Message = "No CSV data available for this article")
   }
 
-  # ===========================================================
-  # EXTRACT METADATA FROM CSV
-  # ===========================================================
+  # ── Extract axis labels and units from CSV ─────────────────────────────────
   stressor_name <- safe_get(paper, "stressor_name")
   response_name <- "Mean System Capacity"
-
-  # Initialize label variables
   stressor_label <- stressor_name
   response_label <- response_name
   units_x <- ""
   units_y <- ""
 
-  # Extract labels from CSV if available
-  if (nrow(df) > 0 && !"Message" %in% names(df) && !"Error" %in% names(df)) {
+  if (nrow(df) > 0 && !"Message" %in% names(df)) {
     nm_lower <- tolower(names(df))
 
-    # stressor.label
-    stressor_label_idx <- which(nm_lower == "stressor.label")
-    if (length(stressor_label_idx) == 1) {
-      unique_vals <- unique(df[[stressor_label_idx]])
-      unique_vals <- unique_vals[!is.na(unique_vals) & nzchar(unique_vals)]
-      if (length(unique_vals) > 0) {
-        stressor_name <- unique_vals[1]
-        stressor_label <- unique_vals[1]
+    extract_first <- function(col_name) {
+      idx <- which(nm_lower == col_name)
+      if (length(idx) != 1) {
+        return(NULL)
+      }
+      vals <- unique(df[[idx]])
+      vals <- vals[!is.na(vals) & nzchar(vals)]
+      if (length(vals) > 0) {
+        return(vals[1])
+      } else {
+        return(NULL)
       }
     }
 
-    # response.label
-    response_label_idx <- which(nm_lower == "response.label")
-    if (length(response_label_idx) == 1) {
-      unique_vals <- unique(df[[response_label_idx]])
-      unique_vals <- unique_vals[!is.na(unique_vals) & nzchar(unique_vals)]
-      if (length(unique_vals) > 0) {
-        response_name <- unique_vals[1]
-        response_label <- unique_vals[1]
-      }
+    if (!is.null(val <- extract_first("stressor.label"))) {
+      stressor_name <- val
+      stressor_label <- val
     }
+    if (!is.null(val <- extract_first("response.label"))) {
+      response_name <- val
+      response_label <- val
+    }
+    if (!is.null(val <- extract_first("units.x"))) units_x <- val
+    if (!is.null(val <- extract_first("units.y"))) units_y <- val
 
-    # units.x
-    units_x_idx <- which(nm_lower == "units.x")
-    if (length(units_x_idx) == 1) {
-      unique_vals <- unique(df[[units_x_idx]])
-      unique_vals <- unique_vals[!is.na(unique_vals) & nzchar(unique_vals)]
-      if (length(unique_vals) > 0) {
-        units_x <- unique_vals[1]
-      }
-    }
-
-    # units.y
-    units_y_idx <- which(nm_lower == "units.y")
-    if (length(units_y_idx) == 1) {
-      unique_vals <- unique(df[[units_y_idx]])
-      unique_vals <- unique_vals[!is.na(unique_vals) & nzchar(unique_vals)]
-      if (length(unique_vals) > 0) {
-        units_y <- unique_vals[1]
-      }
-    }
-
-    # Append units to labels
-    if (nzchar(units_x)) {
-      stressor_label <- paste0(stressor_label, " (", units_x, ")")
-    }
-    if (nzchar(units_y)) {
-      response_label <- paste0(response_label, " (", units_y, ")")
-    }
+    if (nzchar(units_x)) stressor_label <- paste0(stressor_label, " (", units_x, ")")
+    if (nzchar(units_y)) response_label <- paste0(response_label, " (", units_y, ")")
   }
 
-  # ===========================================================
-  # MULTI-CURVE DETECTION & CURVE INFO
-  # ===========================================================
+  # ── Multi-curve detection ──────────────────────────────────────────────────
   has_multiple_curves <- FALSE
   curve_info <- NULL
 
-  if (nrow(df) > 0 && !"Message" %in% names(df) && !"Error" %in% names(df)) {
+  if (nrow(df) > 0 && !"Message" %in% names(df)) {
     nm_lower <- tolower(names(df))
     curve_id_idx <- which(nm_lower == "curve.id")
     stressor_value_idx <- which(nm_lower == "stressor.value")
 
-    if (length(curve_id_idx) == 1) {
-      curve_ids <- df[[curve_id_idx]]
-      unique_curve_ids <- unique(curve_ids[!is.na(curve_ids) & nzchar(curve_ids)])
-
-      if (length(unique_curve_ids) > 1) {
-        has_multiple_curves <- TRUE
-      }
-
-      # Get curves in order of first appearance
-      curve_ids_in_order <- unique(curve_ids[!is.na(curve_ids) & nzchar(curve_ids)])
+    curve_ids_in_order <- if (length(curve_id_idx) == 1) {
+      ids <- df[[curve_id_idx]]
+      unique(ids[!is.na(ids) & nzchar(ids)])
     } else {
-      curve_ids_in_order <- "default"
+      "default"
     }
 
-    # Build curve info dataframe
-    curve_info <- data.frame(
-      curve.id = curve_ids_in_order,
-      stringsAsFactors = FALSE
-    )
+    has_multiple_curves <- length(curve_ids_in_order) > 1
 
-    if (length(stressor_value_idx) == 1) {
-      # Get stressor.value for each curve
-      curve_info$label <- vapply(curve_info$curve.id, function(cid) {
-        curve_rows <- df[[curve_id_idx]] == cid
-        stressor_val <- df[[stressor_value_idx]][curve_rows]
-        stressor_val <- stressor_val[!is.na(stressor_val) & nzchar(stressor_val)]
+    curve_info <- data.frame(curve.id = curve_ids_in_order, stringsAsFactors = FALSE)
 
-        if (length(stressor_val) > 0) {
-          paste0(cid, " (", stressor_val[1], ")")
-        } else {
-          as.character(cid)
-        }
+    curve_info$label <- if (length(stressor_value_idx) == 1) {
+      vapply(curve_info$curve.id, function(cid) {
+        rows <- df[[curve_id_idx]] == cid
+        vals <- df[[stressor_value_idx]][rows]
+        vals <- vals[!is.na(vals) & nzchar(vals)]
+        if (length(vals) > 0) paste0(cid, " (", vals[1], ")") else as.character(cid)
       }, character(1))
     } else {
-      curve_info$label <- as.character(curve_info$curve.id)
+      as.character(curve_info$curve.id)
     }
   }
 
-  # ======================================
-  # RENDER TABLE - Stressor Response Data
-  # ======================================
-  output$csv_table <- renderTable({
-    if (nrow(df) == 0) {
+  # ── Render table ───────────────────────────────────────────────────────────
+  output[[paste0("csv_table_", paper_id)]] <- renderTable({
+    if (nrow(df) == 0 || "Message" %in% names(df)) {
       return(data.frame(Message = "No data available for this article"))
     }
 
     display_df <- df
-
-    # Hide stressor.label, response.label, units.x, and units.y columns since their values are extracted for labeling
-    # Step 1: Find columns to hide
     nm_lower <- tolower(names(display_df))
+
     cols_to_hide <- c(
+      which(nm_lower == "row.index"),
       which(nm_lower == "stressor.label"),
       which(nm_lower == "response.label"),
       which(nm_lower == "units.x"),
       which(nm_lower == "units.y")
     )
+    if (length(cols_to_hide) > 0) display_df <- display_df[, -cols_to_hide, drop = FALSE]
 
-    # Step 2: Actually remove those columns
-    if (length(cols_to_hide) > 0) {
-      display_df <- display_df[, -cols_to_hide, drop = FALSE]
-    }
-
-    # Step 3: Replace dots with spaces
     colnames(display_df) <- gsub("\\.", " ", colnames(display_df))
+    nm_display <- tolower(names(display_df))
 
-    # Step 4: Rename stressor.x → actual stressor label
-    nm_lower_display <- tolower(names(display_df))
-    stressor_x_idx <- which(nm_lower_display == "stressor x")
-    if (length(stressor_x_idx) == 1) {
-      colnames(display_df)[stressor_x_idx] <- stressor_label
-    }
+    x_idx <- which(nm_display == "stressor x")
+    y_idx <- which(nm_display == "response y")
+    if (length(x_idx) == 1) colnames(display_df)[x_idx] <- stressor_label
+    if (length(y_idx) == 1) colnames(display_df)[y_idx] <- response_label
 
-    # Step 5: Rename response.y → actual response label
-    response_y_idx <- which(nm_lower_display == "response y")
-    if (length(response_y_idx) == 1) {
-      colnames(display_df)[response_y_idx] <- response_label
-    }
-
-    # Hide columns that are entirely NA or empty
-    non_empty_cols <- sapply(display_df, function(col) any(!is.na(col) & nzchar(as.character(col))))
-    display_df <- display_df[, non_empty_cols, drop = FALSE]
-
-    display_df
+    non_empty <- sapply(display_df, function(col) any(!is.na(col) & nzchar(as.character(col))))
+    display_df[, non_empty, drop = FALSE]
   })
 
-  # Static Plot with Multi-Curve Support
-  output$stressor_plot <- renderPlot({
-    if (nrow(df) == 0) {
-      plot(1, type = "n", axes = FALSE, xlab = "", ylab = "")
-      text(1, 1, "No data available for this article", col = "black", cex = 1.5, font = 2)
-      return()
-    }
-
-    nm_lower <- tolower(names(df))
-    x_idx <- grep("^stressor\\.x$", nm_lower)
-    y_idx <- grep("^response\\.y$", nm_lower)
-
-    if (length(x_idx) == 0 || length(y_idx) == 0) {
-      plot(1, type = "n", axes = FALSE, xlab = "", ylab = "")
-      text(1, 1, "Invalid data structure", col = "red", cex = 1.5, font = 2)
-      return()
-    }
-
-    x_vals <- df[[x_idx]]
-    y_vals <- df[[y_idx]]
-
-    # Set up plot with appropriate range
-    plot(
-      range(x_vals, na.rm = TRUE), range(y_vals, na.rm = TRUE),
-      type = "n",
-      xlab = stressor_label,
-      ylab = response_label,
-      main = paste("Stressor Response for", response_name, "vs", stressor_name)
-    )
-
-    # Plot each curve
-    if (has_multiple_curves && !is.null(curve_info)) {
-      # Multiple curves - use different colors
-      colors <- rainbow(nrow(curve_info))
-      curve_id_idx <- which(nm_lower == "curve.id")
-
-      for (i in seq_len(nrow(curve_info))) {
-        cid <- curve_info$curve.id[i]
-        curve_rows <- df[[curve_id_idx]] == cid
-
-        # Extract x and y values for this curve
-        x_curve <- df[[x_idx]][curve_rows]
-        y_curve <- df[[y_idx]][curve_rows]
-
-        # Sort this curve's data by x values before plotting
-        # This ensures the line connects points in the correct order
-        sort_order <- order(x_curve)
-        x_curve <- x_curve[sort_order]
-        y_curve <- y_curve[sort_order]
-
-        lines(
-          x_curve,
-          y_curve,
-          type = "o",
-          col = colors[i],
-          pch = 16,
-          lwd = 2
+  # ── Interactive plot ───────────────────────────────────────────────────────
+  output[[paste0("interactive_plot_", paper_id)]] <- renderPlotly({
+    empty_plot <- function(msg, color = "black") {
+      plot_ly(type = "scatter", mode = "markers", height = 200) %>%
+        layout(
+          margin = list(t = 20, b = 20),
+          xaxis = list(visible = FALSE),
+          yaxis = list(visible = FALSE),
+          annotations = list(list(
+            text = msg, xref = "paper", yref = "paper",
+            x = 0.5, y = 0.5, showarrow = FALSE,
+            font = list(size = 16, color = color)
+          ))
         )
-      }
-
-      # Add legend
-      legend(
-        "topright",
-        legend = curve_info$label,
-        col = colors,
-        lwd = 2,
-        pch = 16,
-        bty = "n"
-      )
-    } else {
-      # Single curve - use blue
-      lines(x_vals, y_vals, type = "o", col = "blue", pch = 16, lwd = 2)
     }
-  })
 
-  # Interactive Plot with Multi-Curve Support
-  output$interactive_plot <- renderPlotly({    
-    if (nrow(df) == 0) {
-      return(plot_ly(type = "scatter", mode = "markers", height = 200) %>%
-        layout(
-          margin = list(t = 20, b = 20),
-          xaxis = list(visible = FALSE), yaxis = list(visible = FALSE),
-          annotations = list(list(
-            text = "No data available for this article",
-            xref = "paper", yref = "paper",
-            x = 0.5, y = 0.5, showarrow = FALSE,
-            font = list(size = 16, color = "black")
-          ))
-        ))
+    if (nrow(df) == 0 || "Message" %in% names(df)) {
+      return(empty_plot("No data available for this article"))
     }
 
     nm_lower <- tolower(names(df))
     x_idx <- grep("^stressor\\.x$", nm_lower)
     y_idx <- grep("^response\\.y$", nm_lower)
-
     if (length(x_idx) == 0 || length(y_idx) == 0) {
-      return(plot_ly(type = "scatter", mode = "markers", height = 200) %>%
-        layout(
-          margin = list(t = 20, b = 20),
-          xaxis = list(visible = FALSE), yaxis = list(visible = FALSE),
-          annotations = list(list(
-            text = "Invalid data structure",
-            xref = "paper", yref = "paper",
-            x = 0.5, y = 0.5, showarrow = FALSE,
-            font = list(size = 16, color = "red")
-          ))
-        ))
+      return(empty_plot("Invalid data structure", "red"))
     }
 
-    # Create plotly figure
     if (has_multiple_curves && !is.null(curve_info)) {
-      # Multiple curves - add each as a separate trace
-      p <- plot_ly()
       curve_id_idx <- which(nm_lower == "curve.id")
+      p <- plot_ly()
 
       for (i in seq_len(nrow(curve_info))) {
         cid <- curve_info$curve.id[i]
         curve_rows <- df[[curve_id_idx]] == cid
-
-        # Extract data for this curve
         x_curve <- df[[x_idx]][curve_rows]
         y_curve <- df[[y_idx]][curve_rows]
-
-        # Sort this curve's data by x values before plotting
-        sort_order <- order(x_curve)
-        x_curve <- x_curve[sort_order]
-        y_curve <- y_curve[sort_order]
 
         p <- p %>% add_trace(
           x = x_curve,
@@ -632,22 +351,19 @@ render_article_server <- function(input, output, session, paper_id, db) {
         yaxis = list(title = response_label),
         hovermode = "closest"
       )
-
-      return(p)
     } else {
-      # Single curve
-      return(
-        plot_ly(df,
-          x = ~ df[[x_idx]], y = ~ df[[y_idx]],
-          type = "scatter", mode = "lines+markers",
-          line = list(color = "blue"), marker = list(size = 6)
-        ) %>%
-          layout(
-            title = paste("Interactive Plot for", response_name, "vs", stressor_name),
-            xaxis = list(title = stressor_label),
-            yaxis = list(title = response_label)
-          )
-      )
+      x_vals <- ~ df[[x_idx]]
+      y_vals <- ~ df[[y_idx]]
+      plot_ly(
+        x = x_vals, y = y_vals,
+        type = "scatter", mode = "lines+markers",
+        line = list(color = "blue"), marker = list(size = 6)
+      ) %>%
+        layout(
+          title = paste("Interactive Plot for", response_name, "vs", stressor_name),
+          xaxis = list(title = stressor_label),
+          yaxis = list(title = response_label)
+        )
     }
   })
 }

@@ -4058,9 +4058,6 @@
     "modules/images/Team.jpg": {
       "checksum": "ac6a764be7c65c3442c62014f9db878c"
     },
-    "modules/manage_categories.R": {
-      "checksum": "69bd21b3201d5929c5745547a6211390"
-    },
     "modules/pagination.R": {
       "checksum": "13a5c07d7fff1380cf0a3d9949c790a3"
     },
@@ -4083,7 +4080,7 @@
       "checksum": "f0dd69607c0e04bff0c75cd375d74a7b"
     },
     "modules/update_filters_server.R": {
-      "checksum": "79f756a0056b962c858627f8ce70ff8a"
+      "checksum": "1385729c0ced2aa98f230aba99e600ee"
     },
     "modules/upload.R": {
       "checksum": "ab3e2e7ab8719811e97d5aa3d928ade4"
