@@ -28,8 +28,8 @@ render_papers_server <- function(output, paginated_data, input, session) {
       lapply(seq_len(nrow(data_to_display)), function(i) {
         paper <- data_to_display[i, ]
 
-        article_url <- paste0("?main_id=", paper$main_id)
-        checkbox_id <- paste0("select_article_", paper$main_id)
+        article_url <- paste0("?article_id=", paper$article_id)
+        checkbox_id <- paste0("select_article_", paper$article_id)
 
         div(
           class = "hover-highlight",
@@ -49,8 +49,8 @@ render_papers_server <- function(output, paginated_data, input, session) {
 
             # Title
             actionButton(
-              inputId = paste0("view_article_", paper$main_id),
-              label = paste0(paper$main_id, ". ", paper$title),
+              inputId = paste0("view_article_", paper$article_id),
+              label = paste0(paper$article_id, ". ", paper$title),
               class = "paper-card-title btn-link"
             ),
 
@@ -59,7 +59,7 @@ render_papers_server <- function(output, paginated_data, input, session) {
               class = "paper-meta-row",
               HTML(format_field("Common Name", paper$species_common_name, TRUE)),
               HTML(format_field("Life Stage", paper$life_stages, TRUE)),
-              HTML(format_field("Type", paper$research_article_type, TRUE)),
+              HTML(format_field("Type", paper$article_type, TRUE)),
               HTML(format_field("Activity", paper$activity, TRUE))
             ),
             div(
@@ -67,7 +67,7 @@ render_papers_server <- function(output, paginated_data, input, session) {
               HTML(format_field("Stressor", paper$stressor_name, TRUE)),
               HTML(format_field("Metric", paper$specific_stressor_metric, TRUE)),
               HTML(format_field("Broad Stressor", paper$broad_stressor_name, TRUE)),
-              HTML(format_field("Genus Latin", paper$genus_latin, TRUE))
+              HTML(format_field("Latin Name", paper$latin_name, TRUE))
             ),
             div(
               class = "paper-meta-row",
@@ -84,7 +84,7 @@ render_papers_server <- function(output, paginated_data, input, session) {
 
   # Sync all checkboxes with "Select All"
   observeEvent(input$select_all, {
-    ids <- paginated_data()$main_id
+    ids <- paginated_data()$article_id
     for (mid in ids) {
       updateCheckboxInput(
         session,
