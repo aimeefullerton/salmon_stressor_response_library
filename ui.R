@@ -116,11 +116,7 @@ ui <- navbarPage(
               choices = list(), multiple = TRUE,
               options = list("actions-box" = TRUE, "live-search" = TRUE)
             )),
-            column(3, pickerInput("genus_latin", "Genus Latin",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("species_latin", "Species Latin",
+            column(3, pickerInput("latin_name", "Latin Name",
               choices = list(), multiple = TRUE,
               options = list("actions-box" = TRUE, "live-search" = TRUE)
             ))

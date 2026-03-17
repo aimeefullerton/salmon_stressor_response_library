@@ -40,7 +40,7 @@ edaServer <- function(id) {
       df
     }
 
-    # 1) Stressor names
+    # Stressor names
     output$plot_stressor <- renderPlot({
       df <- top_n_counts("stressor_responses", "stressor_name", 10)
       ggplot(df, aes(x = reorder(value, n), y = n)) +
@@ -59,33 +59,27 @@ edaServer <- function(id) {
         )
     })
 
-    # 3) Life‐stages (explode comma‐separated)
+    # Life‐stages
     output$plot_lifestage <- renderPlot({
-      df0 <- dbGetQuery(pool, "
-        SELECT life_stages
-        FROM stressor_responses
-        WHERE life_stages IS NOT NULL AND TRIM(life_stages) <> ''
+      df1 <- dbGetQuery(pool, "
+        SELECT TRIM(unnested) AS raw, COUNT(*) AS n
+        FROM stressor_responses,
+          LATERAL unnest(life_stages) AS unnested
+        WHERE life_stages IS NOT NULL
+          AND array_length(life_stages, 1) > 0
+        GROUP BY raw
+        ORDER BY n DESC
+        LIMIT 10
       ")
-      # split & count
-      df1 <- tibble::tibble(raw = df0$life_stages) %>%
-        tidyr::separate_rows(raw, sep = ",\\s*") %>%
-        mutate(raw = trimws(gsub('[\\[\\]\"]', "", raw))) %>%
-        filter(raw != "") %>%
-        count(raw, name = "n") %>%
-        arrange(desc(n)) %>%
-        slice_head(n = 10)
 
       ggplot(df1, aes(x = reorder(raw, n), y = n)) +
         geom_col(fill = bar_fill) +
         coord_flip() +
-        labs(
-          title = "Top 10 Life Stages",
-          x = NULL, y = "Count"
-        ) +
+        labs(title = "Top 10 Life Stages", x = NULL, y = "Count") +
         theme_minimal() +
         theme(
           plot.title = element_text(size = 18, face = "bold", color = text_color),
-          axis.text = element_text(size = 12, color = text_color),
+          axis.text  = element_text(size = 12, color = text_color),
           axis.title = element_text(size = 14, color = text_color),
           panel.grid.major.x = element_blank()
         )

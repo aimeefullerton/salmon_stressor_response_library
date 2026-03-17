@@ -67,7 +67,7 @@ render_papers_server <- function(output, paginated_data, input, session) {
               HTML(format_field("Stressor", paper$stressor_name, TRUE)),
               HTML(format_field("Metric", paper$specific_stressor_metric, TRUE)),
               HTML(format_field("Broad Stressor", paper$broad_stressor_name, TRUE)),
-              HTML(format_field("Genus Latin", paper$genus_latin, TRUE))
+              HTML(format_field("Latin Name", paper$latin_name, TRUE))
             ),
             div(
               class = "paper-meta-row",

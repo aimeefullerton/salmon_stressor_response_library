@@ -31,15 +31,9 @@ update_filters_server <- function(input, output, session, data, db) {
       table = "stressor_responses",
       regex = FALSE
     ),
-    genus_latin = list(
-      input_id = "genus_latin",
-      column = "genus_latin",
-      table = "stressor_responses",
-      regex = FALSE
-    ),
-    species_latin = list(
-      input_id = "species_latin",
-      column = "species_latin",
+    latin_name = list(
+      input_id = "latin_name",
+      column = "latin_name",
       table = "stressor_responses",
       regex = FALSE
     ),

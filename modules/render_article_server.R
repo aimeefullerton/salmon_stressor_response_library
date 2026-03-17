@@ -131,7 +131,7 @@ render_article_server <- function(input, output, session, paper_id, db) {
     if (is.na(paper$title) || paper$title == "") "Untitled Article" else paper$title
   })
   output[[paste0("species_name_", paper_id)]] <- renderText(safe_get(paper, "species_common_name"))
-  output[[paste0("genus_latin_", paper_id)]] <- renderText(safe_get(paper, "genus_latin"))
+  output[[paste0("latin_name_", paper_id)]] <- renderText(safe_get(paper, "latin_name"))
   output[[paste0("stressor_name_", paper_id)]] <- renderText(safe_get(paper, "stressor_name"))
   output[[paste0("response_", paper_id)]] <- renderText(safe_get(paper, "response"))
   output[[paste0("specific_stressor_metric_", paper_id)]] <- renderText(safe_get(paper, "specific_stressor_metric"))

@@ -25,14 +25,9 @@ filter_data_server <- function(input, data, session) {
       data_filtered <- data_filtered[data_filtered$activity %in% input$activity, ]
     }
 
-    # Filter: genus latin
-    if (!is.null(input$genus_latin) && length(input$genus_latin) > 0) {
-      data_filtered <- data_filtered[data_filtered$genus_latin %in% input$genus_latin, ]
-    }
-
-    # Filter: species latin
-    if (!is.null(input$species_latin) && length(input$species_latin) > 0) {
-      data_filtered <- data_filtered[data_filtered$species_latin %in% input$species_latin, ]
+    # Filter: latin name
+    if (!is.null(input$latin_name) && length(input$latin_name) > 0) {
+      data_filtered <- data_filtered[data_filtered$latin_name %in% input$latin_name, ]
     }
 
     # Filter: article type
@@ -80,7 +75,7 @@ filter_data_server <- function(input, data, session) {
       search_term <- tolower(input$search)
       search_cols <- c(
         "article_id", "article_type", "title", "stressor_name", "broad_stressor_name",
-        "specific_stressor_metric", "response", "species_common_name", "genus_latin", "species_latin",
+        "specific_stressor_metric", "response", "species_common_name", "latin_name",
         "life_stages", "activity", "season", "location_country", "location_state_province",
         "location_watershed_lab", "location_river_creek", "overview", "function_derivation",
         "transferability_of_function", "source_of_stressor_data"

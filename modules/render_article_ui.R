@@ -50,7 +50,7 @@ render_article_ui <- function(article_id, data) {
         id    = meta_id,
         style = "font-size:1.1em;",
         fluidRow(column(4, strong("Species Common Name:")), column(8, textOutput(paste0("species_name_", article_id)))),
-        fluidRow(column(4, strong("Latin Name (Genus species):")), column(8, em(textOutput(paste0("genus_latin_", article_id))))),
+        fluidRow(column(4, strong("Latin Name (Genus species):")), column(8, em(textOutput(paste0("latin_name_", article_id))))),
         fluidRow(column(4, strong("Stressor Name:")), column(8, textOutput(paste0("stressor_name_", article_id)))),
         fluidRow(column(4, strong("Specific Stressor Metric:")), column(8, textOutput(paste0("specific_stressor_metric_", article_id)))),
         fluidRow(column(4, strong("Stressor Units:")), column(8, textOutput(paste0("stressor_units_", article_id)))),

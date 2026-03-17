@@ -68,17 +68,7 @@ upload_ui <- function(id) {
 
       # Species Info
       fluidRow(
-        column(3, offset = 3, pickerInput(ns("species_common_name"), "Species Common Name", NULL,
-          multiple = TRUE, options = picker_opts,
-          choices = NULL, selected = NULL
-        )),
-        column(3, pickerInput(ns("genus_latin"), "Genus Latin", NULL,
-          multiple = TRUE, options = picker_opts,
-          choices = NULL, selected = NULL
-        ))
-      ),
-      fluidRow(
-        column(3, offset = 3, pickerInput(ns("species_latin"), "Species Latin", NULL,
+        column(3, offset = 3, pickerInput(ns("latin_name"), "Latin Name (Genus Species)", NULL,
           multiple = TRUE, options = picker_opts,
           choices = NULL, selected = NULL
         )),
@@ -182,8 +172,7 @@ upload_server <- function(id, db_conn = pool) {
       "stressor_name" = "stressor_names",
       "specific_stressor_metric" = "stressor_metrics",
       "species_common_name" = "species_common_names",
-      "genus_latin" = "genus_latins",
-      "species_latin" = "species_latins",
+      "latin_name" = "latin_name",
       "geography" = "geographies",
       "life_stage" = "life_stages",
       "activity" = "activities",
@@ -378,7 +367,7 @@ upload_server <- function(id, db_conn = pool) {
             db_conn,
             "INSERT INTO stressor_responses (
               title, stressor_name, specific_stressor_metric, stressor_units,
-              species_common_name, genus_latin, species_latin, geography,
+              species_common_name, latin_name, geography,
               life_stages, activity, article_type, location_country,
               location_state_province, location_watershed_lab, location_river_creek,
               broad_stressor_name, overview, function_derivation,
@@ -393,8 +382,7 @@ upload_server <- function(id, db_conn = pool) {
               paste(input$specific_stressor_metric, collapse = ", "),
               input$stressor_units,
               paste(input$species_common_name, collapse = ", "),
-              paste(input$genus_latin, collapse = ", "),
-              paste(input$species_latin, collapse = ", "),
+              paste(input$latin_name, collapse = ", "),
               paste(input$geography, collapse = ", "),
               paste(input$life_stage, collapse = ", "),
               paste(input$activity, collapse = ", "),
@@ -644,11 +632,8 @@ upload_server <- function(id, db_conn = pool) {
       output$preview_species <- renderText({
         paste(input$species_common_name, collapse = ", ")
       })
-      output$preview_genus <- renderText({
-        paste(input$genus_latin, collapse = ", ")
-      })
-      output$preview_species_latin <- renderText({
-        paste(input$species_latin, collapse = ", ")
+      output$preview_latin_name <- renderText({
+        paste(input$latin_name, collapse = ", ")
       })
       output$preview_geography <- renderText({
         paste(input$geography, collapse = ", ")
