@@ -44,6 +44,20 @@ jobs:
     - name: Install rsconnect
       run: Rscript -e 'install.packages("rsconnect")'
 
+    - name: Diagnose manifest diff
+      run: |
+        Rscript -e 'rsconnect::writeManifest()'
+        echo "=== git diff of manifest.json ==="
+        git diff manifest.json
+        echo "=== .Rprofile line endings ==="
+        cat -A .Rprofile
+        echo "=== .Rprofile file info ==="
+        file .Rprofile
+        echo "=== git attributes ==="
+        git check-attr text eol -- .Rprofile
+        echo "=== git ls-files .Rprofile ==="
+        git ls-files --eol .Rprofile
+
     - name: Check manifest.json is up to date
       run: |
         Rscript -e 'rsconnect::writeManifest()'
