@@ -35,6 +35,7 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
     c(
       "Article Metadata",
       "Description & Function Details",
+      "Confidence Rankings & Uncertainty",
       "Citation(s)",
       "Stressor Response Data",
       "Stressor Response Chart"
@@ -42,6 +43,7 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
     c(
       paste0("toggle_metadata_", paper_id),
       paste0("toggle_description_", paper_id),
+      paste0("toggle_confidence_", paper_id),
       paste0("toggle_citations_", paper_id),
       paste0("toggle_csv_", paper_id),
       paste0("toggle_interactive_plot_", paper_id)
@@ -142,6 +144,30 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
   output[[paste0("life_stage_", paper_id)]] <- renderText(safe_get(paper, "life_stages"))
   output[[paste0("overview_", paper_id)]] <- renderText(safe_get(paper, "overview"))
   output[[paste0("function_derivation_", paper_id)]] <- renderText(safe_get(paper, "function_derivation"))
+
+  # ── Render confidence rankings ────────────────────────────────────────────────
+  output[[paste0("confidence_table_", paper_id)]] <- renderTable({
+    conf_cols <- c(
+      "Source"       = "conf_source",
+      "Shape"        = "conf_shape",
+      "Variance"     = "conf_variance",
+      "Applicability"= "conf_applicability",
+      "Interactions" = "conf_interactions"
+    )
+
+    # All fields are optional — show "Not provided" for any that are missing or NA
+    vals <- sapply(conf_cols, function(col) {
+      if (!col %in% names(paper)) return("Not provided")
+      v <- paper[[col]]
+      if (is.null(v) || is.na(v) || !nzchar(trimws(v))) "Not provided" else trimws(v)
+    })
+
+    data.frame(
+      Category = names(conf_cols),
+      Rating   = unname(vals),
+      stringsAsFactors = FALSE
+    )
+  }, striped = TRUE, hover = TRUE, bordered = TRUE)
 
   # ── Render citations ───────────────────────────────────────────────────────
   output[[paste0("citations_", paper_id)]] <- renderUI({
@@ -298,7 +324,7 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
 
     non_empty <- sapply(display_df, function(col) any(!is.na(col) & nzchar(as.character(col))))
     display_df[, non_empty, drop = FALSE]
-  })
+  }, striped = TRUE, hover = TRUE, bordered = TRUE)
 
   # ── Interactive plot ───────────────────────────────────────────────────────
   output[[paste0("interactive_plot_", paper_id)]] <- renderPlotly({

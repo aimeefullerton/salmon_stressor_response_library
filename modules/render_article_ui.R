@@ -14,6 +14,7 @@ render_article_ui <- function(article_id, data) {
   collapse_id <- paste0("collapse_all_", article_id)
   meta_id <- paste0("metadata_section_", article_id)
   desc_id <- paste0("description_section_", article_id)
+  conf_id <- paste0("confidence_section_", article_id)
   cite_id <- paste0("citations_section_", article_id)
   csv_id <- paste0("csv_section_", article_id)
   plot_id <- paste0("interactive_plot_section_", article_id)
@@ -67,6 +68,17 @@ render_article_ui <- function(article_id, data) {
         style = "font-size:1.1em;",
         strong("Detailed SR Function Description"), br(), textOutput(paste0("overview_", article_id)), br(), br(),
         strong("Function Derivation"), br(), textOutput(paste0("function_derivation_", article_id))
+      ))
+    ),
+
+    # ── Confidence Rankings ────────────────────────────────────────────────
+    div(
+      style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
+      actionLink(paste0("toggle_confidence_", article_id), "Confidence Rankings & Uncertainty ▼", class = "section-title"),
+      hidden(div(
+        id    = conf_id,
+        style = "font-size:1.1em;",
+        tableOutput(paste0("confidence_table_", article_id))
       ))
     ),
 

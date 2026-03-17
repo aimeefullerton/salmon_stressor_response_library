@@ -144,6 +144,7 @@ server <- function(input, output, session) {
               {
                 shinyjs::show(paste0("metadata_section_", mid))
                 shinyjs::show(paste0("description_section_", mid))
+                shinyjs::show(paste0("confidence_section_", mid))
                 shinyjs::show(paste0("citations_section_", mid))
                 shinyjs::show(paste0("csv_section_", mid))
                 shinyjs::show(paste0("interactive_plot_section_", mid))
@@ -156,6 +157,7 @@ server <- function(input, output, session) {
               {
                 shinyjs::hide(paste0("metadata_section_", mid))
                 shinyjs::hide(paste0("description_section_", mid))
+                shinyjs::hide(paste0("confidence_section_", mid))
                 shinyjs::hide(paste0("citations_section_", mid))
                 shinyjs::hide(paste0("csv_section_", mid))
                 shinyjs::hide(paste0("interactive_plot_section_", mid))
@@ -164,7 +166,7 @@ server <- function(input, output, session) {
             )
 
             # ── Section toggles ───────────────────────────────────────────────
-            for (section in c("metadata", "description", "citations", "csv", "interactive_plot")) {
+            for (section in c("metadata", "description", "confidence", "citations", "csv", "interactive_plot")) {
               local({
                 s <- section
                 m <- mid
