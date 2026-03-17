@@ -3828,7 +3828,7 @@
       "checksum": "8a82aae483a7fc454448ff0f74a36241"
     },
     ".github/workflows/check-dependencies.yml": {
-      "checksum": "1a6b2da4a9c195abdb62d4b62d95624b"
+      "checksum": "b0afde659b9492a8f1faf8b09fab5bca"
     },
     ".github/workflows/secretScan.yml": {
       "checksum": "c8ab19612d3fab566bfe99fffa824737"
@@ -3843,7 +3843,7 @@
       "checksum": "459c349c9227bab10b03c2616446171e"
     },
     ".Rprofile": {
-      "checksum": "8107175ba2f2d61d0fd68d5db71c71d2"
+      "checksum": "97cc78eeedd320db824d3177e4f767fc"
     },
     "app.R": {
       "checksum": "93970e5798eb59eee6e554e1fda639ef"
