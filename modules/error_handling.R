@@ -246,31 +246,37 @@ check_title_duplicate <- function(title, db_conn) {
 
 #' Check for Data Conflicts
 #'
-#' Checks if the same stressor-species-geography combination already exists
+#' Checks if the same stressor-species-location combination already exists
 #'
 #' @param stressor Stressor name(s)
 #' @param species Species name(s)
-#' @param geography Geography value(s)
+#' @param location Location value(s) - list of location_country, location_state_province, location_watershed_lab, location_river_creek
 #' @param db_conn Database connection
 #'
 #' @return List with $conflict (logical) and $message (character)
-check_data_conflict <- function(stressor, species, geography, db_conn) {
-  if (is.null(stressor) || is.null(species) || is.null(geography)) {
+location <- function(input, data) {
+  updatePickerInput(session, "location_country", choices = getCategoryChoices("location_country"))
+  updatePickerInput(session, "location_state_province", choices = getCategoryChoices("location_state_province"))
+  updatePickerInput(session, "location_watershed_lab", choices = getCategoryChoices("location_watershed_lab"))
+  updatePickerInput(session, "location_river_creek", choices = getCategoryChoices("location_river_creek"))
+}
+check_data_conflict <- function(stressor, species, location, db_conn) {
+  if (is.null(stressor) || is.null(species) || is.null(location)) {
     return(list(conflict = FALSE, message = ""))
   }
 
   stressor_str <- paste(stressor, collapse = ", ")
   species_str <- paste(species, collapse = ", ")
-  geography_str <- paste(geography, collapse = ", ")
+  location_str <- paste(location, collapse = ", ")
 
   tryCatch(
     {
       similar <- dbGetQuery(db_conn,
-        "SELECT title, stressor_name, species_common_name, geography
+        "SELECT title, stressor_name, species_common_name, location
          FROM stressor_responses
-         WHERE stressor_name = $1 AND species_common_name = $2 AND geography = $3
+         WHERE stressor_name = $1 AND species_common_name = $2 AND location = $3
          LIMIT 5",
-        params = list(stressor_str, species_str, geography_str)
+        params = list(stressor_str, species_str, location_str)
       )
 
       if (nrow(similar) > 0) {
@@ -278,8 +284,8 @@ check_data_conflict <- function(stressor, species, geography, db_conn) {
         return(list(
           conflict = TRUE,
           message = sprintf(
-            "Warning: The combination of stressor '%s', species '%s', and geography '%s' already exists in these records:\n\n%s\n\nYou can still proceed if this is a different study or updated data.",
-            stressor_str, species_str, geography_str, titles
+            "Warning: The combination of stressor '%s', species '%s', and location '%s' already exists in these records:\n\n%s\n\nYou can still proceed if this is a different study or updated data.",
+            stressor_str, species_str, location_str, titles
           )
         ))
       }

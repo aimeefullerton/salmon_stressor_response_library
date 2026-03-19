@@ -5,7 +5,6 @@ library(shinyWidgets)
 
 # Source all necessary modules
 source("modules/upload.R", local = TRUE)
-source("modules/manage_categories.R", local = TRUE)
 source("modules/about_us.R", local = TRUE)
 source("modules/acknowledgement.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
@@ -77,7 +76,7 @@ ui <- navbarPage(
     fluidPage(
       useShinyjs(),
       conditionalPanel(
-        condition = "!window.location.search.includes('main_id')",
+        condition = "!window.location.search.includes('article_id')",
         fluidRow(
           column(8, textInput("search", "Search All Text", placeholder = "Type keywords...")),
           column(4, actionButton("toggle_filters", "Show Filters", icon = icon("filter")))
@@ -103,7 +102,7 @@ ui <- navbarPage(
               choices = list(), multiple = TRUE,
               options = list("actions-box" = TRUE, "live-search" = TRUE)
             )),
-            column(3, pickerInput("geography", "Geography (Region)",
+            column(3, pickerInput("broad_stressor_name", "Broad Stressor Name",
               choices = list(), multiple = TRUE,
               options = list("actions-box" = TRUE, "live-search" = TRUE)
             ))
@@ -117,17 +116,13 @@ ui <- navbarPage(
               choices = list(), multiple = TRUE,
               options = list("actions-box" = TRUE, "live-search" = TRUE)
             )),
-            column(3, pickerInput("genus_latin", "Genus Latin",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("species_latin", "Species Latin",
+            column(3, pickerInput("latin_name", "Latin Name",
               choices = list(), multiple = TRUE,
               options = list("actions-box" = TRUE, "live-search" = TRUE)
             ))
           ),
           fluidRow(
-            column(3, pickerInput("research_article_type", "Research Article Type",
+            column(3, pickerInput("article_type", "Article Type",
               choices = list(), multiple = TRUE,
               options = list("actions-box" = TRUE, "live-search" = TRUE)
             )),
@@ -146,10 +141,6 @@ ui <- navbarPage(
           ),
           fluidRow(
             column(3, pickerInput("location_river_creek", "River / Creek",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("broad_stressor_name", "Broad Stressor Name",
               choices = list(), multiple = TRUE,
               options = list("actions-box" = TRUE, "live-search" = TRUE)
             ))
