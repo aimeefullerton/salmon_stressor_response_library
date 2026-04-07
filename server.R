@@ -29,18 +29,22 @@ server <- function(input, output, session) {
   } else {
     data <- dbGetQuery(db, "SELECT * FROM stressor_responses ORDER BY article_id ASC")
 
-    # Parse Postgres text[] columns into R character vectors
+# Parse Postgres text[] columns into R character vectors AND collapse into strings
     pq_array_cols <- names(data)[sapply(data, inherits, "pq__text")]
     data[pq_array_cols] <- lapply(data[pq_array_cols], function(col) {
-      lapply(col, function(x) {
-        if (is.null(x) || is.na(x) || !nzchar(x)) return(character(0))
+      sapply(col, function(x) {
+        # Return true NA instead of "N/A"
+        if (is.null(x) || is.na(x) || !nzchar(x)) return(NA_character_)
         x <- gsub("^\\{|\\}$", "", x)
         parts <- strsplit(x, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", perl = TRUE)[[1]]
         parts <- gsub('^"|"$', "", trimws(parts))
-        parts[parts != "NULL" & nzchar(parts)]
+        valid_parts <- parts[parts != "NULL" & nzchar(parts)]
+        # If the array was empty (e.g., {""}), return true NA
+        if (length(valid_parts) == 0) return(NA_character_)
+        # Collapse valid items
+        return(paste(valid_parts, collapse = ", "))
       })
     })
-  }
 
   # ── Filter dropdowns ───────────────────────────────────────────────────────
   getCategoryChoices <- function(column_name) {
