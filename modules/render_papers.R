@@ -4,14 +4,18 @@ render_papers_server <- function(output, paginated_data, input, session) {
     data_to_display <- paginated_data()
 
     format_field <- function(label, val, bold = FALSE) {
-      display <- ifelse(is.na(val) || val == "NA", "", val)
+      # UPDATED: Expanded the check to catch "N/A" and length-0 vectors just in case
+      display <- ifelse(is.null(val) || length(val) == 0 || is.na(val) || val == "NA" || val == "N/A", "", val)
       if (display == "") {
         return("")
       }
       value_span <- sprintf("<span class='%s'>%s</span>", if (bold) "metadata-bold" else "metadata-light", htmltools::htmlEscape(display))
       label_span <- sprintf("<span class='metadata-label'>%s:</span> ", htmltools::htmlEscape(label))
       div_class <- "paper-meta-item"
-      sprintf("<div class='%s' title='%s'>%s%s</div>", div_class, htmltools::htmlEscape(display), label_span, value_span)
+      
+      # UPDATED: Added inline styles here to force text wrapping and prevent boundary overflow
+      sprintf("<div class='%s' title='%s' style='white-space: normal !important; word-break: break-word; overflow-wrap: break-word; padding-right: 15px; flex: 1 1 auto; min-width: 150px;'>%s%s</div>", 
+              div_class, htmltools::htmlEscape(display), label_span, value_span)
     }
 
     if (is.null(data_to_display) || nrow(data_to_display) == 0) {
@@ -33,30 +37,39 @@ render_papers_server <- function(output, paginated_data, input, session) {
 
         div(
           class = "hover-highlight",
-          style = "padding: 8px 12px; margin: 6px auto; border-radius: 6px; width: 95%;
+          # UPDATED: width to 100% to fill your UI columns, and height to auto
+          style = "padding: 12px 15px; margin: 10px auto; border-radius: 6px; width: 100%;
                 display: flex; align-items: flex-start; justify-content: flex-start;
-                border: 1px solid #ddd; background-color: #f9f9f9; min-height: 80px;",
+                border: 1px solid #ddd; background-color: #f9f9f9; min-height: 100px; height: auto;",
 
           # Checkbox
           div(
-            style = "margin-right: 10px; margin-top: 5px;",
+            # UPDATED: Added flex-shrink: 0 to stop the checkbox from squishing
+            style = "margin-right: 15px; margin-top: 5px; flex-shrink: 0;",
             checkboxInput(inputId = checkbox_id, label = NULL, value = FALSE, width = "20px")
           ),
 
           # Title + Metadata block
           div(
-            style = "flex-grow: 1; padding-left: 10px;",
+            # UPDATED: Added min-width: 0 to force flexbox to respect text-wrapping
+            style = "flex-grow: 1; padding-left: 10px; min-width: 0;",
 
             # Title
-            actionButton(
-              inputId = paste0("view_article_", paper$article_id),
-              label = paste0(paper$article_id, ". ", paper$title),
-              class = "paper-card-title btn-link"
+            div(
+              style = "margin-bottom: 8px; white-space: normal; word-wrap: break-word;",
+              actionButton(
+                inputId = paste0("view_article_", paper$article_id),
+                label = paste0(paper$article_id, ". ", paper$title),
+                class = "paper-card-title btn-link",
+                style = "text-align: left; white-space: normal; word-wrap: break-word; padding: 0;"
+              )
             ),
 
             # Metadata rows
+            # UPDATED: Added display: flex and flex-wrap: wrap so items drop down instead of pushing off-screen
             div(
               class = "paper-meta-row",
+              style = "display: flex; flex-wrap: wrap; margin-bottom: 4px;",
               HTML(format_field("Common Name", paper$species_common_name, TRUE)),
               HTML(format_field("Life Stage", paper$life_stages, TRUE)),
               HTML(format_field("Type", paper$article_type, TRUE)),
@@ -64,6 +77,7 @@ render_papers_server <- function(output, paginated_data, input, session) {
             ),
             div(
               class = "paper-meta-row",
+              style = "display: flex; flex-wrap: wrap; margin-bottom: 4px;",
               HTML(format_field("Stressor", paper$stressor_name, TRUE)),
               HTML(format_field("Metric", paper$specific_stressor_metric, TRUE)),
               HTML(format_field("Broad Stressor", paper$broad_stressor_name, TRUE)),
@@ -71,6 +85,7 @@ render_papers_server <- function(output, paginated_data, input, session) {
             ),
             div(
               class = "paper-meta-row",
+              style = "display: flex; flex-wrap: wrap;",
               HTML(format_field("River/Creek", paper$location_river_creek, TRUE)),
               HTML(format_field("Watershed/Lab", paper$location_watershed_lab, TRUE)),
               HTML(format_field("State/Province", paper$location_state_province, TRUE)),
