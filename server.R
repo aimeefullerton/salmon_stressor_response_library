@@ -45,7 +45,7 @@ server <- function(input, output, session) {
         return(paste(valid_parts, collapse = ", "))
       })
     })
-
+}
   # ── Filter dropdowns ───────────────────────────────────────────────────────
   getCategoryChoices <- function(column_name) {
     # Use unnest() so each array element becomes its own distinct row
