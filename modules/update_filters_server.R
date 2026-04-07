@@ -22,21 +22,28 @@ update_filters_server <- function(input, output, session, data, db) {
     broad_stressor_name = list(input_id = "broad_stressor_name", column = "broad_stressor_name")
   )
 
-  # Apply one filter to a dataframe, aware of list vs plain columns
+# Apply one filter to a dataframe, aware of list vs plain columns
   apply_filter <- function(df, vals, col) {
     if (is.null(vals) || length(vals) == 0) return(df)
     if (col %in% array_cols) {
-      keep <- vapply(df[[col]], function(cell) any(cell %in% vals), logical(1))
+      keep <- vapply(df[[col]], function(cell) {
+        if (is.na(cell)) return(FALSE)
+        # Split the string back into individual items using the comma-space
+        cell_parts <- strsplit(cell, ", ")[[1]]
+        any(cell_parts %in% vals)
+      }, logical(1))
     } else {
       keep <- df[[col]] %in% vals
     }
     df[keep, ]
   }
 
-  # Get distinct values from a column for dropdown choices
+# Get distinct values from a column for dropdown choices
   get_dynamic_vals <- function(df, col) {
     if (col %in% array_cols) {
-      vals <- unique(unlist(df[[col]], use.names = FALSE))
+      # Remove NAs, then split all strings by comma-space, then unlist to a flat vector
+      clean_cells <- df[[col]][!is.na(df[[col]])]
+      vals <- unique(unlist(strsplit(clean_cells, ", ")))
     } else {
       vals <- unique(df[[col]])
     }
