@@ -1,15 +1,19 @@
 # nolint start
 
-# Helper: checks if any element of a list-column cell matches selected values
+# Helper: checks if any element of a comma-separated string matches selected values
 match_array_col <- function(col, selected) {
-  vapply(col, function(cell) any(cell %in% selected), logical(1))
+  vapply(col, function(cell) {
+    if (is.na(cell) || !nzchar(cell)) return(FALSE)
+    # Split the string back into individual items using the comma-space
+    cell_parts <- strsplit(as.character(cell), ", ")[[1]]
+    any(cell_parts %in% selected)
+  }, logical(1), USE.NAMES = FALSE)
 }
 
-# Helper: checks if any element of a list-column cell matches a search term
+# Helper: checks if a comma-separated string matches a search term
 search_array_col <- function(col, search_term) {
-  vapply(col, function(cell) {
-    any(grepl(search_term, tolower(cell), ignore.case = TRUE))
-  }, logical(1))
+  # Since col is now a standard character vector, we can just use vectorized grepl!
+  grepl(search_term, tolower(as.character(col)), ignore.case = TRUE)
 }
 
 filter_data_server <- function(input, data, session) {
