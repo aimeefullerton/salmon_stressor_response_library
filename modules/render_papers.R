@@ -53,7 +53,7 @@ render_papers_server <- function(output, paginated_data, input, session) {
 
             # Title 
             div(
-              style = "margin-bottom: 8px;", 
+              style = "margin-bottom: 8px; padding-right: 150x;", 
               actionButton(
                 inputId = paste0("view_article_", paper$article_id),
                 label = paste0(paper$article_id, ". ", paper$title),
