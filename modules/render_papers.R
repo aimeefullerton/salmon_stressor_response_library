@@ -33,7 +33,7 @@ render_papers_server <- function(output, paginated_data, input, session) {
         checkbox_id <- paste0("select_article_", paper$article_id)
 
         # Safely pull the userid for the badge (defaults to "Unknown" if column is missing)
-        contributor <- if ("userid" %in% names(paper) && !is.na(paper$userid)) paper$userid else "Unknown"
+        contributor <- if ("contributor_name" %in% names(paper) && !is.na(paper$contributor_name)) paper$contributor_name else "UNKNOWN"
 
         div(
           class = "paper-card", # NEW: Uses your modern card CSS
