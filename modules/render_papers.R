@@ -9,13 +9,10 @@ render_papers_server <- function(output, paginated_data, input, session) {
       if (display == "") {
         return("")
       }
-      value_span <- sprintf("<span class='%s'>%s</span>", if (bold) "metadata-bold" else "metadata-light", htmltools::htmlEscape(display))
-      label_span <- sprintf("<span class='metadata-label'>%s:</span> ", htmltools::htmlEscape(label))
-      div_class <- "paper-meta-item"
+      label_span <- sprintf("<span class='metadata-light'>%s:</span> ", htmltools::htmlEscape(label))
+      value_span <- sprintf("<span class='metadata-bold'>%s</span>", htmltools::htmlEscape(display))
       
-      # UPDATED: Added inline styles here to force text wrapping and prevent boundary overflow
-      sprintf("<div class='%s' title='%s' style='white-space: normal !important; word-break: break-word; overflow-wrap: break-word; padding-right: 15px; flex: 1 1 auto; min-width: 150px;'>%s%s</div>", 
-              div_class, htmltools::htmlEscape(display), label_span, value_span)
+      sprintf("<div class='paper-meta-item'>%s%s</div>", label_span, value_span)
     }
 
     if (is.null(data_to_display) || nrow(data_to_display) == 0) {
@@ -25,7 +22,7 @@ render_papers_server <- function(output, paginated_data, input, session) {
       ))
     }
 
-    # Remove rows where all values are NA
+# Remove rows where all values are NA
     data_to_display <- data_to_display[rowSums(is.na(data_to_display)) != ncol(data_to_display), ]
 
     tagList(
@@ -35,61 +32,57 @@ render_papers_server <- function(output, paginated_data, input, session) {
         article_url <- paste0("?article_id=", paper$article_id)
         checkbox_id <- paste0("select_article_", paper$article_id)
 
-        div(
-          class = "hover-highlight",
-          # UPDATED: width to 100% to fill your UI columns, and height to auto
-          style = "padding: 12px 15px; margin: 10px auto; border-radius: 6px; width: 100%;
-                display: flex; align-items: flex-start; justify-content: flex-start;
-                border: 1px solid #ddd; background-color: #f9f9f9; min-height: 100px; height: auto;",
+        # Safely pull the userid for the badge (defaults to "Unknown" if column is missing)
+        contributor <- if ("userid" %in% names(paper) && !is.na(paper$userid)) paper$userid else "Unknown"
 
-          # Checkbox
+        div(
+          class = "paper-card", # NEW: Uses your modern card CSS
+
+          # 1. THE CONTRIBUTOR BADGE
+          tags$span(class = "contributor-badge", paste("Entry by:", contributor)),
+
+          # 2. THE CHECKBOX
           div(
-            # UPDATED: Added flex-shrink: 0 to stop the checkbox from squishing
-            style = "margin-right: 15px; margin-top: 5px; flex-shrink: 0;",
+            class = "paper-checkbox-container",
             checkboxInput(inputId = checkbox_id, label = NULL, value = FALSE, width = "20px")
           ),
 
-          # Title + Metadata block
+          # 3. THE MAIN CONTENT
           div(
-            # UPDATED: Added min-width: 0 to force flexbox to respect text-wrapping
-            style = "flex-grow: 1; padding-left: 10px; min-width: 0;",
+            class = "paper-content",
 
-            # Title
+            # Title 
             div(
-              style = "margin-bottom: 8px; white-space: normal; word-wrap: break-word;",
+              style = "margin-bottom: 8px;", 
               actionButton(
                 inputId = paste0("view_article_", paper$article_id),
                 label = paste0(paper$article_id, ". ", paper$title),
                 class = "paper-card-title btn-link",
-                style = "text-align: left; white-space: normal; word-wrap: break-word; padding: 0;"
+                style = "text-align: left; padding: 0; white-space: normal; border: none; background: none;"
               )
             ),
 
-            # Metadata rows
-            # UPDATED: Added display: flex and flex-wrap: wrap so items drop down instead of pushing off-screen
+            # Metadata rows - CSS classes paper-meta-row and paper-meta-item do the aligning!
             div(
               class = "paper-meta-row",
-              style = "display: flex; flex-wrap: wrap; margin-bottom: 4px;",
-              HTML(format_field("Common Name", paper$species_common_name, TRUE)),
-              HTML(format_field("Life Stage", paper$life_stages, TRUE)),
-              HTML(format_field("Type", paper$article_type, TRUE)),
-              HTML(format_field("Activity", paper$activity, TRUE))
+              HTML(format_field("Common Name", paper$species_common_name)),
+              HTML(format_field("Life Stage", paper$life_stages)),
+              HTML(format_field("Type", paper$article_type)),
+              HTML(format_field("Activity", paper$activity))
             ),
             div(
               class = "paper-meta-row",
-              style = "display: flex; flex-wrap: wrap; margin-bottom: 4px;",
-              HTML(format_field("Stressor", paper$stressor_name, TRUE)),
-              HTML(format_field("Metric", paper$specific_stressor_metric, TRUE)),
-              HTML(format_field("Broad Stressor", paper$broad_stressor_name, TRUE)),
-              HTML(format_field("Latin Name", paper$latin_name, TRUE))
+              HTML(format_field("Stressor", paper$stressor_name)),
+              HTML(format_field("Metric", paper$specific_stressor_metric)),
+              HTML(format_field("Response", paper$response)),
+              HTML(format_field("Latin Name", paper$latin_name))
             ),
             div(
               class = "paper-meta-row",
-              style = "display: flex; flex-wrap: wrap;",
-              HTML(format_field("River/Creek", paper$location_river_creek, TRUE)),
-              HTML(format_field("Watershed/Lab", paper$location_watershed_lab, TRUE)),
-              HTML(format_field("State/Province", paper$location_state_province, TRUE)),
-              HTML(format_field("Country", paper$location_country, TRUE))
+              HTML(format_field("River/Creek", paper$location_river_creek)),
+              HTML(format_field("Watershed/Lab", paper$location_watershed_lab)),
+              HTML(format_field("State/Province", paper$location_state_province)),
+              HTML(format_field("Country", paper$location_country))
             )
           )
         )
