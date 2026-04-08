@@ -27,7 +27,15 @@ server <- function(input, output, session) {
     warning("Table `stressor_responses` does not exist in the database.")
     data <- data.frame()
   } else {
-    data <- dbGetQuery(db, "SELECT * FROM stressor_responses ORDER BY article_id ASC")
+    # UPDATED: Added LEFT JOIN to pull the user's name from the users table
+    data <- dbGetQuery(db, "
+      SELECT 
+        sr.*, 
+        u.name AS contributor_name 
+      FROM stressor_responses sr
+      LEFT JOIN users u ON sr.user_id = u.user_id 
+      ORDER BY sr.article_id ASC
+    ")
 
 # Parse Postgres text[] columns into R character vectors AND collapse into strings
     pq_array_cols <- names(data)[sapply(data, inherits, "pq__text")]
