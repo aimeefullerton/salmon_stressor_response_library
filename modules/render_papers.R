@@ -38,31 +38,32 @@ render_papers_server <- function(output, paginated_data, input, session) {
         div(
           class = "paper-card", # NEW: Uses your modern card CSS
 
-          # 1. THE CONTRIBUTOR BADGE
+# 1. THE CONTRIBUTOR BADGE
           tags$span(class = "contributor-badge", paste("Entry by:", contributor)),
 
-          # 2. THE CHECKBOX
+# 2. THE CHECKBOX
           div(
             class = "paper-checkbox-container",
             checkboxInput(inputId = checkbox_id, label = NULL, value = FALSE, width = "20px")
           ),
 
-          # 3. THE MAIN CONTENT
+# 3. THE MAIN CONTENT
           div(
             class = "paper-content",
-
-            # Title 
+# Title 
             div(
-              style = "margin-bottom: 8px; padding-right: 150x;", 
+              style = "margin-bottom: 8px; width: 100%;", 
               actionButton(
                 inputId = paste0("view_article_", paper$article_id),
                 label = paste0(paper$article_id, ". ", paper$title),
                 class = "paper-card-title btn-link",
-                style = "text-align: left; padding: 0; white-space: normal; border: none; background: none;"
+                
+                # UPDATED STYLE: Forces block display, overrides text wrapping, and cuts 160px off the max width
+                style = "display: block; text-align: left; padding: 0; white-space: normal !important; word-break: break-word; max-width: calc(100% - 160px); border: none; background: none;"
               )
             ),
 
-            # Metadata rows - CSS classes paper-meta-row and paper-meta-item do the aligning!
+# Metadata rows - CSS classes paper-meta-row and paper-meta-item do the aligning!
             div(
               class = "paper-meta-row",
               HTML(format_field("Common Name", paper$species_common_name)),
