@@ -144,7 +144,33 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
   output[[paste0("life_stage_", paper_id)]] <- renderText(safe_get(paper, "life_stages"))
   output[[paste0("overview_", paper_id)]] <- renderText(safe_get(paper, "overview"))
   output[[paste0("function_derivation_", paper_id)]] <- renderText(safe_get(paper, "function_derivation"))
+# ── Conditional: Transferability of Function ──
+  output[[paste0("transferability_ui_", paper_id)]] <- renderUI({
+    val <- safe_get(paper, "transferability_of_function")
+    # Check if null, NA, or empty
+    if (is.null(val) || length(val) == 0 || is.na(val) || val == "" || val == "NA" || val == "N/A") {
+      return(NULL) 
+    }
+    tagList(
+      br(), br(),
+      strong("Transferability of Function"), br(), 
+      div(val)
+    )
+  })
 
+  # ── Conditional: SRF Formula ──
+  output[[paste0("srf_formula_ui_", paper_id)]] <- renderUI({
+    val <- safe_get(paper, "srf_formula")
+    # Check if null, NA, or empty
+    if (is.null(val) || length(val) == 0 || is.na(val) || val == "" || val == "NA" || val == "N/A") {
+      return(NULL) 
+    }
+    tagList(
+      br(), br(),
+      strong("SRF Formula"), br(), 
+      div(val)
+    )
+  })
   # ── Render confidence rankings ────────────────────────────────────────────────
   output[[paste0("confidence_table_", paper_id)]] <- renderTable({
     conf_cols <- c(
