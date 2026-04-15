@@ -67,7 +67,10 @@ render_article_ui <- function(article_id, data) {
         id = desc_id,
         style = "font-size:1.1em;",
         strong("Detailed SR Function Description"), br(), textOutput(paste0("overview_", article_id)), br(), br(),
-        strong("Function Derivation"), br(), textOutput(paste0("function_derivation_", article_id))
+        strong("Function Derivation"), br(), textOutput(paste0("function_derivation_", article_id)),
+        # Dynamic UI placeholders for conditional fields
+        uiOutput(paste0("transferability_ui_", article_id)),
+        uiOutput(paste0("srf_formula_ui", article_id))
       ))
     ),
 
