@@ -123,7 +123,7 @@ server <- function(input, output, session) {
   submit_relationship_server("submit_relationship")
   edaServer("eda")
   render_papers_server(output, paginated_data, input, session)
-  setup_download_csv(output, paginated_data, db, input, session)
+  setup_download_csv(output, filtered_data, paginated_data, db, input, session)
 
   # ── Article modal ──────────────────────────────────────────────────────────
   # Track which articles have had render_article_server called to avoid
