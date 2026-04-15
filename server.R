@@ -27,7 +27,15 @@ server <- function(input, output, session) {
     warning("Table `stressor_responses` does not exist in the database.")
     data <- data.frame()
   } else {
-    data <- dbGetQuery(db, "SELECT * FROM stressor_responses ORDER BY article_id ASC")
+    # UPDATED: Added LEFT JOIN to pull the user's name from the users table
+    data <- dbGetQuery(db, "
+      SELECT 
+        sr.*, 
+        u.name AS contributor_name 
+      FROM stressor_responses sr
+      LEFT JOIN users u ON sr.user_id = u.user_id 
+      ORDER BY sr.article_id ASC
+    ")
 
 # Parse Postgres text[] columns into R character vectors AND collapse into strings
     pq_array_cols <- names(data)[sapply(data, inherits, "pq__text")]
@@ -90,23 +98,12 @@ server <- function(input, output, session) {
 
   # ── Filtered & paginated data ──────────────────────────────────────────────
   filtered_data <- filter_data_server(input, data, session)
-
   pagination <- pagination_server(input, output, session, filtered_data)
   paginated_data <- pagination$paginated_data
-  output$page_info <- renderText(pagination$page_info())
+  
+  # Wire the text outputs to the new Top and Bottom UI elements
   output$page_info_top <- renderText(pagination$page_info())
-
-  observeEvent(filtered_data(), {
-    updateNumericInput(session, "page", value = 1)
-  })
-
-  observeEvent(input$prev_page, {
-    updateNumericInput(session, "page", value = max(1, input$page - 1))
-  })
-
-  observeEvent(input$next_page, {
-    updateNumericInput(session, "page", value = input$page + 1)
-  })
+  output$page_info_bottom <- renderText(pagination$page_info())
 
   # ── Modules ────────────────────────────────────────────────────────────────
   update_filters_server(input, output, session, data, db)
@@ -115,7 +112,7 @@ server <- function(input, output, session) {
   submit_relationship_server("submit_relationship")
   edaServer("eda")
   render_papers_server(output, paginated_data, input, session)
-  setup_download_csv(output, paginated_data, db, input, session)
+  setup_download_csv(output, filtered_data, paginated_data, db, input, session)
 
   # ── Article modal ──────────────────────────────────────────────────────────
   # Track which articles have had render_article_server called to avoid

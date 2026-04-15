@@ -19,12 +19,12 @@ userGuideUI <- function(id) {
       p("Each entry has an identifier and descriptive metadata fields."),
       includeMarkdown("data/user_guide/metadata_fields.md"),
       h2("Extracted Data"),
-      p("When you download an SR function as a CSV, you receive:"),
+      p("When you download an SR function as an Excel Spreadsheet, you receive:"),
       tags$ol(
         tags$li("Metadata (all fields above), and"),
         tags$li("Extracted data table - numerical data pulled from figures, tables, or supplementary files.")
       ),
-      p("The extracted CSV data have the following standardized columns:"),
+      p("The extracted spreadsheet data have the following standardized columns:"),
       includeMarkdown("data/user_guide/extracted_data.md"),
       tags$div(
         style = "margin: 16px 0;",

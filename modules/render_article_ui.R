@@ -55,7 +55,12 @@ render_article_ui <- function(article_id, data) {
         fluidRow(column(4, strong("Stressor Name:")), column(8, textOutput(paste0("stressor_name_", article_id)))),
         fluidRow(column(4, strong("Specific Stressor Metric:")), column(8, textOutput(paste0("specific_stressor_metric_", article_id)))),
         fluidRow(column(4, strong("Response:")), column(8, textOutput(paste0("response_", article_id)))),
-        fluidRow(column(4, strong("Life Stage:")), column(8, textOutput(paste0("life_stage_", article_id))))
+        fluidRow(column(4, strong("Life Stage:")), column(8, textOutput(paste0("life_stage_", article_id)))),
+    # NEW: Dynamic UI placeholders for conditional location fields
+        uiOutput(paste0("location_country_ui_", article_id)),
+        uiOutput(paste0("location_state_province_ui_", article_id)),
+        uiOutput(paste0("location_watershed_lab_ui_", article_id)),
+        uiOutput(paste0("location_river_creek_ui_", article_id))
       ))
     ),
 
@@ -67,7 +72,10 @@ render_article_ui <- function(article_id, data) {
         id = desc_id,
         style = "font-size:1.1em;",
         strong("Detailed SR Function Description"), br(), textOutput(paste0("overview_", article_id)), br(), br(),
-        strong("Function Derivation"), br(), textOutput(paste0("function_derivation_", article_id))
+        strong("Function Derivation"), br(), textOutput(paste0("function_derivation_", article_id)),
+        # Dynamic UI placeholders for conditional fields
+        uiOutput(paste0("transferability_ui_", article_id)),
+        uiOutput(paste0("srf_formula_ui", article_id))
       ))
     ),
 

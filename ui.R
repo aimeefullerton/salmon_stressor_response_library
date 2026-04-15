@@ -17,7 +17,7 @@ addResourcePath("teamimg", "modules/images")
 # UI
 ui <- navbarPage(
   id = "main_navbar",
-  title = "Salmon Stressor-Response eLibrary",
+  title = "Pacific Salmonid Stressor-Response eLibrary",
   selected = "dashboard",
   # use Bootstrap 5 for better styling and responsiveness
   # https://bootswatch.com/5/ for themes if desired
@@ -154,15 +154,22 @@ ui <- navbarPage(
             ))
           )
         ),
+        # ── 1. Top Pagination Controls ──
         fluidRow(
-          column(
-            12,
-            div(
-              style = "text-align: center; margin-bottom: 10px;",
-              actionButton("prev_page", "<< Previous", class = "btn btn-sm"),
-              span(textOutput("page_info", inline = TRUE), style = "margin: 0 10px; font-size: 13px;"),
-              actionButton("next_page", "Next >>", class = "btn btn-sm")
-            )
+          column(12, align = "center",
+            style = "margin-top: 10px; margin-bottom: 15px;",
+            
+            # Page size selector
+            selectInput("page_size", "Articles per page:", 
+                        choices = c(5, 10, 25, 50), 
+                        selected = 10, 
+                        width = "150px"),
+            br(),
+            
+            # Top Buttons
+            actionButton("prev_page_top", "← Previous", class = "btn-primary btn-sm"),
+            span(textOutput("page_info_top", inline = TRUE), style = "margin: 0 15px; font-weight: bold;"),
+            actionButton("next_page_top", "Next →", class = "btn-primary btn-sm")
           )
         ),
         dropdownButton(
@@ -195,14 +202,17 @@ ui <- navbarPage(
           column(6, offset = 3, uiOutput("paper_cards"))
         ),
         br(), br(),
+        # ── 2. Bottom Pagination Controls ──
         fluidRow(
-          column(12,
-            align = "center",
-            actionButton("load_more_mode", "Load More", icon = icon("plus")),
-            tags$br(), tags$br()
+          column(12, align = "center",
+            style = "margin-top: 20px; margin-bottom: 20px;",
+            
+            # Bottom Buttons
+            actionButton("prev_page_bottom", "← Previous", class = "btn-primary"),
+            span(textOutput("page_info_bottom", inline = TRUE), style = "margin: 0 15px; font-weight: bold;"),
+            actionButton("next_page_bottom", "Next →", class = "btn-primary")
           )
         ),
-
         # Back to Top floating button
         tags$div(
           id = "back_to_top_fab",
@@ -220,7 +230,7 @@ ui <- navbarPage(
             });
           ")),
         tags$script(HTML("
-          $(document).on('click', '#next_page, #prev_page', function() {
+          $(document).on('click', '#next_page_top, #prev_page_top, #next_page_bottom, #prev_page_bottom', function() {
             $('html, body').animate({ scrollTop: 0 }, 'smooth');
           });
         "))
