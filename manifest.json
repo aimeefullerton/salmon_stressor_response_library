@@ -15,6 +15,26 @@
     }
   },
   "packages": {
+    "openxlsx": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "openxlsx",
+        "Version": "4.2.7.1",
+        "Source": "Repository",
+        "Repository": "CRAN"
+      }
+    },
+    "zip": {
+      "Source": "CRAN",
+      "Repository": "https://cran.rstudio.com",
+      "description": {
+        "Package": "zip",
+        "Version": "2.3.1",
+        "Source": "Repository",
+        "Repository": "CRAN"
+      }
+    },
     "DBI": {
       "Source": "CRAN",
       "Repository": "https://cloud.r-project.org",
