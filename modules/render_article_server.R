@@ -139,11 +139,43 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
   output[[paste0("species_name_", paper_id)]] <- renderText(safe_get(paper, "species_common_name"))
   output[[paste0("latin_name_", paper_id)]] <- renderText(safe_get(paper, "latin_name"))
   output[[paste0("stressor_name_", paper_id)]] <- renderText(safe_get(paper, "stressor_name"))
-  output[[paste0("response_", paper_id)]] <- renderText(safe_get(paper, "response"))
   output[[paste0("specific_stressor_metric_", paper_id)]] <- renderText(safe_get(paper, "specific_stressor_metric"))
+  output[[paste0("response_", paper_id)]] <- renderText(safe_get(paper, "response"))
   output[[paste0("life_stage_", paper_id)]] <- renderText(safe_get(paper, "life_stages"))
   output[[paste0("overview_", paper_id)]] <- renderText(safe_get(paper, "overview"))
   output[[paste0("function_derivation_", paper_id)]] <- renderText(safe_get(paper, "function_derivation"))
+# ── Conditional: Location Country ──
+  output[[paste0("location_country_ui_", paper_id)]] <- renderUI({
+    val <- safe_get(paper, "location_country")
+    if (is.null(val) || length(val) == 0 || is.na(val) || val == "" || val == "NA" || val == "N/A" || val == "Not provided") {
+      return(NULL)
+    }
+    fluidRow(column(4, strong("Country:")), column(8, val))
+  })
+# ── Conditional: Location State/Province ──
+  output[[paste0("location_state_province_ui_", paper_id)]] <- renderUI({
+    val <- safe_get(paper, "location_state_province")
+    if (is.null(val) || length(val) == 0 || is.na(val) || val == "" || val == "NA" || val == "N/A" || val == "Not provided") {
+      return(NULL)
+    }
+    fluidRow(column(4, strong("State/Province:")), column(8, val))
+  })
+# ── Conditional: Location Watershed/Lab ──
+  output[[paste0("location_watershed_lab_ui_", paper_id)]] <- renderUI({
+    val <- safe_get(paper, "location_watershed_lab")
+    if (is.null(val) || length(val) == 0 || is.na(val) || val == "" || val == "NA" || val == "N/A" || val == "Not provided") {
+      return(NULL)
+    }
+    fluidRow(column(4, strong("Watershed/Lab:")), column(8, val))
+  })
+# ── Conditional: Location River/Creek ──
+  output[[paste0("location_river_creek_ui_", paper_id)]] <- renderUI({
+    val <- safe_get(paper, "location_river_creek")
+    if (is.null(val) || length(val) == 0 || is.na(val) || val == "" || val == "NA" || val == "N/A" || val == "Not provided") {
+      return(NULL)
+    }
+    fluidRow(column(4, strong("River/Creek:")), column(8, val))
+  })
 # ── Conditional: Transferability of Function ──
   output[[paste0("transferability_ui_", paper_id)]] <- renderUI({
     val <- safe_get(paper, "transferability_of_function")
