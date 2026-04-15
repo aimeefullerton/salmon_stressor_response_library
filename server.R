@@ -98,23 +98,12 @@ server <- function(input, output, session) {
 
   # ── Filtered & paginated data ──────────────────────────────────────────────
   filtered_data <- filter_data_server(input, data, session)
-
   pagination <- pagination_server(input, output, session, filtered_data)
   paginated_data <- pagination$paginated_data
-  output$page_info <- renderText(pagination$page_info())
+  
+  # Wire the text outputs to the new Top and Bottom UI elements
   output$page_info_top <- renderText(pagination$page_info())
-
-  observeEvent(filtered_data(), {
-    updateNumericInput(session, "page", value = 1)
-  })
-
-  observeEvent(input$prev_page, {
-    updateNumericInput(session, "page", value = max(1, input$page - 1))
-  })
-
-  observeEvent(input$next_page, {
-    updateNumericInput(session, "page", value = input$page + 1)
-  })
+  output$page_info_bottom <- renderText(pagination$page_info())
 
   # ── Modules ────────────────────────────────────────────────────────────────
   update_filters_server(input, output, session, data, db)
