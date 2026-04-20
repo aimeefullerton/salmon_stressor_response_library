@@ -149,20 +149,29 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       citation_count(citation_count() + 1)
     })
 
-    # Render the dynamic citation fields
-    output$dynamic_citations_ui <- renderUI({
-      n <- citation_count()
-      lapply(1:n, function(i) {
-        div(
-          style = "border: 1px solid #e3e3e3; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #fafafa;",
-          textAreaInput(ns(paste0("citation_text_", i)), paste("Citation", i, "(Text)"), placeholder = "e.g., Smith et al. (2020)...", height = "70px", width = "100%"),
-          fluidRow(
-            column(6, textInput(ns(paste0("citation_title_", i)), "Link Title", placeholder = "e.g., Read the full paper")),
-            column(6, textInput(ns(paste0("citation_url_", i)), "URL", placeholder = "https://doi.org/..."))
-          )
+# Citations (Dynamic)
+      fluidRow(
+        column(6, offset = 3, h4("Citations"))
+      ),
+      fluidRow(
+        column(6, offset = 3,
+          # Box 1 is always here by default
+          div(
+            id = ns("citation_block_1"),
+            style = "border: 1px solid #e3e3e3; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #fafafa;",
+            textAreaInput(ns("citation_text_1"), "Citation 1 (Text)", placeholder = "e.g., Smith et al. (2020)...", height = "70px", width = "100%"),
+            fluidRow(
+              column(6, textInput(ns("citation_title_1"), "Link Title", placeholder = "e.g., Read the full paper")),
+              column(6, textInput(ns("citation_url_1"), "URL", placeholder = "https://doi.org/..."))
+            )
+          ),
+          # This is the invisible container where boxes 2, 3, 4 etc. will be injected
+          tags$div(id = ns("extra_citations_container")) 
         )
-      })
-    })
+      ),
+      fluidRow(
+        column(6, offset = 3, actionButton(ns("add_citation"), "Add Another Citation", icon = icon("plus"), class = "btn-sm", style = "margin-bottom: 20px;"))
+      ),
     
 # Real-time CSV validation display
     observeEvent(input$sr_csv_file, {
@@ -208,7 +217,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
         c_title <- input[[paste0("citation_title_", i)]]
         c_url <- input[[paste0("citation_url_", i)]]
 
-        # Only add to the database if the citation text isn't blank
+# Only add to the database if the citation text isn't blank
         if (!is.null(c_text) && trimws(c_text) != "") {
           citations_list[[length(citations_list) + 1]] <- list(
             text = trimws(c_text),
@@ -218,7 +227,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
         }
       }
 
-      # Convert to JSON (If empty, save an empty JSON array '[]')
+# Convert to JSON (If empty, save an empty JSON array '[]')
       citation_json <- if (length(citations_list) > 0) {
         jsonlite::toJSON(citations_list, auto_unbox = TRUE, null = "null")
       } else {
@@ -228,7 +237,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
 # Handle Confidence Rankings (Convert empty strings back to NA)
       get_conf <- function(val) if (is.null(val) || trimws(val) == "") NA_character_ else trimws(val)
 
-      # Handle comma-separated Postgres Arrays (e.g., "Adult, Fry" -> '{"Adult","Fry"}')
+# Handle comma-separated Postgres Arrays (e.g., "Adult, Fry" -> '{"Adult","Fry"}')
       to_pg_array <- function(val) {
         if (is.null(val) || trimws(val) == "") return(NA_character_)
         parts <- trimws(strsplit(val, ",")[[1]])
