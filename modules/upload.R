@@ -59,36 +59,36 @@ upload_ui <- function(id) {
 
       # Species Info
       fluidRow(
-        column(3, offset = 3, textInput(ns("species_common_name"), "Species Common Name", placeholder = "e.g., Chinook Salmon")),
-        column(3, textInput(ns("latin_name"), "Latin Name", placeholder = "e.g., Oncorhynchus tshawytscha"))
+        column(3, offset = 3, textInput(ns("species_common_name"), "Species Common Name", placeholder = "e.g., Chinook Salmon. You can put multiple species, seperate with comma")),
+        column(3, textInput(ns("latin_name"), "Latin Name", placeholder = "e.g., Oncorhynchus tshawytscha. You can put multiple species, seperate with comma"))
       ),
       fluidRow(
         column(3, offset = 3, textInput(ns("life_stages"), "Life Stages", placeholder = "e.g., Adult, Fry")),
-        column(3, textInput(ns("activity"), "Activity", placeholder = "e.g., Migration, Spawning"))
+        column(3, textInput(ns("activity"), "Activity", placeholder = "e.g., Migration, Spawning. You can put multiple life stages, seperate with comma"))
       ),
       fluidRow(
-        column(6, offset = 3, textInput(ns("season"), "Season", placeholder = "e.g., Summer, Fall", width = "100%"))
+        column(6, offset = 3, textInput(ns("season"), "Season", placeholder = "e.g., Summer, Fall. You can put multiple seasons, seperate with comma", width = "100%"))
       ),
 
       # Location Info
       fluidRow(
         column(3, offset = 3, textInput(ns("location_country"), "Country", placeholder = "e.g., USA, Canada")),
-        column(3, textInput(ns("location_state_province"), "State / Province", placeholder = "e.g., Washington, BC"))
+        column(3, textInput(ns("location_state_province"), "State / Province", placeholder = "e.g., Washington, BC. You can put multiple states or provinces, seperate with comma"))
       ),
       fluidRow(
         column(3, offset = 3, textInput(ns("location_watershed_lab"), "Watershed / Lab", placeholder = "e.g., Columbia River Basin")),
-        column(3, textInput(ns("location_river_creek"), "River / Creek", placeholder = "e.g., Snake River"))
+        column(3, textInput(ns("location_river_creek"), "River / Creek", placeholder = "e.g., Snake River. You can put multiple rivers or creeks, seperate with comma"))
       ),
 
       # Descriptions & Formulas
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("overview"), "Overview Description", placeholder = "Describe importance, pathways of effect, etc.", height = "120px", width = "100%"))
+        column(6, offset = 3, textAreaInput(ns("overview"), "Overview Description", placeholder = "Comprehensively outline the data, theory, mechanism, and pathway of effects underlying the SR Function. This should be as detailed as possible.", height = "120px", width = "100%"))
       ),
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("function_derivation"), "Function Derivation", placeholder = "Describe the source of the function (e.g., expert opinion, mechanistic).", height = "120px", width = "100%"))
+        column(6, offset = 3, textAreaInput(ns("function_derivation"), "Function Derivation", placeholder = "Describe the source of the function (e.g., expert opinion, mechanistic). This can have multiple derivations, seperate with comma.", height = "120px", width = "100%"))
       ),
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("transferability_of_function"), "Transferability of Function", placeholder = "Notes regarding transferability to other species and systems.", height = "80px", width = "100%"))
+        column(6, offset = 3, textAreaInput(ns("transferability_of_function"), "Transferability of Function", placeholder = "Describe whether the function can effectively be extended to systems beyond the intended target. Discuss situations where transfer might be unsuitable.", height = "80px", width = "100%"))
       ),
       fluidRow(
         column(6, offset = 3, textInput(ns("srf_formula"), "SRF Formula", placeholder = "Enter the mathematical formula if applicable", width = "100%"))
@@ -102,15 +102,15 @@ upload_ui <- function(id) {
         column(6, offset = 3, h4("Confidence Rankings"))
       ),
       fluidRow(
-        column(3, offset = 3, textInput(ns("conf_source"), "Source", placeholder = "e.g., High, Moderate, Low")),
-        column(3, textInput(ns("conf_shape"), "Shape", placeholder = "e.g., High, Moderate, Low"))
+        column(3, offset = 3, textInput(ns("conf_source"), "Data Source", placeholder = "Describe how well the data used to derive the stressor-response function represent the stressor and response of interest. Rank it as either High, Moderate, or Low")),
+        column(3, textInput(ns("conf_shape"), "Shape of SR Function", placeholder = "Describe how well-supported the functional form is (e.g., linear, threshold, dome-shaped). Rank it as either High, Moderate, or Low"))
       ),
       fluidRow(
-        column(3, offset = 3, textInput(ns("conf_variance"), "Variance", placeholder = "e.g., High, Moderate, Low")),
-        column(3, textInput(ns("conf_applicability"), "Applicability", placeholder = "e.g., High, Moderate, Low"))
+        column(3, offset = 3, textInput(ns("conf_variance"), "Data Variance/Consistency", placeholder = "Describe the variability, noise, or inconsistency in the underlying dataset. Rank it as either High, Moderate, or Low")),
+        column(3, textInput(ns("conf_applicability"), "Applicability to System", placeholder = "Describe how transferable the stressor-response function is to other populations, locations, or environmental contexts. Rank it as either High, Moderate, or Low"))
       ),
       fluidRow(
-        column(6, offset = 3, textInput(ns("conf_interactions"), "Interactions", placeholder = "e.g., High, Moderate, Low", width = "100%"))
+        column(6, offset = 3, textInput(ns("conf_interactions"), "Potential Stressor Interactions", placeholder = "Describe whether the stressor-response function may be influenced by interactions with other environmental stressors (e.g., temperature × flow). Rank it as either High, Moderate, or Low", width = "100%"))
       ),
 
       # Citations (Dynamic)
