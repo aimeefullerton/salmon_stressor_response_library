@@ -19,7 +19,7 @@ upload_ui <- function(id) {
         column(12, h3("Submit New SRF Relationship", style = "text-align: center; color: #6082B6;"))
       ),
 
-# Core Metadata
+      # Core Metadata
       fluidRow(
         column(6, offset = 3, textInput(ns("title"), "Article Title *", placeholder = "Add a short descriptive title", width = "800px"))
       ),
@@ -28,7 +28,7 @@ upload_ui <- function(id) {
         column(3, textInput(ns("response"), "Response", placeholder = "e.g., Mean System Capacity"))
       ),
 
-# CSV Upload
+      # CSV Upload
       fluidRow(
         column(6, offset = 3, wellPanel(
           style = "background-color: #f9f9f9; border-color: #ccc;",
@@ -48,7 +48,7 @@ upload_ui <- function(id) {
         ))
       ),
       
-# Stressor Information
+      # Stressor Information
       fluidRow(
         column(3, offset = 3, textInput(ns("stressor_name"), "Stressor Name", placeholder = "e.g., Temperature")),
         column(3, textInput(ns("broad_stressor_name"), "Broad Stressor Name", placeholder = "e.g., Water Quality"))
@@ -57,7 +57,7 @@ upload_ui <- function(id) {
         column(6, offset = 3, textInput(ns("specific_stressor_metric"), "Specific Stressor Metric", placeholder = "e.g., 7DADM, Celsius, % Capacity", width = "100%"))
       ),
 
-# Species Info
+      # Species Info
       fluidRow(
         column(3, offset = 3, textInput(ns("species_common_name"), "Species Common Name", placeholder = "e.g., Chinook Salmon")),
         column(3, textInput(ns("latin_name"), "Latin Name", placeholder = "e.g., Oncorhynchus tshawytscha"))
@@ -70,7 +70,7 @@ upload_ui <- function(id) {
         column(6, offset = 3, textInput(ns("season"), "Season", placeholder = "e.g., Summer, Fall", width = "100%"))
       ),
 
-# Location Info
+      # Location Info
       fluidRow(
         column(3, offset = 3, textInput(ns("location_country"), "Country", placeholder = "e.g., USA, Canada")),
         column(3, textInput(ns("location_state_province"), "State / Province", placeholder = "e.g., Washington, BC"))
@@ -80,7 +80,7 @@ upload_ui <- function(id) {
         column(3, textInput(ns("location_river_creek"), "River / Creek", placeholder = "e.g., Snake River"))
       ),
 
-# Descriptions & Formulas
+      # Descriptions & Formulas
       fluidRow(
         column(6, offset = 3, textAreaInput(ns("overview"), "Overview Description", placeholder = "Describe importance, pathways of effect, etc.", height = "120px", width = "100%"))
       ),
@@ -97,33 +97,47 @@ upload_ui <- function(id) {
         column(6, offset = 3, textAreaInput(ns("source_of_stressor_data"), "Source of Stressor Data", placeholder = "Describe the source of stressor data needed to apply the function", height = "80px", width = "100%"))
       ),
 
-# Confidence Rankings
+      # Confidence Rankings
       fluidRow(
         column(6, offset = 3, h4("Confidence Rankings"))
       ),
       fluidRow(
-        column(3, offset = 3, textInput(ns("conf_source"), "Source", placeholder = "e.g., High, Medium, Low")),
-        column(3, textInput(ns("conf_shape"), "Shape", placeholder = "e.g., High, Medium, Low"))
+        column(3, offset = 3, textInput(ns("conf_source"), "Source", placeholder = "e.g., High, Moderate, Low")),
+        column(3, textInput(ns("conf_shape"), "Shape", placeholder = "e.g., High, Moderate, Low"))
       ),
       fluidRow(
-        column(3, offset = 3, textInput(ns("conf_variance"), "Variance", placeholder = "e.g., High, Medium, Low")),
-        column(3, textInput(ns("conf_applicability"), "Applicability", placeholder = "e.g., High, Medium, Low"))
+        column(3, offset = 3, textInput(ns("conf_variance"), "Variance", placeholder = "e.g., High, Moderate, Low")),
+        column(3, textInput(ns("conf_applicability"), "Applicability", placeholder = "e.g., High, Moderate, Low"))
       ),
       fluidRow(
-        column(6, offset = 3, textInput(ns("conf_interactions"), "Interactions", placeholder = "e.g., High, Medium, Low", width = "100%"))
+        column(6, offset = 3, textInput(ns("conf_interactions"), "Interactions", placeholder = "e.g., High, Moderate, Low", width = "100%"))
       ),
-# Citations (Dynamic)
+
+      # Citations (Dynamic)
       fluidRow(
         column(6, offset = 3, h4("Citations"))
       ),
       fluidRow(
-        column(6, offset = 3, uiOutput(ns("dynamic_citations_ui")))
+        column(6, offset = 3,
+          # Box 1 is always here by default
+          div(
+            id = ns("citation_block_1"),
+            style = "border: 1px solid #e3e3e3; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #fafafa;",
+            textAreaInput(ns("citation_text_1"), "Citation 1 (Text)", placeholder = "e.g., Smith et al. (2020)...", height = "70px", width = "100%"),
+            fluidRow(
+              column(6, textInput(ns("citation_title_1"), "Link Title", placeholder = "Place the Author and Year here. e.g., Baker et al. 1995; Pess & Beamer 1999")),
+              column(6, textInput(ns("citation_url_1"), "URL", placeholder = "Place the URL or DOI to the paper here: https://doi.org/..."))
+            )
+          ),
+          # This is the invisible container where boxes 2, 3, 4 etc. will be injected
+          tags$div(id = ns("extra_citations_container")) 
+        )
       ),
       fluidRow(
         column(6, offset = 3, actionButton(ns("add_citation"), "Add Another Citation", icon = icon("plus"), class = "btn-sm", style = "margin-bottom: 20px;"))
       ),
       
-# Revision Log and Submit
+      # Revision Log and Submit
       fluidRow(
         column(6, offset = 3, textAreaInput(ns("revision_log"), "Revision Log Message", placeholder = "Briefly describe the reason for this upload/change", height = "60px", width = "100%"))
       )
@@ -142,38 +156,30 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       fileInput(ns("sr_csv_file"), NULL, accept = ".csv", buttonLabel = "Choose File", placeholder = "No file chosen")
     })
 
-# Track the number of citation blocks
+    # Track the number of citation blocks
     citation_count <- reactiveVal(1)
 
     observeEvent(input$add_citation, {
-      citation_count(citation_count() + 1)
-    })
+      new_count <- citation_count() + 1
+      citation_count(new_count)
 
-# Citations (Dynamic)
-      fluidRow(
-        column(6, offset = 3, h4("Citations"))
-      ),
-      fluidRow(
-        column(6, offset = 3,
-          # Box 1 is always here by default
-          div(
-            id = ns("citation_block_1"),
-            style = "border: 1px solid #e3e3e3; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #fafafa;",
-            textAreaInput(ns("citation_text_1"), "Citation 1 (Text)", placeholder = "e.g., Smith et al. (2020)...", height = "70px", width = "100%"),
-            fluidRow(
-              column(6, textInput(ns("citation_title_1"), "Link Title", placeholder = "e.g., Read the full paper")),
-              column(6, textInput(ns("citation_url_1"), "URL", placeholder = "https://doi.org/..."))
-            )
-          ),
-          # This is the invisible container where boxes 2, 3, 4 etc. will be injected
-          tags$div(id = ns("extra_citations_container")) 
+      # Safely injects a new block WITHOUT deleting the old ones
+      insertUI(
+        selector = paste0("#", ns("extra_citations_container")),
+        where = "beforeEnd",
+        ui = div(
+          id = ns(paste0("citation_block_", new_count)),
+          style = "border: 1px solid #e3e3e3; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #fafafa;",
+          textAreaInput(ns(paste0("citation_text_", new_count)), paste("Citation", new_count, "(Text)"), placeholder = "Citation of paper in APA format without the link e.g., Smith et al. (2020)...", height = "70px", width = "100%"),
+          fluidRow(
+            column(6, textInput(ns(paste0("citation_title_", new_count)), "Link Title", placeholder = "Place the Author and Year here. e.g., Baker et al. 1995; Pess & Beamer 1999")),
+            column(6, textInput(ns(paste0("citation_url_", new_count)), "URL", placeholder = "Place the URL or DOI to the paper here: https://doi.org/..."))
+          )
         )
-      ),
-      fluidRow(
-        column(6, offset = 3, actionButton(ns("add_citation"), "Add Another Citation", icon = icon("plus"), class = "btn-sm", style = "margin-bottom: 20px;"))
-      ),
+      )
+    })
     
-# Real-time CSV validation display
+    # Real-time CSV validation display
     observeEvent(input$sr_csv_file, {
       req(input$sr_csv_file)
       csv_validation_result <- validate_csv_upload(input$sr_csv_file)
@@ -210,14 +216,14 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       }
       df_csv <- csv_validation_result$data
 
-# Compile Dynamic Citations into JSON Array
+      # Compile Dynamic Citations into JSON Array
       citations_list <- list()
       for (i in 1:citation_count()) {
         c_text <- input[[paste0("citation_text_", i)]]
         c_title <- input[[paste0("citation_title_", i)]]
         c_url <- input[[paste0("citation_url_", i)]]
 
-# Only add to the database if the citation text isn't blank
+        # Only add to the database if the citation text isn't blank
         if (!is.null(c_text) && trimws(c_text) != "") {
           citations_list[[length(citations_list) + 1]] <- list(
             text = trimws(c_text),
@@ -227,17 +233,17 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
         }
       }
 
-# Convert to JSON (If empty, save an empty JSON array '[]')
+      # Convert to JSON (If empty, save an empty JSON array '[]')
       citation_json <- if (length(citations_list) > 0) {
         jsonlite::toJSON(citations_list, auto_unbox = TRUE, null = "null")
       } else {
         "[]"
       }
       
-# Handle Confidence Rankings (Convert empty strings back to NA)
+      # Handle Confidence Rankings (Convert empty strings back to NA)
       get_conf <- function(val) if (is.null(val) || trimws(val) == "") NA_character_ else trimws(val)
 
-# Handle comma-separated Postgres Arrays (e.g., "Adult, Fry" -> '{"Adult","Fry"}')
+      # Handle comma-separated Postgres Arrays (e.g., "Adult, Fry" -> '{"Adult","Fry"}')
       to_pg_array <- function(val) {
         if (is.null(val) || trimws(val) == "") return(NA_character_)
         parts <- trimws(strsplit(val, ",")[[1]])
@@ -332,11 +338,11 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
           revision_json
         ))
 
-# 5. --- Transaction Step 2: Insert CSV Data ---
+        # 5. --- Transaction Step 2: Insert CSV Data ---
         if (nrow(df_csv) > 0) {
           df_csv$article_id <- new_article_id
           
-          # --- NEW: Generate the missing row_index! ---
+          # --- Generate the missing row_index! ---
           df_csv$row_index <- 1:nrow(df_csv) 
           
           names(df_csv) <- gsub("\\.", "_", names(df_csv)) 
@@ -352,7 +358,19 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
 
         # Clear the form
         try({ shinyjs::reset(ns("upload_form")) }, silent = TRUE)
-        citation_count(1)
+        
+        # Remove any extra citation boxes we injected
+        if (citation_count() > 1) {
+          for (i in 2:citation_count()) {
+            removeUI(selector = paste0("#", ns(paste0("citation_block_", i))))
+          }
+          citation_count(1) # Reset counter
+        }
+        
+        # Manually clear the first citation block
+        try({ updateTextAreaInput(session, "citation_text_1", value = "") }, silent = TRUE)
+        try({ updateTextInput(session, "citation_title_1", value = "") }, silent = TRUE)
+        try({ updateTextInput(session, "citation_url_1", value = "") }, silent = TRUE)
         
         all_text_inputs <- c(
           "title", "article_type", "response", "stressor_name", "broad_stressor_name", 
@@ -393,7 +411,6 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
           h4("Stressor Name:"), p(input$stressor_name),
           h4("Species:"), p(input$species_common_name),
           h4("Location:"), p(paste(input$location_country, input$location_state_province, sep = " - "))
-          # (Add more fields here if desired!)
         ),
         easyClose = TRUE,
         footer = modalButton("Close")
