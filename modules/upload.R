@@ -253,7 +253,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
 
       user_name_to_log <- if(is.null(current_user)) "System Admin" else current_user
 
-      tryCatch({
+tryCatch({
         # Compile Revision Log into JSONB Format
         revision_json <- jsonlite::toJSON(list(
           list(
@@ -263,10 +263,15 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
           )
         ), auto_unbox = TRUE)
 
+        # --- NEW LOGIC: Calculate the next article_id manually ---
+        # This bypasses the database's lack of auto-increment
+        max_id_res <- dbGetQuery(db_conn, "SELECT MAX(article_id) as max_id FROM stressor_responses;")
+        new_article_id <- if(is.na(max_id_res$max_id[1])) 1 else as.integer(max_id_res$max_id[1] + 1)
+
         # --- Transaction Step 1: Insert Metadata ---
         query <- "
           INSERT INTO stressor_responses (
-            article_type, title, stressor_name, broad_stressor_name, specific_stressor_metric, 
+            article_id, article_type, title, stressor_name, broad_stressor_name, specific_stressor_metric, 
             response, srf_formula, species_common_name, latin_name, life_stages, activity, season, 
             location_country, location_state_province, location_watershed_lab, location_river_creek, 
             overview, function_derivation, transferability_of_function, 
@@ -274,10 +279,12 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
             source_of_stressor_data, citations, revision_log
           ) VALUES (
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, 
-            $18, $19, $20, $21, $22, $23, $24, $25, $26::jsonb, $27::jsonb
-          ) RETURNING article_id;"
+            $18, $19, $20, $21, $22, $23, $24, $25, $26, $27::jsonb, $28::jsonb
+          );"
 
-        new_article <- dbGetQuery(db_conn, query, params = list(
+        dbExecute(db_conn, query, params = list(
+          new_article_id, # Safely calculated ID inserted here!
+          
           # Standard Text Columns
           input$article_type, 
           input$title, 
@@ -300,7 +307,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
 
           # Large Text / Description Columns
           input$overview, 
-          to_pg_array_single(input$function_derivation), # Formatted safely as a 1-item array
+          to_pg_array_single(input$function_derivation), 
           input$transferability_of_function, 
           
           # Confidence Rankings
@@ -313,13 +320,12 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
           # Final Fields
           input$source_of_stressor_data, 
           citation_json, 
-          revision_json # Inserted as JSONB
+          revision_json
         ))
-
-        new_article_id <- new_article$article_id
 
         # --- Transaction Step 2: Insert CSV Data ---
         if (nrow(df_csv) > 0) {
+          # Attach our manually generated ID to the CSV rows
           df_csv$article_id <- new_article_id
           names(df_csv) <- gsub("\\.", "_", names(df_csv)) 
           dbAppendTable(db_conn, "csv_data", df_csv)
