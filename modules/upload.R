@@ -323,9 +323,13 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
           revision_json
         ))
 
-        # 5. --- Transaction Step 2: Insert CSV Data ---
+# 5. --- Transaction Step 2: Insert CSV Data ---
         if (nrow(df_csv) > 0) {
           df_csv$article_id <- new_article_id
+          
+          # --- NEW: Generate the missing row_index! ---
+          df_csv$row_index <- 1:nrow(df_csv) 
+          
           names(df_csv) <- gsub("\\.", "_", names(df_csv)) 
           dbAppendTable(db_conn, "csv_data", df_csv)
         }
