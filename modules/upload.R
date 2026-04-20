@@ -225,14 +225,6 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
         "[]"
       }
       
-# Handle Confidence Rankings (Convert empty strings back to NA for the DB)
-      get_conf <- function(val) if (is.null(val) || trimws(val) == "") NA_character_ else trimws(val)
-
-      # Determine user_id (You may need to look this up via a query depending on your DB)
-      # For now, we will assume user_id is nullable or can accept the string. If it's a numeric ID,
-      # you would query the 'users' table here to get the integer.
-      user_name_to_log <- if(is.null(current_user)) "System Admin" else current_user
-
 # Handle Confidence Rankings (Convert empty strings back to NA)
       get_conf <- function(val) if (is.null(val) || trimws(val) == "") NA_character_ else trimws(val)
 
@@ -253,8 +245,8 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
 
       user_name_to_log <- if(is.null(current_user)) "System Admin" else current_user
 
-tryCatch({
-        # Compile Revision Log into JSONB Format
+      tryCatch({
+        # 1. Compile Revision Log into JSONB Format
         revision_json <- jsonlite::toJSON(list(
           list(
             message = input$revision_log,
@@ -263,15 +255,22 @@ tryCatch({
           )
         ), auto_unbox = TRUE)
 
-        # --- NEW LOGIC: Calculate the next article_id manually ---
-        # This bypasses the database's lack of auto-increment
+        # 2. Calculate the next article_id manually (Bypasses the missing auto-increment)
         max_id_res <- dbGetQuery(db_conn, "SELECT MAX(article_id) as max_id FROM stressor_responses;")
         new_article_id <- if(is.na(max_id_res$max_id[1])) 1 else as.integer(max_id_res$max_id[1] + 1)
 
-        # --- Transaction Step 1: Insert Metadata ---
+        # 3. Look up the user's integer ID from the users table using Connect's username
+        lookup_query <- "SELECT user_id FROM users WHERE name = $1 OR email ILIKE $2 LIMIT 1"
+        user_res <- dbGetQuery(db_conn, lookup_query, params = list(
+          current_user, 
+          paste0(current_user, "@%") # e.g., 'paxton.calhoun@%'
+        ))
+        uploader_id <- if (nrow(user_res) > 0) as.integer(user_res$user_id[1]) else 1L
+
+        # 4. --- Transaction Step 1: Insert Metadata ---
         query <- "
           INSERT INTO stressor_responses (
-            article_id, article_type, title, stressor_name, broad_stressor_name, specific_stressor_metric, 
+            article_id, user_id, article_type, title, stressor_name, broad_stressor_name, specific_stressor_metric, 
             response, srf_formula, species_common_name, latin_name, life_stages, activity, season, 
             location_country, location_state_province, location_watershed_lab, location_river_creek, 
             overview, function_derivation, transferability_of_function, 
@@ -279,11 +278,12 @@ tryCatch({
             source_of_stressor_data, citations, revision_log
           ) VALUES (
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, 
-            $18, $19, $20, $21, $22, $23, $24, $25, $26, $27::jsonb, $28::jsonb
+            $18, $19, $20, $21, $22, $23, $24, $25, $26, $27, $28::jsonb, $29::jsonb
           );"
 
         dbExecute(db_conn, query, params = list(
-          new_article_id, # Safely calculated ID inserted here!
+          new_article_id, # $1
+          uploader_id,    # $2
           
           # Standard Text Columns
           input$article_type, 
@@ -323,9 +323,8 @@ tryCatch({
           revision_json
         ))
 
-        # --- Transaction Step 2: Insert CSV Data ---
+        # 5. --- Transaction Step 2: Insert CSV Data ---
         if (nrow(df_csv) > 0) {
-          # Attach our manually generated ID to the CSV rows
           df_csv$article_id <- new_article_id
           names(df_csv) <- gsub("\\.", "_", names(df_csv)) 
           dbAppendTable(db_conn, "csv_data", df_csv)
@@ -338,24 +337,22 @@ tryCatch({
           sprintf("Your stressor-response data <strong>%s</strong> has been successfully saved to the database (ID: %s).", input$title, new_article_id)
         )
 
-# Clear the form
+        # Clear the form
         try({ shinyjs::reset(ns("upload_form")) }, silent = TRUE)
-        citation_count(1) # Resets the dynamic citations back to 1 box
+        citation_count(1)
         
- # Manually clear text inputs just in case shinyjs reset misses dynamically bound ones
         all_text_inputs <- c(
           "title", "article_type", "response", "stressor_name", "broad_stressor_name", 
           "specific_stressor_metric", "species_common_name", "latin_name", "life_stages", 
           "activity", "season", "location_country", "location_state_province", 
           "location_watershed_lab", "location_river_creek", "srf_formula", 
-          "conf_source", "conf_shape", "conf_variance", "conf_applicability", "conf_interactions",
-          "citation_title", "citation_url"
+          "conf_source", "conf_shape", "conf_variance", "conf_applicability", "conf_interactions"
         )
         for (tid in all_text_inputs) {
           try({ updateTextInput(session, inputId = tid, value = "") }, silent = TRUE)
         }
         
-        textarea_inputs <- c("overview", "function_derivation", "transferability_of_function", "source_of_stressor_data", "citation_text", "revision_log")
+        textarea_inputs <- c("overview", "function_derivation", "transferability_of_function", "source_of_stressor_data", "revision_log")
         for (tid in textarea_inputs) {
           try({ updateTextAreaInput(session, inputId = tid, value = "") }, silent = TRUE)
         }
