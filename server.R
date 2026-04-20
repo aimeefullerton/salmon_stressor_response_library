@@ -113,6 +113,33 @@ server <- function(input, output, session) {
   edaServer("eda")
   render_papers_server(output, paginated_data, input, session)
   setup_download_csv(output, filtered_data, paginated_data, db, input, session)
+  
+  # ── Admin Upload Tab (Protected by Posit Connect) ────────────────────────
+  admin_users <- c("aimee.fullerton", "paxton.calhoun") 
+
+  observe({
+    req(session$user) 
+    # Check if the viewer is on the admin list
+    if (session$user %in% admin_users) {
+      
+      # Inject the protected upload tab into the navbar
+      insertTab(
+        inputId = "main_navbar", 
+        target = "Submit a Relationship",
+        position = "after",
+        tabPanel(
+          title = "Admin Upload",
+          value = "admin_upload_tab",
+          icon = icon("lock"),
+          
+          # Call the UI from upload.R module
+          upload_ui("secure_admin_upload") 
+        )
+      )
+      # Initialize the server logic for the upload module
+      upload_server("secure_admin_upload", db_conn = db)
+    }
+  })
 
   # ── Article modal ──────────────────────────────────────────────────────────
   # Track which articles have had render_article_server called to avoid
