@@ -196,9 +196,37 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       # you would query the 'users' table here to get the integer.
       user_name_to_log <- if(is.null(current_user)) "System Admin" else current_user
 
+# Handle Confidence Rankings (Convert empty strings back to NA)
+      get_conf <- function(val) if (is.null(val) || trimws(val) == "") NA_character_ else trimws(val)
+
+      # Handle comma-separated Postgres Arrays (e.g., "Adult, Fry" -> '{"Adult","Fry"}')
+      to_pg_array <- function(val) {
+        if (is.null(val) || trimws(val) == "") return(NA_character_)
+        parts <- trimws(strsplit(val, ",")[[1]])
+        parts <- parts[parts != ""]
+        if (length(parts) == 0) return(NA_character_)
+        paste0("{", paste(sprintf('"%s"', gsub('"', '\\"', parts, fixed = TRUE)), collapse = ","), "}")
+      }
+
+      # Handle paragraph-style Postgres Arrays (e.g., wraps a whole paragraph in a 1-item array)
+      to_pg_array_single <- function(val) {
+        if (is.null(val) || trimws(val) == "") return(NA_character_)
+        paste0('{"', gsub('"', '\\"', trimws(val), fixed = TRUE), '"}')
+      }
+
+      user_name_to_log <- if(is.null(current_user)) "System Admin" else current_user
+
       tryCatch({
+        # Compile Revision Log into JSONB Format
+        revision_json <- jsonlite::toJSON(list(
+          list(
+            message = input$revision_log,
+            user = user_name_to_log,
+            date = as.character(Sys.Date())
+          )
+        ), auto_unbox = TRUE)
+
         # --- Transaction Step 1: Insert Metadata ---
-        # Using RETURNING article_id to link the CSV data!
         query <- "
           INSERT INTO stressor_responses (
             article_type, title, stressor_name, broad_stressor_name, specific_stressor_metric, 
@@ -209,32 +237,54 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
             source_of_stressor_data, citations, revision_log
           ) VALUES (
             $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, 
-            $18, $19, $20, $21, $22, $23, $24, $25, $26::jsonb, $27
+            $18, $19, $20, $21, $22, $23, $24, $25, $26::jsonb, $27::jsonb
           ) RETURNING article_id;"
 
         new_article <- dbGetQuery(db_conn, query, params = list(
-          input$article_type, input$title, input$stressor_name, input$broad_stressor_name, 
-          input$specific_stressor_metric, input$response, input$srf_formula, 
-          input$species_common_name, input$latin_name, input$life_stages, input$activity, 
-          input$season, input$location_country, input$location_state_province, 
-          input$location_watershed_lab, input$location_river_creek, input$overview, 
-          input$function_derivation, input$transferability_of_function, 
-          get_conf(input$conf_source), get_conf(input$conf_shape), get_conf(input$conf_variance), 
-          get_conf(input$conf_applicability), get_conf(input$conf_interactions), 
-          input$source_of_stressor_data, citation_json, input$revision_log
+          # Standard Text Columns
+          input$article_type, 
+          input$title, 
+          input$stressor_name, 
+          input$broad_stressor_name, 
+          input$specific_stressor_metric, 
+          input$response, 
+          input$srf_formula, 
+
+          # Array Columns (Separated by commas)
+          to_pg_array(input$species_common_name), 
+          to_pg_array(input$latin_name), 
+          to_pg_array(input$life_stages), 
+          to_pg_array(input$activity), 
+          to_pg_array(input$season), 
+          to_pg_array(input$location_country), 
+          to_pg_array(input$location_state_province), 
+          to_pg_array(input$location_watershed_lab), 
+          to_pg_array(input$location_river_creek), 
+
+          # Large Text / Description Columns
+          input$overview, 
+          to_pg_array_single(input$function_derivation), # Formatted safely as a 1-item array
+          input$transferability_of_function, 
+          
+          # Confidence Rankings
+          get_conf(input$conf_source), 
+          get_conf(input$conf_shape), 
+          get_conf(input$conf_variance), 
+          get_conf(input$conf_applicability), 
+          get_conf(input$conf_interactions), 
+          
+          # Final Fields
+          input$source_of_stressor_data, 
+          citation_json, 
+          revision_json # Inserted as JSONB
         ))
 
         new_article_id <- new_article$article_id
 
         # --- Transaction Step 2: Insert CSV Data ---
         if (nrow(df_csv) > 0) {
-          # Add the new article ID to the CSV dataframe
           df_csv$article_id <- new_article_id
-          
-          # Use dbAppendTable for safe, bulk insertion into the csv_data table
-          # (Normalizes dot.names to underscore_names if required by your DB)
           names(df_csv) <- gsub("\\.", "_", names(df_csv)) 
-          
           dbAppendTable(db_conn, "csv_data", df_csv)
         }
 
