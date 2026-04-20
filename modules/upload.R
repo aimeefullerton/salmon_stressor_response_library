@@ -19,7 +19,7 @@ upload_ui <- function(id) {
         column(12, h3("Submit New SRF Relationship", style = "text-align: center; color: #6082B6;"))
       ),
 
-      # Core Metadata
+# Core Metadata
       fluidRow(
         column(6, offset = 3, textInput(ns("title"), "Article Title *", placeholder = "Add a short descriptive title", width = "800px"))
       ),
@@ -28,7 +28,7 @@ upload_ui <- function(id) {
         column(3, textInput(ns("response"), "Response", placeholder = "e.g., Mean System Capacity"))
       ),
 
-      # CSV Upload
+# CSV Upload
       fluidRow(
         column(6, offset = 3, wellPanel(
           style = "background-color: #f9f9f9; border-color: #ccc;",
@@ -48,7 +48,7 @@ upload_ui <- function(id) {
         ))
       ),
       
-      # Stressor Information
+# Stressor Information
       fluidRow(
         column(3, offset = 3, textInput(ns("stressor_name"), "Stressor Name", placeholder = "e.g., Temperature")),
         column(3, textInput(ns("broad_stressor_name"), "Broad Stressor Name", placeholder = "e.g., Water Quality"))
@@ -57,7 +57,7 @@ upload_ui <- function(id) {
         column(6, offset = 3, textInput(ns("specific_stressor_metric"), "Specific Stressor Metric", placeholder = "e.g., 7DADM, Celsius, % Capacity", width = "100%"))
       ),
 
-      # Species Info
+# Species Info
       fluidRow(
         column(3, offset = 3, textInput(ns("species_common_name"), "Species Common Name", placeholder = "e.g., Chinook Salmon")),
         column(3, textInput(ns("latin_name"), "Latin Name", placeholder = "e.g., Oncorhynchus tshawytscha"))
@@ -70,7 +70,7 @@ upload_ui <- function(id) {
         column(6, offset = 3, textInput(ns("season"), "Season", placeholder = "e.g., Summer, Fall", width = "100%"))
       ),
 
-      # Location Info
+# Location Info
       fluidRow(
         column(3, offset = 3, textInput(ns("location_country"), "Country", placeholder = "e.g., USA, Canada")),
         column(3, textInput(ns("location_state_province"), "State / Province", placeholder = "e.g., Washington, BC"))
@@ -80,7 +80,7 @@ upload_ui <- function(id) {
         column(3, textInput(ns("location_river_creek"), "River / Creek", placeholder = "e.g., Snake River"))
       ),
 
-      # Descriptions & Formulas
+# Descriptions & Formulas
       fluidRow(
         column(6, offset = 3, textAreaInput(ns("overview"), "Overview Description", placeholder = "Describe importance, pathways of effect, etc.", height = "120px", width = "100%"))
       ),
@@ -97,7 +97,7 @@ upload_ui <- function(id) {
         column(6, offset = 3, textAreaInput(ns("source_of_stressor_data"), "Source of Stressor Data", placeholder = "Describe the source of stressor data needed to apply the function", height = "80px", width = "100%"))
       ),
 
-  # Confidence Rankings
+# Confidence Rankings
       fluidRow(
         column(6, offset = 3, h4("Confidence Rankings"))
       ),
@@ -112,17 +112,18 @@ upload_ui <- function(id) {
       fluidRow(
         column(6, offset = 3, textInput(ns("conf_interactions"), "Interactions", placeholder = "e.g., High, Medium, Low", width = "100%"))
       ),
-# Citations
+# Citations (Dynamic)
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("citation_text"), "Citation (Text)", placeholder = "Enter the full citation without the link for the article in APA format: e.g., Smith et al. (2020). Impact of temperature...", height = "70px", width = "100%"))
+        column(6, offset = 3, h4("Citations"))
       ),
       fluidRow(
-        column(3, offset = 3, textInput(ns("citation_title"), "Citation Title", placeholder = "Only the author and year e.g., Beakes et al. 2014; Cramer 2001")),
-        column(3, textInput(ns("citation_url"), "Citation URL", placeholder = "enter DOI or URL to paper/report: https://doi.org/..."))
+        column(6, offset = 3, uiOutput(ns("dynamic_citations_ui")))
       ),
-
+      fluidRow(
+        column(6, offset = 3, actionButton(ns("add_citation"), "Add Another Citation", icon = icon("plus"), class = "btn-sm", style = "margin-bottom: 20px;"))
+      ),
       
-      # Revision Log and Submit
+# Revision Log and Submit
       fluidRow(
         column(6, offset = 3, textAreaInput(ns("revision_log"), "Revision Log Message", placeholder = "Briefly describe the reason for this upload/change", height = "60px", width = "100%"))
       )
@@ -142,7 +143,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       fileInput(ns("sr_csv_file"), NULL, accept = ".csv", buttonLabel = "Choose File", placeholder = "No file chosen")
     })
 
-    # Real-time CSV validation display
+# Real-time CSV validation display
     observeEvent(input$sr_csv_file, {
       req(input$sr_csv_file)
       csv_validation_result <- validate_csv_upload(input$sr_csv_file)
