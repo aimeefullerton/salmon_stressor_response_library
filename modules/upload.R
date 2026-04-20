@@ -115,10 +115,10 @@ upload_ui <- function(id) {
 
       # Citations
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("citation_text"), "Citation (Text)", placeholder = "e.g., Smith et al. (2020). Impact of temperature...", height = "70px", width = "100%"))
+        column(6, offset = 3, textAreaInput(ns("citation_text"), "Citation (Text)", placeholder = "Write out the citation in APA format without the link.", height = "70px", width = "100%"))
       ),
       fluidRow(
-        column(3, offset = 3, textInput(ns("citation_title"), "Citation Link Title", placeholder = "e.g., Read the full paper")),
+        column(3, offset = 3, textInput(ns("citation_title"), "Citation Link Title", placeholder = "e.g., Put the DOI or link to paper here")),
         column(3, textInput(ns("citation_url"), "Citation URL", placeholder = "https://doi.org/..."))
       ),
 
@@ -188,8 +188,8 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
         )
       ), auto_unbox = TRUE)
 
-      # Handle Confidence Rankings (Convert "Not provided" back to NA for the DB)
-      get_conf <- function(val) if (val == "Not provided") NA_character_ else val
+      # Handle Confidence Rankings (Convert empty strings back to NA for the DB)
+      get_conf <- function(val) if (is.null(val) || trimws(val) == "") NA_character_ else trimws(val)
 
       # Determine user_id (You may need to look this up via a query depending on your DB)
       # For now, we will assume user_id is nullable or can accept the string. If it's a numeric ID,
@@ -253,7 +253,9 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
           "title", "article_type", "response", "stressor_name", "broad_stressor_name", 
           "specific_stressor_metric", "species_common_name", "latin_name", "life_stages", 
           "activity", "season", "location_country", "location_state_province", 
-          "location_watershed_lab", "location_river_creek", "srf_formula", "citation_title", "citation_url"
+          "location_watershed_lab", "location_river_creek", "srf_formula", 
+          "conf_source", "conf_shape", "conf_variance", "conf_applicability", "conf_interactions",
+          "citation_title", "citation_url"
         )
         for (tid in all_text_inputs) {
           try({ updateTextInput(session, inputId = tid, value = "") }, silent = TRUE)
