@@ -97,31 +97,31 @@ upload_ui <- function(id) {
         column(6, offset = 3, textAreaInput(ns("source_of_stressor_data"), "Source of Stressor Data", placeholder = "Describe the source of stressor data needed to apply the function", height = "80px", width = "100%"))
       ),
 
-      # Confidence Rankings
+  # Confidence Rankings
       fluidRow(
         column(6, offset = 3, h4("Confidence Rankings"))
       ),
       fluidRow(
-        column(3, offset = 3, selectInput(ns("conf_source"), "Source", choices = c("Not provided", "High", "Medium", "Low"))),
-        column(3, selectInput(ns("conf_shape"), "Shape", choices = c("Not provided", "High", "Medium", "Low")))
+        column(3, offset = 3, textInput(ns("conf_source"), "Source", placeholder = "e.g., High, Medium, Low")),
+        column(3, textInput(ns("conf_shape"), "Shape", placeholder = "e.g., High, Medium, Low"))
       ),
       fluidRow(
-        column(3, offset = 3, selectInput(ns("conf_variance"), "Variance", choices = c("Not provided", "High", "Medium", "Low"))),
-        column(3, selectInput(ns("conf_applicability"), "Applicability", choices = c("Not provided", "High", "Medium", "Low")))
+        column(3, offset = 3, textInput(ns("conf_variance"), "Variance", placeholder = "e.g., High, Medium, Low")),
+        column(3, textInput(ns("conf_applicability"), "Applicability", placeholder = "e.g., High, Medium, Low"))
       ),
       fluidRow(
-        column(6, offset = 3, selectInput(ns("conf_interactions"), "Interactions", choices = c("Not provided", "High", "Medium", "Low"), width = "100%"))
+        column(6, offset = 3, textInput(ns("conf_interactions"), "Interactions", placeholder = "e.g., High, Medium, Low", width = "100%"))
+      ),
+# Citations
+      fluidRow(
+        column(6, offset = 3, textAreaInput(ns("citation_text"), "Citation (Text)", placeholder = "Enter the full citation without the link for the article in APA format: e.g., Smith et al. (2020). Impact of temperature...", height = "70px", width = "100%"))
+      ),
+      fluidRow(
+        column(3, offset = 3, textInput(ns("citation_title"), "Citation Title", placeholder = "Only the author and year e.g., Beakes et al. 2014; Cramer 2001")),
+        column(3, textInput(ns("citation_url"), "Citation URL", placeholder = "enter DOI or URL to paper/report: https://doi.org/..."))
       ),
 
-      # Citations
-      fluidRow(
-        column(6, offset = 3, textAreaInput(ns("citation_text"), "Citation (Text)", placeholder = "Write out the citation in APA format without the link.", height = "70px", width = "100%"))
-      ),
-      fluidRow(
-        column(3, offset = 3, textInput(ns("citation_title"), "Citation Link Title", placeholder = "e.g., Put the DOI or link to paper here")),
-        column(3, textInput(ns("citation_url"), "Citation URL", placeholder = "https://doi.org/..."))
-      ),
-
+      
       # Revision Log and Submit
       fluidRow(
         column(6, offset = 3, textAreaInput(ns("revision_log"), "Revision Log Message", placeholder = "Briefly describe the reason for this upload/change", height = "60px", width = "100%"))
