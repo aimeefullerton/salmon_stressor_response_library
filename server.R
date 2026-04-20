@@ -137,7 +137,7 @@ server <- function(input, output, session) {
         )
       )
       # Initialize the server logic for the upload module
-      upload_server("secure_admin_upload", db_conn = db)
+      upload_server("secure_admin_upload", db_conn = db, current_user = session$user)
     }
   })
 
