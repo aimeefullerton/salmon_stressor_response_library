@@ -138,11 +138,32 @@ upload_ui <- function(id) {
 upload_server <- function(id, db_conn = pool, current_user = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-
     output$sr_csv_file_ui <- renderUI({
       fileInput(ns("sr_csv_file"), NULL, accept = ".csv", buttonLabel = "Choose File", placeholder = "No file chosen")
     })
 
+# Track the number of citation blocks
+    citation_count <- reactiveVal(1)
+
+    observeEvent(input$add_citation, {
+      citation_count(citation_count() + 1)
+    })
+
+    # Render the dynamic citation fields
+    output$dynamic_citations_ui <- renderUI({
+      n <- citation_count()
+      lapply(1:n, function(i) {
+        div(
+          style = "border: 1px solid #e3e3e3; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #fafafa;",
+          textAreaInput(ns(paste0("citation_text_", i)), paste("Citation", i, "(Text)"), placeholder = "e.g., Smith et al. (2020)...", height = "70px", width = "100%"),
+          fluidRow(
+            column(6, textInput(ns(paste0("citation_title_", i)), "Link Title", placeholder = "e.g., Read the full paper")),
+            column(6, textInput(ns(paste0("citation_url_", i)), "URL", placeholder = "https://doi.org/..."))
+          )
+        )
+      })
+    })
+    
 # Real-time CSV validation display
     observeEvent(input$sr_csv_file, {
       req(input$sr_csv_file)
@@ -180,16 +201,31 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       }
       df_csv <- csv_validation_result$data
 
-      # Compile Citation JSON
-      citation_json <- jsonlite::toJSON(list(
-        list(
-          text = input$citation_text,
-          title = input$citation_title,
-          url = input$citation_url
-        )
-      ), auto_unbox = TRUE)
+# Compile Dynamic Citations into JSON Array
+      citations_list <- list()
+      for (i in 1:citation_count()) {
+        c_text <- input[[paste0("citation_text_", i)]]
+        c_title <- input[[paste0("citation_title_", i)]]
+        c_url <- input[[paste0("citation_url_", i)]]
 
-      # Handle Confidence Rankings (Convert empty strings back to NA for the DB)
+        # Only add to the database if the citation text isn't blank
+        if (!is.null(c_text) && trimws(c_text) != "") {
+          citations_list[[length(citations_list) + 1]] <- list(
+            text = trimws(c_text),
+            title = if (!is.null(c_title) && trimws(c_title) != "") trimws(c_title) else NA_character_,
+            url = if (!is.null(c_url) && trimws(c_url) != "") trimws(c_url) else NA_character_
+          )
+        }
+      }
+
+      # Convert to JSON (If empty, save an empty JSON array '[]')
+      citation_json <- if (length(citations_list) > 0) {
+        jsonlite::toJSON(citations_list, auto_unbox = TRUE, null = "null")
+      } else {
+        "[]"
+      }
+      
+# Handle Confidence Rankings (Convert empty strings back to NA for the DB)
       get_conf <- function(val) if (is.null(val) || trimws(val) == "") NA_character_ else trimws(val)
 
       # Determine user_id (You may need to look this up via a query depending on your DB)
@@ -296,10 +332,11 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
           sprintf("Your stressor-response data <strong>%s</strong> has been successfully saved to the database (ID: %s).", input$title, new_article_id)
         )
 
-        # Clear the form
+# Clear the form
         try({ shinyjs::reset(ns("upload_form")) }, silent = TRUE)
+        citation_count(1) # Resets the dynamic citations back to 1 box
         
-        # Manually clear text inputs just in case shinyjs reset misses dynamically bound ones
+ # Manually clear text inputs just in case shinyjs reset misses dynamically bound ones
         all_text_inputs <- c(
           "title", "article_type", "response", "stressor_name", "broad_stressor_name", 
           "specific_stressor_metric", "species_common_name", "latin_name", "life_stages", 
