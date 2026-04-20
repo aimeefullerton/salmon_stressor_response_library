@@ -16,22 +16,22 @@ upload_ui <- function(id) {
     div(
       id = ns("upload_form"),
       fluidRow(
-        column(12, h3("Submit New SRF Relationship", style = "text-align: center; color: #6082B6;"))
+        column(12, h3("Submit New SRF Relationship", style = "text-align: center; color: #6082B6; margin-bottom: 30px;"))
       ),
 
       # Core Metadata
       fluidRow(
-        column(6, offset = 3, textInput(ns("title"), "Article Title *", placeholder = "Add a short descriptive title", width = "800px"))
+        column(8, offset = 2, textInput(ns("title"), "Article Title *", placeholder = "Add a short descriptive title", width = "100%"))
       ),
       fluidRow(
-        column(3, offset = 3, textInput(ns("article_type"), "Article Type", placeholder = "e.g., Peer-reviewed, Report")),
-        column(3, textInput(ns("response"), "Response", placeholder = "e.g., Mean System Capacity"))
+        column(4, offset = 2, textInput(ns("article_type"), "Article Type", placeholder = "e.g., Peer-reviewed, Report", width = "100%")),
+        column(4, textInput(ns("response"), "Response", placeholder = "e.g., Mean System Capacity", width = "100%"))
       ),
 
       # CSV Upload
       fluidRow(
-        column(6, offset = 3, wellPanel(
-          style = "background-color: #f9f9f9; border-color: #ccc;",
+        column(8, offset = 2, wellPanel(
+          style = "background-color: #f9f9f9; border-color: #ccc; margin-top: 15px; margin-bottom: 25px;",
           strong("SR Curve Data CSV"),
           uiOutput(ns("sr_csv_file_ui")),
           helpText(
@@ -50,83 +50,83 @@ upload_ui <- function(id) {
       
       # Stressor Information
       fluidRow(
-        column(3, offset = 3, textInput(ns("stressor_name"), "Stressor Name", placeholder = "e.g., Temperature")),
-        column(3, textInput(ns("broad_stressor_name"), "Broad Stressor Name", placeholder = "e.g., Water Quality"))
+        column(4, offset = 2, textInput(ns("stressor_name"), "Stressor Name", placeholder = "e.g., Temperature", width = "100%")),
+        column(4, textInput(ns("broad_stressor_name"), "Broad Stressor Name", placeholder = "e.g., Water Quality", width = "100%"))
       ),
       fluidRow(
-        column(6, offset = 3, textInput(ns("specific_stressor_metric"), "Specific Stressor Metric", placeholder = "e.g., 7DADM, Celsius, % Capacity", width = "100%"))
+        column(8, offset = 2, textInput(ns("specific_stressor_metric"), "Specific Stressor Metric", placeholder = "e.g., 7DADM, Celsius, % Capacity", width = "100%"))
       ),
 
       # Species Info
       fluidRow(
-        column(3, offset = 3, textInput(ns("species_common_name"), "Species Common Name", placeholder = "e.g., Chinook Salmon. You can put multiple species, seperate with comma")),
-        column(3, textInput(ns("latin_name"), "Latin Name", placeholder = "e.g., Oncorhynchus tshawytscha. You can put multiple species, seperate with comma"))
+        column(4, offset = 2, textInput(ns("species_common_name"), "Species Common Name", placeholder = "e.g., Chinook Salmon. You can put multiple species, seperate with comma", width = "100%")),
+        column(4, textInput(ns("latin_name"), "Latin Name", placeholder = "e.g., Oncorhynchus tshawytscha. You can put multiple species, seperate with comma", width = "100%"))
       ),
       fluidRow(
-        column(3, offset = 3, textInput(ns("life_stages"), "Life Stages", placeholder = "e.g., Adult, Fry")),
-        column(3, textInput(ns("activity"), "Activity", placeholder = "e.g., Migration, Spawning. You can put multiple life stages, seperate with comma"))
+        column(4, offset = 2, textInput(ns("life_stages"), "Life Stages", placeholder = "e.g., Adult, Fry. You can put multiple life stages, seperate with comma", width = "100%")),
+        column(4, textInput(ns("activity"), "Activity", placeholder = "e.g., Migration, Spawning. You can put multiple activities, seperate with comma", width = "100%"))
       ),
       fluidRow(
-        column(6, offset = 3, textInput(ns("season"), "Season", placeholder = "e.g., Summer, Fall. You can put multiple seasons, seperate with comma", width = "100%"))
+        column(8, offset = 2, textInput(ns("season"), "Season", placeholder = "e.g., Summer, Fall. You can put multiple seasons, seperate with comma", width = "100%"))
       ),
 
       # Location Info
       fluidRow(
-        column(3, offset = 3, textInput(ns("location_country"), "Country", placeholder = "e.g., USA, Canada")),
-        column(3, textInput(ns("location_state_province"), "State / Province", placeholder = "e.g., Washington, BC. You can put multiple states or provinces, seperate with comma"))
+        column(4, offset = 2, textInput(ns("location_country"), "Country", placeholder = "e.g., USA, Canada. You can put multiple countries, seperate with comma", width = "100%")),
+        column(4, textInput(ns("location_state_province"), "State / Province", placeholder = "e.g., Washington, BC. You can put multiple states or provinces, seperate with comma", width = "100%"))
       ),
       fluidRow(
-        column(3, offset = 3, textInput(ns("location_watershed_lab"), "Watershed / Lab", placeholder = "e.g., Columbia River Basin")),
-        column(3, textInput(ns("location_river_creek"), "River / Creek", placeholder = "e.g., Snake River. You can put multiple rivers or creeks, seperate with comma"))
+        column(4, offset = 2, textInput(ns("location_watershed_lab"), "Watershed / Lab", placeholder = "e.g., Columbia River Basin. You can put multiple Watersheds or Labs, seperate with comma", width = "100%")),
+        column(4, textInput(ns("location_river_creek"), "River / Creek", placeholder = "e.g., Snake River. You can put multiple rivers or creeks, seperate with comma", width = "100%"))
       ),
 
       # Descriptions & Formulas
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("overview"), "Overview Description", placeholder = "Comprehensively outline the data, theory, mechanism, and pathway of effects underlying the SR Function. This should be as detailed as possible.", height = "120px", width = "100%"))
+        column(8, offset = 2, textAreaInput(ns("overview"), "Overview Description", placeholder = "Comprehensively outline the data, theory, mechanism, and pathway of effects underlying the SR Function. This should be as detailed as possible.", height = "120px", width = "100%"))
       ),
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("function_derivation"), "Function Derivation", placeholder = "Describe the source of the function (e.g., expert opinion, mechanistic). This can have multiple derivations, seperate with comma.", height = "120px", width = "100%"))
+        column(8, offset = 2, textAreaInput(ns("function_derivation"), "Function Derivation", placeholder = "Describe the source of the function (e.g., expert opinion, mechanistic). This can have multiple derivations, seperate with comma.", height = "120px", width = "100%"))
       ),
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("transferability_of_function"), "Transferability of Function", placeholder = "Describe whether the function can effectively be extended to systems beyond the intended target. Discuss situations where transfer might be unsuitable.", height = "80px", width = "100%"))
+        column(8, offset = 2, textAreaInput(ns("transferability_of_function"), "Transferability of Function", placeholder = "Describe whether the function can effectively be extended to systems beyond the intended target. Discuss situations where transfer might be unsuitable.", height = "80px", width = "100%"))
       ),
       fluidRow(
-        column(6, offset = 3, textInput(ns("srf_formula"), "SRF Formula", placeholder = "Enter the mathematical formula if applicable", width = "100%"))
+        column(8, offset = 2, textInput(ns("srf_formula"), "SRF Formula", placeholder = "Enter the mathematical formula if applicable", width = "100%"))
       ),
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("source_of_stressor_data"), "Source of Stressor Data", placeholder = "Describe the source of stressor data needed to apply the function", height = "80px", width = "100%"))
+        column(8, offset = 2, textAreaInput(ns("source_of_stressor_data"), "Source of Stressor Data", placeholder = "Describe the source of stressor data needed to apply the function", height = "80px", width = "100%"))
       ),
 
       # Confidence Rankings
       fluidRow(
-        column(6, offset = 3, h4("Confidence Rankings"))
+        column(8, offset = 2, h4("Confidence Rankings", style = "margin-top: 20px; border-bottom: 1px solid #ddd; padding-bottom: 5px;"))
       ),
       fluidRow(
-        column(3, offset = 3, textInput(ns("conf_source"), "Data Source", placeholder = "Describe how well the data used to derive the stressor-response function represent the stressor and response of interest. Rank it as either High, Moderate, or Low")),
-        column(3, textInput(ns("conf_shape"), "Shape of SR Function", placeholder = "Describe how well-supported the functional form is (e.g., linear, threshold, dome-shaped). Rank it as either High, Moderate, or Low"))
+        column(4, offset = 2, textInput(ns("conf_source"), "Data Source", placeholder = "Describe how well the data used to derive the stressor-response function represent the stressor and response of interest. Rank it as either High, Moderate, or Low", width = "100%")),
+        column(4, textInput(ns("conf_shape"), "Shape of SR Function", placeholder = "Describe how well-supported the functional form is (e.g., linear, threshold, dome-shaped). Rank it as either High, Moderate, or Low", width = "100%"))
       ),
       fluidRow(
-        column(3, offset = 3, textInput(ns("conf_variance"), "Data Variance/Consistency", placeholder = "Describe the variability, noise, or inconsistency in the underlying dataset. Rank it as either High, Moderate, or Low")),
-        column(3, textInput(ns("conf_applicability"), "Applicability to System", placeholder = "Describe how transferable the stressor-response function is to other populations, locations, or environmental contexts. Rank it as either High, Moderate, or Low"))
+        column(4, offset = 2, textInput(ns("conf_variance"), "Data Variance/Consistency", placeholder = "Describe the variability, noise, or inconsistency in the underlying dataset. Rank it as either High, Moderate, or Low", width = "100%")),
+        column(4, textInput(ns("conf_applicability"), "Applicability to System", placeholder = "Describe how transferable the stressor-response function is to other populations, locations, or environmental contexts. Rank it as either High, Moderate, or Low", width = "100%"))
       ),
       fluidRow(
-        column(6, offset = 3, textInput(ns("conf_interactions"), "Potential Stressor Interactions", placeholder = "Describe whether the stressor-response function may be influenced by interactions with other environmental stressors (e.g., temperature × flow). Rank it as either High, Moderate, or Low", width = "100%"))
+        column(8, offset = 2, textInput(ns("conf_interactions"), "Potential Stressor Interactions", placeholder = "Describe whether the stressor-response function may be influenced by interactions with other environmental stressors (e.g., temperature × flow). Rank it as either High, Moderate, or Low", width = "100%"))
       ),
 
       # Citations (Dynamic)
       fluidRow(
-        column(6, offset = 3, h4("Citations"))
+        column(8, offset = 2, h4("Citations", style = "margin-top: 20px; border-bottom: 1px solid #ddd; padding-bottom: 5px;"))
       ),
       fluidRow(
-        column(6, offset = 3,
+        column(8, offset = 2,
           # Box 1 is always here by default
           div(
             id = ns("citation_block_1"),
             style = "border: 1px solid #e3e3e3; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #fafafa;",
             textAreaInput(ns("citation_text_1"), "Citation 1 (Text)", placeholder = "e.g., Smith et al. (2020)...", height = "70px", width = "100%"),
             fluidRow(
-              column(6, textInput(ns("citation_title_1"), "Link Title", placeholder = "Place the Author and Year here. e.g., Baker et al. 1995; Pess & Beamer 1999")),
-              column(6, textInput(ns("citation_url_1"), "URL", placeholder = "Place the URL or DOI to the paper here: https://doi.org/..."))
+              column(6, textInput(ns("citation_title_1"), "Link Title", placeholder = "Place the Author and Year here. e.g., Baker et al. 1995; Pess & Beamer 1999", width = "100%")),
+              column(6, textInput(ns("citation_url_1"), "URL", placeholder = "Place the URL or DOI to the paper here: https://doi.org/...", width = "100%"))
             )
           ),
           # This is the invisible container where boxes 2, 3, 4 etc. will be injected
@@ -134,17 +134,23 @@ upload_ui <- function(id) {
         )
       ),
       fluidRow(
-        column(6, offset = 3, actionButton(ns("add_citation"), "Add Another Citation", icon = icon("plus"), class = "btn-sm", style = "margin-bottom: 20px;"))
+        column(8, offset = 2, actionButton(ns("add_citation"), "Add Another Citation", icon = icon("plus"), class = "btn-sm", style = "margin-bottom: 30px;"))
       ),
       
       # Revision Log and Submit
       fluidRow(
-        column(6, offset = 3, textAreaInput(ns("revision_log"), "Revision Log Message", placeholder = "Briefly describe the reason for this upload/change", height = "60px", width = "100%"))
+        column(8, offset = 2, textAreaInput(ns("revision_log"), "Revision Log Message", placeholder = "Briefly describe the reason for this upload/change", height = "60px", width = "100%"))
+      ),
+      
+      # Buttons
+      fluidRow(
+        column(8, offset = 2, 
+          div(style = "margin-top: 20px; margin-bottom: 50px;",
+            actionButton(ns("save"), "Submit SR Profile", class = "btn-primary", style = "margin-right: 15px; width: 180px;"),
+            actionButton(ns("preview"), "Preview", class = "btn-secondary", style = "width: 120px;")
+          )
+        )
       )
-    ),
-    fluidRow(
-      column(3, offset = 3, actionButton(ns("save"), "Submit SR Profile", class = "btn-primary")),
-      column(3, actionButton(ns("preview"), "Preview", class = "btn-secondary"))
     )
   )
 }
@@ -153,7 +159,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     output$sr_csv_file_ui <- renderUI({
-      fileInput(ns("sr_csv_file"), NULL, accept = ".csv", buttonLabel = "Choose File", placeholder = "No file chosen")
+      fileInput(ns("sr_csv_file"), NULL, accept = ".csv", buttonLabel = "Choose File", placeholder = "No file chosen", width = "100%")
     })
 
     # Track the number of citation blocks
@@ -172,8 +178,8 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
           style = "border: 1px solid #e3e3e3; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #fafafa;",
           textAreaInput(ns(paste0("citation_text_", new_count)), paste("Citation", new_count, "(Text)"), placeholder = "Citation of paper in APA format without the link e.g., Smith et al. (2020)...", height = "70px", width = "100%"),
           fluidRow(
-            column(6, textInput(ns(paste0("citation_title_", new_count)), "Link Title", placeholder = "Place the Author and Year here. e.g., Baker et al. 1995; Pess & Beamer 1999")),
-            column(6, textInput(ns(paste0("citation_url_", new_count)), "URL", placeholder = "Place the URL or DOI to the paper here: https://doi.org/..."))
+            column(6, textInput(ns(paste0("citation_title_", new_count)), "Link Title", placeholder = "Place the Author and Year here. e.g., Baker et al. 1995; Pess & Beamer 1999", width = "100%")),
+            column(6, textInput(ns(paste0("citation_url_", new_count)), "URL", placeholder = "Place the URL or DOI to the paper here: https://doi.org/...", width = "100%"))
           )
         )
       )
