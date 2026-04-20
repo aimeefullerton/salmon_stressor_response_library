@@ -114,27 +114,18 @@ server <- function(input, output, session) {
   render_papers_server(output, paginated_data, input, session)
   setup_download_csv(output, filtered_data, paginated_data, db, input, session)
   
-  # ── Admin Upload Tab (Protected by Posit Connect) ────────────────────────
 # ── Admin Upload Tab (Protected by Posit Connect) ────────────────────────
   admin_users <- c("aimee.fullerton", "paxton.calhoun") 
 
   observe({
     req(session$user) 
     
-    # 🚨 TEMPORARY DEBUG NOTIFICATION 🚨
-    # This will pop up a message on the live app showing your exact username.
-    # Delete this showNotification line after you fix the username mismatch!
-    showNotification(
-      paste("Posit Connect sees your username as: '", session$user, "'", sep=""), 
-      duration = 15, 
-      type = "warning"
-    )
-    
     # Check if the viewer is on the admin list
     if (session$user %in% admin_users) {
+      
       insertTab(
         inputId = "main_navbar", 
-        target = "submit_relationship", # Make sure this matches the 'value' in ui.R exactly
+        target = "submit_relationship", # Matches the 'value' of the tab in ui.R
         position = "after",
         tabPanel(
           title = "Admin Upload",
