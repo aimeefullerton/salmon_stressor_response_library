@@ -54,7 +54,7 @@ upload_ui <- function(id) {
         column(4, textInput(ns("broad_stressor_name"), "Broad Stressor Name", placeholder = "e.g., Water Quality", width = "100%"))
       ),
       fluidRow(
-        column(8, offset = 2, textInput(ns("specific_stressor_metric"), "Specific Stressor Metric", placeholder = "e.g., 7DADM, Celsius, % Capacity", width = "100%"))
+        column(4, offset = 2, textInput(ns("specific_stressor_metric"), "Specific Stressor Metric", placeholder = "e.g., 7DADM, Celsius, % Capacity", width = "100%"))
       ),
 
       # Species Info
@@ -67,7 +67,7 @@ upload_ui <- function(id) {
         column(4, textInput(ns("activity"), "Activity", placeholder = "e.g., Migration, Spawning. You can put multiple activities, seperate with comma", width = "100%"))
       ),
       fluidRow(
-        column(8, offset = 2, textInput(ns("season"), "Season", placeholder = "e.g., Summer, Fall. You can put multiple seasons, seperate with comma", width = "100%"))
+        column(4, offset = 2, textInput(ns("season"), "Season", placeholder = "e.g., Summer, Fall. You can put multiple seasons, seperate with comma", width = "100%"))
       ),
 
       # Location Info
@@ -102,12 +102,12 @@ upload_ui <- function(id) {
         column(8, offset = 2, h4("Confidence Rankings", style = "margin-top: 20px; border-bottom: 1px solid #ddd; padding-bottom: 5px;"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("conf_source"), "Data Source", placeholder = "Describe how well the data used to derive the stressor-response function represent the stressor and response of interest. Rank it as either High, Moderate, or Low", width = "100%")),
-        column(4, textInput(ns("conf_shape"), "Shape of SR Function", placeholder = "Describe how well-supported the functional form is (e.g., linear, threshold, dome-shaped). Rank it as either High, Moderate, or Low", width = "100%"))
+        column(8, offset = 2, textInput(ns("conf_source"), "Data Source", placeholder = "Describe how well the data used to derive the stressor-response function represent the stressor and response of interest. Rank it as either High, Moderate, or Low", width = "100%")),
+        column(8, textInput(ns("conf_shape"), "Shape of SR Function", placeholder = "Describe how well-supported the functional form is (e.g., linear, threshold, dome-shaped). Rank it as either High, Moderate, or Low", width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("conf_variance"), "Data Variance/Consistency", placeholder = "Describe the variability, noise, or inconsistency in the underlying dataset. Rank it as either High, Moderate, or Low", width = "100%")),
-        column(4, textInput(ns("conf_applicability"), "Applicability to System", placeholder = "Describe how transferable the stressor-response function is to other populations, locations, or environmental contexts. Rank it as either High, Moderate, or Low", width = "100%"))
+        column(8, offset = 2, textInput(ns("conf_variance"), "Data Variance/Consistency", placeholder = "Describe the variability, noise, or inconsistency in the underlying dataset. Rank it as either High, Moderate, or Low", width = "100%")),
+        column(8, textInput(ns("conf_applicability"), "Applicability to System", placeholder = "Describe how transferable the stressor-response function is to other populations, locations, or environmental contexts. Rank it as either High, Moderate, or Low", width = "100%"))
       ),
       fluidRow(
         column(8, offset = 2, textInput(ns("conf_interactions"), "Potential Stressor Interactions", placeholder = "Describe whether the stressor-response function may be influenced by interactions with other environmental stressors (e.g., temperature × flow). Rank it as either High, Moderate, or Low", width = "100%"))
