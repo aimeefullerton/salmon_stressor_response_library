@@ -11,69 +11,10 @@
   },
   "environment": {
     "r": {
-      "requires": "~=4.5.0"
+      "requires": "~=4.3.0"
     }
   },
   "packages": {
-    "openxlsx": {
-      "Source": "CRAN",
-      "Repository": "https://cloud.r-project.org",
-      "description": {
-        "Type": "Package",
-        "Package": "openxlsx",
-        "Title": "Read, Write and Edit xlsx Files",
-        "Version": "4.2.7.1",
-        "Date": "2024-09-19",
-        "Authors@R": "\n    c(person(given = \"Philipp\",\n             family = \"Schauberger\",\n             role = \"aut\",\n             email = \"philipp@schauberger.co.at\"),\n      person(given = \"Alexander\",\n             family = \"Walker\",\n             role = \"aut\",\n             email = \"Alexander.Walker1989@gmail.com\"),\n      person(given = \"Luca\",\n             family = \"Braglia\",\n             role = \"ctb\"),\n      person(given = \"Joshua\",\n             family = \"Sturm\",\n             role = \"ctb\"),\n      person(given = \"Jan Marvin\",\n             family = \"Garbuszus\",\n             role = c(\"ctb\", \"cre\"),\n             email = \"jan.garbuszus@ruhr-uni-bochum.de\"),\n      person(given = \"Jordan Mark\",\n             family = \"Barbone\",\n             role = \"ctb\",\n             email = \"jmbarbone@gmail.com\",\n             comment = c(ORCID = \"0000-0001-9788-3628\")),\n      person(given = \"David\",\n             family = \"Zimmermann\",\n             role = \"ctb\",\n             email = \"david_j_zimmermann@hotmail.com\"),\n      person(given = \"Reinhold\",\n             family = \"Kainhofer\",\n             role = \"ctb\",\n             email = \"reinhold@kainhofer.com\"))",
-        "Description": "Simplifies the creation of Excel .xlsx files by providing a\n    high level interface to writing, styling and editing worksheets.\n    Through the use of 'Rcpp', read/write times are comparable to the\n    'xlsx' and 'XLConnect' packages with the added benefit of removing the\n    dependency on Java.",
-        "License": "MIT + file LICENSE",
-        "URL": "https://ycphs.github.io/openxlsx/index.html,\nhttps://github.com/ycphs/openxlsx",
-        "BugReports": "https://github.com/ycphs/openxlsx/issues",
-        "Depends": "R (>= 3.3.0)",
-        "Imports": "grDevices, methods, Rcpp, stats, stringi, utils, zip",
-        "Suggests": "curl, formula.tools, knitr, rmarkdown, testthat",
-        "LinkingTo": "Rcpp",
-        "VignetteBuilder": "knitr",
-        "Encoding": "UTF-8",
-        "Language": "en-US",
-        "RoxygenNote": "7.3.2",
-        "Collate": "'CommentClass.R' 'HyperlinkClass.R' 'RcppExports.R'\n'class_definitions.R' 'StyleClass.R' 'WorkbookClass.R'\n'asserts.R' 'baseXML.R' 'borderFunctions.R' 'build_workbook.R'\n'chartsheet_class.R' 'conditional_formatting.R'\n'data-fontSizeLookupTables.R' 'helperFunctions.R'\n'loadWorkbook.R' 'onUnload.R' 'openXL.R' 'openxlsx-package.R'\n'openxlsx.R' 'openxlsxCoerce.R' 'readWorkbook.R'\n'setWindowSize.R' 'sheet_data_class.R' 'utils.R'\n'workbook_column_widths.R' 'workbook_read_workbook.R'\n'workbook_write_data.R' 'worksheet_class.R' 'wrappers.R'\n'writeData.R' 'writeDataTable.R' 'writexlsx.R' 'zzz.R'",
-        "LazyData": "true",
-        "NeedsCompilation": "yes",
-        "Packaged": "2024-09-18 22:29:51 UTC; janmarvingarbuszus",
-        "Author": "Philipp Schauberger [aut],\n  Alexander Walker [aut],\n  Luca Braglia [ctb],\n  Joshua Sturm [ctb],\n  Jan Marvin Garbuszus [ctb, cre],\n  Jordan Mark Barbone [ctb] (<https://orcid.org/0000-0001-9788-3628>),\n  David Zimmermann [ctb],\n  Reinhold Kainhofer [ctb]",
-        "Maintainer": "Jan Marvin Garbuszus <jan.garbuszus@ruhr-uni-bochum.de>",
-        "Repository": "CRAN",
-        "Date/Publication": "2024-09-20 12:50:02 UTC",
-        "Built": "R 4.3.3; x86_64-pc-linux-gnu; 2026-04-15 17:00:53 UTC; unix"
-      }
-    },
-    "zip": {
-      "Source": "CRAN",
-      "Repository": "https://cloud.r-project.org",
-      "description": {
-        "Package": "zip",
-        "Title": "Cross-Platform 'zip' Compression",
-        "Version": "2.3.1",
-        "Authors@R": "c(\n    person(\"Gábor\", \"Csárdi\", , \"csardi.gabor@gmail.com\", role = c(\"aut\", \"cre\")),\n    person(\"Kuba\", \"Podgórski\", role = \"ctb\"),\n    person(\"Rich\", \"Geldreich\", role = \"ctb\"),\n    person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\"))\n  )",
-        "Description": "Cross-Platform 'zip' Compression Library. A replacement for\n    the 'zip' function, that does not require any additional external\n    tools on any platform.",
-        "License": "MIT + file LICENSE",
-        "URL": "https://github.com/r-lib/zip, https://r-lib.github.io/zip/",
-        "BugReports": "https://github.com/r-lib/zip/issues",
-        "Suggests": "covr, processx, R6, testthat, withr",
-        "Config/Needs/website": "tidyverse/tidytemplate",
-        "Config/testthat/edition": "3",
-        "Encoding": "UTF-8",
-        "RoxygenNote": "7.2.3",
-        "NeedsCompilation": "yes",
-        "Packaged": "2024-01-27 09:28:29 UTC; gaborcsardi",
-        "Author": "Gábor Csárdi [aut, cre],\n  Kuba Podgórski [ctb],\n  Rich Geldreich [ctb],\n  Posit Software, PBC [cph, fnd]",
-        "Maintainer": "Gábor Csárdi <csardi.gabor@gmail.com>",
-        "Repository": "CRAN",
-        "Date/Publication": "2024-01-27 10:00:02 UTC",
-        "Built": "R 4.3.3; x86_64-pc-linux-gnu; 2026-04-15 17:00:42 UTC; unix"
-      }
-    },
     "DBI": {
       "Source": "CRAN",
       "Repository": "https://cloud.r-project.org",
@@ -420,6 +361,40 @@
         "Repository": "CRAN",
         "Date/Publication": "2026-01-14 09:10:14 UTC",
         "Built": "R 4.3.3; ; 2026-04-15 17:03:15 UTC; unix"
+      }
+    },
+    "bsicons": {
+      "Source": "CRAN",
+      "Repository": "https://cloud.r-project.org",
+      "description": {
+        "Package": "bsicons",
+        "Title": "Easily Work with 'Bootstrap' Icons",
+        "Version": "0.1.2",
+        "Authors@R": "c(\n    person(\"Carson\", \"Sievert\", , \"carson@posit.co\", role = c(\"cre\", \"aut\"),\n           comment = c(ORCID = \"0000-0002-4958-2844\")),\n    person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")),\n    person(\"Mark\", \"Otto\", role = \"cph\",\n           comment = \"Bootstrap icons maintainer\")\n  )",
+        "Description": "Easily use 'Bootstrap' icons inside 'Shiny' apps and 'R\n    Markdown' documents. More generally, icons can be inserted in any\n    'htmltools' document through inline 'SVG'.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://github.com/rstudio/bsicons",
+        "BugReports": "https://github.com/rstudio/bsicons/issues",
+        "Depends": "R (>= 2.10)",
+        "Imports": "cli, htmltools, rlang, utils",
+        "Suggests": "bslib, processx, testthat, webshot2, withr",
+        "Config/testthat/edition": "3",
+        "Encoding": "UTF-8",
+        "RoxygenNote": "7.2.3",
+        "NeedsCompilation": "no",
+        "Packaged": "2023-11-03 23:29:00 UTC; cpsievert",
+        "Author": "Carson Sievert [cre, aut] (<https://orcid.org/0000-0002-4958-2844>),\n  Posit Software, PBC [cph, fnd],\n  Mark Otto [cph] (Bootstrap icons maintainer)",
+        "Maintainer": "Carson Sievert <carson@posit.co>",
+        "Repository": "CRAN",
+        "Date/Publication": "2023-11-04 00:30:05 UTC",
+        "Built": "R 4.3.3; ; 2026-04-21 20:58:14 UTC; unix",
+        "RemoteType": "standard",
+        "RemoteRef": "bsicons",
+        "RemotePkgRef": "bsicons",
+        "RemoteRepos": "https://cloud.r-project.org",
+        "RemoteReposName": "CRAN",
+        "RemotePkgPlatform": "source",
+        "RemoteSha": "0.1.2"
       }
     },
     "bslib": {
@@ -1838,6 +1813,39 @@
         "Built": "R 4.3.3; x86_64-pc-linux-gnu; 2026-04-15 17:11:38 UTC; unix"
       }
     },
+    "openxlsx": {
+      "Source": "CRAN",
+      "Repository": "https://cloud.r-project.org",
+      "description": {
+        "Type": "Package",
+        "Package": "openxlsx",
+        "Title": "Read, Write and Edit xlsx Files",
+        "Version": "4.2.7.1",
+        "Date": "2024-09-19",
+        "Authors@R": "\n    c(person(given = \"Philipp\",\n             family = \"Schauberger\",\n             role = \"aut\",\n             email = \"philipp@schauberger.co.at\"),\n      person(given = \"Alexander\",\n             family = \"Walker\",\n             role = \"aut\",\n             email = \"Alexander.Walker1989@gmail.com\"),\n      person(given = \"Luca\",\n             family = \"Braglia\",\n             role = \"ctb\"),\n      person(given = \"Joshua\",\n             family = \"Sturm\",\n             role = \"ctb\"),\n      person(given = \"Jan Marvin\",\n             family = \"Garbuszus\",\n             role = c(\"ctb\", \"cre\"),\n             email = \"jan.garbuszus@ruhr-uni-bochum.de\"),\n      person(given = \"Jordan Mark\",\n             family = \"Barbone\",\n             role = \"ctb\",\n             email = \"jmbarbone@gmail.com\",\n             comment = c(ORCID = \"0000-0001-9788-3628\")),\n      person(given = \"David\",\n             family = \"Zimmermann\",\n             role = \"ctb\",\n             email = \"david_j_zimmermann@hotmail.com\"),\n      person(given = \"Reinhold\",\n             family = \"Kainhofer\",\n             role = \"ctb\",\n             email = \"reinhold@kainhofer.com\"))",
+        "Description": "Simplifies the creation of Excel .xlsx files by providing a\n    high level interface to writing, styling and editing worksheets.\n    Through the use of 'Rcpp', read/write times are comparable to the\n    'xlsx' and 'XLConnect' packages with the added benefit of removing the\n    dependency on Java.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://ycphs.github.io/openxlsx/index.html,\nhttps://github.com/ycphs/openxlsx",
+        "BugReports": "https://github.com/ycphs/openxlsx/issues",
+        "Depends": "R (>= 3.3.0)",
+        "Imports": "grDevices, methods, Rcpp, stats, stringi, utils, zip",
+        "Suggests": "curl, formula.tools, knitr, rmarkdown, testthat",
+        "LinkingTo": "Rcpp",
+        "VignetteBuilder": "knitr",
+        "Encoding": "UTF-8",
+        "Language": "en-US",
+        "RoxygenNote": "7.3.2",
+        "Collate": "'CommentClass.R' 'HyperlinkClass.R' 'RcppExports.R'\n'class_definitions.R' 'StyleClass.R' 'WorkbookClass.R'\n'asserts.R' 'baseXML.R' 'borderFunctions.R' 'build_workbook.R'\n'chartsheet_class.R' 'conditional_formatting.R'\n'data-fontSizeLookupTables.R' 'helperFunctions.R'\n'loadWorkbook.R' 'onUnload.R' 'openXL.R' 'openxlsx-package.R'\n'openxlsx.R' 'openxlsxCoerce.R' 'readWorkbook.R'\n'setWindowSize.R' 'sheet_data_class.R' 'utils.R'\n'workbook_column_widths.R' 'workbook_read_workbook.R'\n'workbook_write_data.R' 'worksheet_class.R' 'wrappers.R'\n'writeData.R' 'writeDataTable.R' 'writexlsx.R' 'zzz.R'",
+        "LazyData": "true",
+        "NeedsCompilation": "yes",
+        "Packaged": "2024-09-18 22:29:51 UTC; janmarvingarbuszus",
+        "Author": "Philipp Schauberger [aut],\n  Alexander Walker [aut],\n  Luca Braglia [ctb],\n  Joshua Sturm [ctb],\n  Jan Marvin Garbuszus [ctb, cre],\n  Jordan Mark Barbone [ctb] (<https://orcid.org/0000-0001-9788-3628>),\n  David Zimmermann [ctb],\n  Reinhold Kainhofer [ctb]",
+        "Maintainer": "Jan Marvin Garbuszus <jan.garbuszus@ruhr-uni-bochum.de>",
+        "Repository": "CRAN",
+        "Date/Publication": "2024-09-20 12:50:02 UTC",
+        "Built": "R 4.3.3; x86_64-pc-linux-gnu; 2026-04-15 17:00:53 UTC; unix"
+      }
+    },
     "otel": {
       "Source": "CRAN",
       "Repository": "https://cloud.r-project.org",
@@ -3124,6 +3132,32 @@
         "Built": "R 4.3.3; x86_64-pc-linux-gnu; 2026-04-15 17:10:51 UTC; unix"
       }
     },
+    "zip": {
+      "Source": "CRAN",
+      "Repository": "https://cloud.r-project.org",
+      "description": {
+        "Package": "zip",
+        "Title": "Cross-Platform 'zip' Compression",
+        "Version": "2.3.1",
+        "Authors@R": "c(\n    person(\"Gábor\", \"Csárdi\", , \"csardi.gabor@gmail.com\", role = c(\"aut\", \"cre\")),\n    person(\"Kuba\", \"Podgórski\", role = \"ctb\"),\n    person(\"Rich\", \"Geldreich\", role = \"ctb\"),\n    person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\"))\n  )",
+        "Description": "Cross-Platform 'zip' Compression Library. A replacement for\n    the 'zip' function, that does not require any additional external\n    tools on any platform.",
+        "License": "MIT + file LICENSE",
+        "URL": "https://github.com/r-lib/zip, https://r-lib.github.io/zip/",
+        "BugReports": "https://github.com/r-lib/zip/issues",
+        "Suggests": "covr, processx, R6, testthat, withr",
+        "Config/Needs/website": "tidyverse/tidytemplate",
+        "Config/testthat/edition": "3",
+        "Encoding": "UTF-8",
+        "RoxygenNote": "7.2.3",
+        "NeedsCompilation": "yes",
+        "Packaged": "2024-01-27 09:28:29 UTC; gaborcsardi",
+        "Author": "Gábor Csárdi [aut, cre],\n  Kuba Podgórski [ctb],\n  Rich Geldreich [ctb],\n  Posit Software, PBC [cph, fnd]",
+        "Maintainer": "Gábor Csárdi <csardi.gabor@gmail.com>",
+        "Repository": "CRAN",
+        "Date/Publication": "2024-01-27 10:00:02 UTC",
+        "Built": "R 4.3.3; x86_64-pc-linux-gnu; 2026-04-15 17:00:42 UTC; unix"
+      }
+    },
     "zoo": {
       "Source": "CRAN",
       "Repository": "https://cloud.r-project.org",
@@ -3154,16 +3188,19 @@
       "checksum": "c0a42253ba94ae18f5d75b414c5b3b4e"
     },
     ".github/workflows/check-dependencies.yml": {
-      "checksum": "0ba706ff59b3732068e57a34a8a8955b"
+      "checksum": "449245e127a3644cc07e23c837d113c4"
     },
     ".github/workflows/secretScan.yml": {
       "checksum": "c8ab19612d3fab566bfe99fffa824737"
+    },
+    ".RData": {
+      "checksum": "e7e12e39aedf1b0cce77d64b9b935b25"
     },
     ".Renviron.example": {
       "checksum": "459c349c9227bab10b03c2616446171e"
     },
     ".Rprofile": {
-      "checksum": "08bcd9412c1aa68abaace55b8e478677"
+      "checksum": "04a8f3d8a7e5f51f0892e0a950ff1331"
     },
     "app.R": {
       "checksum": "203ea244c4e9469f540d1c050514b29a"
@@ -3253,13 +3290,13 @@
       "checksum": "65f2cb783c2f0eb6f8106d360153a6ef"
     },
     "global.R": {
-      "checksum": "92551262967d1a4b3904269df033185b"
+      "checksum": "2f4bbfe887a3e714fb180e9ce1a02bad"
     },
     "LICENSE_Apache_2.0": {
       "checksum": "86d3f3a95c324c9479bd8986968f4327"
     },
     "modules/about_us.R": {
-      "checksum": "82de004a6bf3eb7bd4d4344125130111"
+      "checksum": "8b3c97c256d5cf2242ac7dec84a5f26f"
     },
     "modules/acknowledgement.R": {
       "checksum": "13e5ae4b6d48036c7689864acb8854bf"
@@ -3367,13 +3404,13 @@
       "checksum": "ac6a764be7c65c3442c62014f9db878c"
     },
     "modules/pagination.R": {
-      "checksum": "a9df5b326c92adb5eb0f2fb7f6e7f623"
+      "checksum": "54d5034f84fe8d087cb9f3e9952a9b4d"
     },
     "modules/render_article_server.R": {
-      "checksum": "f960bae47ea54da7b03bc2df79dec2f6"
+      "checksum": "c72088832b43f19263d9ad3c21e2a571"
     },
     "modules/render_article_ui.R": {
-      "checksum": "f2f48e0e514908f41744064dc62223ba"
+      "checksum": "98e0e233008d7c6efb605b612a72ff02"
     },
     "modules/render_papers.R": {
       "checksum": "396b76ef058c936cd427ba9dea79087e"
@@ -3391,16 +3428,16 @@
       "checksum": "af572b11ca6e8855f95a792c36d7a192"
     },
     "modules/upload.R": {
-      "checksum": "7a027fb9c4a54454f045d1e8cffb2a97"
+      "checksum": "3909f393ed9da3f0f5ebae2eaea21ff1"
     },
     "modules/user_guide.R": {
-      "checksum": "89d79ad9d5d7e887f1085c8f2aa99462"
+      "checksum": "7e6be2f51862731647618b592283c74b"
     },
     "README.md": {
-      "checksum": "6a881f28905a12b39ba53d94a8117398"
+      "checksum": "08c8f1dea794c26dad4de7af7a9e9edf"
     },
     "renv.lock": {
-      "checksum": "b0cc5da11018950da411b88d4ec574dc"
+      "checksum": "9021cc85269888f297e36cc533cd4cd2"
     },
     "scripts/ARCHIVE/migrate_csv_text_to_jsonb.R": {
       "checksum": "b8af9d9ba9875325bc4da9a0d29676c4"
@@ -3451,10 +3488,10 @@
       "checksum": "c697f030f7c58e7e77014446a235b4e9"
     },
     "server.R": {
-      "checksum": "a8c5b4539885fcec79d4cb11439af44d"
+      "checksum": "586ac38233897fa22331d4c9351fb84b"
     },
     "ui.R": {
-      "checksum": "31b12078f11007bd075f739d0d32b061"
+      "checksum": "3355ec6342cd378eb48512c72decba03"
     },
     "www/custom.css": {
       "checksum": "8ea38d048e58d9ba81d28968791b69bf"
