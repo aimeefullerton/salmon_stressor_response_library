@@ -98,23 +98,12 @@ server <- function(input, output, session) {
 
   # ── Filtered & paginated data ──────────────────────────────────────────────
   filtered_data <- filter_data_server(input, data, session)
-
   pagination <- pagination_server(input, output, session, filtered_data)
   paginated_data <- pagination$paginated_data
-  output$page_info <- renderText(pagination$page_info())
+  
+  # Wire the text outputs to the new Top and Bottom UI elements
   output$page_info_top <- renderText(pagination$page_info())
-
-  observeEvent(filtered_data(), {
-    updateNumericInput(session, "page", value = 1)
-  })
-
-  observeEvent(input$prev_page, {
-    updateNumericInput(session, "page", value = max(1, input$page - 1))
-  })
-
-  observeEvent(input$next_page, {
-    updateNumericInput(session, "page", value = input$page + 1)
-  })
+  output$page_info_bottom <- renderText(pagination$page_info())
 
   # ── Modules ────────────────────────────────────────────────────────────────
   update_filters_server(input, output, session, data, db)
@@ -123,7 +112,32 @@ server <- function(input, output, session) {
   submit_relationship_server("submit_relationship")
   edaServer("eda")
   render_papers_server(output, paginated_data, input, session)
-  setup_download_csv(output, paginated_data, db, input, session)
+  setup_download_csv(output, filtered_data, paginated_data, db, input, session)
+  
+# ── Admin Upload Tab (Protected by Posit Connect) ────────────────────────
+  admin_users <- c("aimee.fullerton", "paxton.calhoun") 
+
+  observe({
+    req(session$user) 
+    
+    # Check if the viewer is on the admin list
+    if (session$user %in% admin_users) {
+      
+      insertTab(
+        inputId = "main_navbar", 
+        target = "submit_relationship", # Matches the 'value' of the tab in ui.R
+        position = "after",
+        tabPanel(
+          title = "Admin Upload",
+          value = "admin_upload_tab",
+          icon = icon("lock"),
+          upload_ui("secure_admin_upload") 
+        )
+      )
+      
+      upload_server("secure_admin_upload", db_conn = db, current_user = session$user)
+    }
+  })
 
   # ── Article modal ──────────────────────────────────────────────────────────
   # Track which articles have had render_article_server called to avoid
