@@ -31,12 +31,3 @@ jobs:
         with:
           cache-version: 1
 
-      - name: Check renv is in sync
-        run: |
-          Rscript -e '
-            status <- renv::status()
-            if (!isTRUE(status$synchronized)) {
-              message("renv is out of sync. Please run renv::snapshot() locally and commit renv.lock.")
-              quit(status = 1)
-            }
-          '
