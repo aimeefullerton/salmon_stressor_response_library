@@ -406,20 +406,121 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       })
     })
 
-    # Preview modal logic (simplified to just display the inputs)
+# Preview modal logic (1:1 WYSIWYG matched to render_article_ui)
     observeEvent(input$preview, {
       req(input$title)
+      
+      # 1. Dynamically grab all the citations the user added so far
+      cit_list <- tagList()
+      for (i in 1:citation_count()) {
+        c_text <- input[[paste0("citation_text_", i)]]
+        c_title <- input[[paste0("citation_title_", i)]]
+        c_url <- input[[paste0("citation_url_", i)]]
+        
+        if (!is.null(c_text) && trimws(c_text) != "") {
+          link_tag <- if (!is.null(c_url) && trimws(c_url) != "") {
+            tags$a(href = c_url, target = "_blank", if (!is.null(c_title) && trimws(c_title) != "") c_title else "Link")
+          } else {
+            span(if (!is.null(c_title)) c_title else "")
+          }
+          cit_list <- tagAppendChild(cit_list, tags$li(c_text, " ", link_tag))
+        }
+      }
+      
+      # Helper to handle empty inputs
+      show_val <- function(val) { if (is.null(val) || trimws(val) == "") em("Not provided") else val }
+
+      # 2. Build the exact modal matching render_article_ui
       showModal(modalDialog(
-        title = "Preview Your Submission",
-        size = "l",
-        tagList(
-          h4("Title:"), p(input$title),
-          h4("Stressor Name:"), p(input$stressor_name),
-          h4("Species:"), p(input$species_common_name),
-          h4("Location:"), p(paste(input$location_country, input$location_state_province, sep = " - "))
-        ),
+        title = "Preview: Final Submission Layout",
+        size = "xl", 
         easyClose = TRUE,
-        footer = modalButton("Close")
+        footer = modalButton("Close Preview"),
+        
+        tagList(
+          # ── Title ──
+          fluidRow(
+            column(12, align = "center", tags$h3(input$title, style = "margin-top: 10px; margin-bottom: 20px;"))
+          ),
+
+          # ── Article Metadata ──
+          div(
+            style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #f8f9fa; border-radius: 8px;",
+            tags$strong("Article Metadata ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
+            div(style = "font-size:1.1em;",
+              fluidRow(column(4, strong("Species Common Name:")), column(8, show_val(input$species_common_name))),
+              fluidRow(column(4, strong("Latin Name (Genus species):")), column(8, em(show_val(input$latin_name)))),
+              fluidRow(column(4, strong("Stressor Name:")), column(8, show_val(input$stressor_name))),
+              fluidRow(column(4, strong("Specific Stressor Metric:")), column(8, show_val(input$specific_stressor_metric))),
+              fluidRow(column(4, strong("Response:")), column(8, show_val(input$response))),
+              fluidRow(column(4, strong("Life Stage:")), column(8, show_val(input$life_stages))),
+              if(trimws(input$location_country) != "") fluidRow(column(4, strong("Country:")), column(8, input$location_country)),
+              if(trimws(input$location_state_province) != "") fluidRow(column(4, strong("State / Province:")), column(8, input$location_state_province)),
+              if(trimws(input$location_watershed_lab) != "") fluidRow(column(4, strong("Watershed / Lab:")), column(8, input$location_watershed_lab)),
+              if(trimws(input$location_river_creek) != "") fluidRow(column(4, strong("River / Creek:")), column(8, input$location_river_creek))
+            )
+          ),
+
+          # ── Description & Function Details ──
+          div(
+            style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
+            tags$strong("Description & Function Details ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
+            div(style = "font-size:1.1em;",
+              strong("Detailed SR Function Description"), br(), p(show_val(input$overview)),
+              strong("Function Derivation"), br(), p(show_val(input$function_derivation)),
+              if(trimws(input$transferability_of_function) != "") tagList(strong("Transferability"), br(), p(input$transferability_of_function)),
+              if(trimws(input$srf_formula) != "") tagList(strong("SRF Formula"), br(), p(input$srf_formula))
+            )
+          ),
+
+          # ── Confidence Rankings ──
+          div(
+            style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
+            tags$strong("Confidence Rankings & Uncertainty ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
+            div(style = "font-size:1.1em;",
+              # Mimicking the table view
+              tags$table(class = "table table-bordered table-sm",
+                tags$thead(tags$tr(tags$th("Metric"), tags$th("Rank"))),
+                tags$tbody(
+                  tags$tr(tags$td("Data Source"), tags$td(show_val(input$conf_source))),
+                  tags$tr(tags$td("Shape"), tags$td(show_val(input$conf_shape))),
+                  tags$tr(tags$td("Variance"), tags$td(show_val(input$conf_variance))),
+                  tags$tr(tags$td("Applicability"), tags$td(show_val(input$conf_applicability))),
+                  tags$tr(tags$td("Interactions"), tags$td(show_val(input$conf_interactions)))
+                )
+              )
+            )
+          ),
+
+          # ── Citations ──
+          div(
+            style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
+            tags$strong("Citation(s) ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
+            div(style = "font-size:1.1em;",
+              if (length(cit_list$children) > 0) tags$ul(cit_list) else p(em("No citations added yet."))
+            )
+          ),
+
+          # ── CSV Data Table (Placeholder) ──
+          div(
+            style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px; opacity: 0.7;",
+            tags$strong("Stressor Response Data ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
+            div(style = "font-size:1.1em; text-align: center; padding: 20px;",
+              icon("table", "fa-2x"), br(),
+              em("A preview of the uploaded CSV data table will render here in the final dashboard.")
+            )
+          ),
+
+          # ── Interactive Plot (Placeholder) ──
+          div(
+            style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px; opacity: 0.7;",
+            tags$strong("Stressor Response Chart ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
+            div(style = "font-size:1.1em; text-align: center; padding: 20px;",
+              icon("chart-line", "fa-2x"), br(),
+              em("An interactive Plotly chart will automatically render here based on your uploaded CSV data.")
+            )
+          )
+        )
       ))
     })
 
