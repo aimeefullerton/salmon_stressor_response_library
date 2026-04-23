@@ -24,8 +24,8 @@ upload_ui <- function(id) {
         column(8, offset = 2, textInput(ns("title"), "Article Title *", placeholder = "Add a short descriptive title", width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("article_type"), "Article Type", placeholder = "e.g., Peer-reviewed, Report", width = "100%")),
-        column(4, textInput(ns("response"), "Response", placeholder = "e.g., Mean System Capacity", width = "100%"))
+        column(4, offset = 2, textInput(ns("article_type"), "Article Type *", placeholder = "e.g., Peer-reviewed, Report", width = "100%")),
+        column(4, textInput(ns("response"), "Response *", placeholder = "e.g., Mean System Capacity", width = "100%"))
       ),
 
       # CSV Upload
@@ -35,7 +35,7 @@ upload_ui <- function(id) {
           strong("SR Curve Data CSV"),
           uiOutput(ns("sr_csv_file_ui")),
           helpText(
-            "Upload a CSV data file for the SR relationship.",
+            "Upload a CSV data file for the SR relationship. This is required.",
             br(),
             "Required columns: curve.id, stressor.label, stressor.x, units.x, response.label, response.y, units.y.",
             br(),
@@ -50,17 +50,17 @@ upload_ui <- function(id) {
       
       # Stressor Information
       fluidRow(
-        column(4, offset = 2, textInput(ns("stressor_name"), "Stressor Name", placeholder = "e.g., Temperature", width = "100%")),
-        column(4, textInput(ns("broad_stressor_name"), "Broad Stressor Name", placeholder = "e.g., Water Quality", width = "100%"))
+        column(4, offset = 2, textInput(ns("stressor_name"), "Stressor Name *", placeholder = "e.g., Temperature", width = "100%")),
+        column(4, textInput(ns("broad_stressor_name"), "Broad Stressor Name *", placeholder = "e.g., Water Quality", width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("specific_stressor_metric"), "Specific Stressor Metric", placeholder = "e.g., 7DADM, Celsius, % Capacity", width = "100%"))
+        column(4, offset = 2, textInput(ns("specific_stressor_metric"), "Specific Stressor Metric *", placeholder = "e.g., 7DADM, Celsius, % Capacity", width = "100%"))
       ),
 
       # Species Info
       fluidRow(
-        column(4, offset = 2, textInput(ns("species_common_name"), "Species Common Name", placeholder = "e.g., Chinook Salmon. You can put multiple species, seperate with comma", width = "100%")),
-        column(4, textInput(ns("latin_name"), "Latin Name", placeholder = "e.g., Oncorhynchus tshawytscha. You can put multiple species, seperate with comma", width = "100%"))
+        column(4, offset = 2, textInput(ns("species_common_name"), "Species Common Name *", placeholder = "e.g., Chinook Salmon. You can put multiple species, seperate with comma", width = "100%")),
+        column(4, textInput(ns("latin_name"), "Latin Name *", placeholder = "e.g., Oncorhynchus tshawytscha. You can put multiple species, seperate with comma", width = "100%"))
       ),
       fluidRow(
         column(4, offset = 2, textInput(ns("life_stages"), "Life Stages", placeholder = "e.g., Adult, Fry. You can put multiple life stages, seperate with comma", width = "100%")),
@@ -72,7 +72,7 @@ upload_ui <- function(id) {
 
       # Location Info
       fluidRow(
-        column(4, offset = 2, textInput(ns("location_country"), "Country", placeholder = "e.g., USA, Canada. You can put multiple countries, seperate with comma", width = "100%")),
+        column(4, offset = 2, textInput(ns("location_country"), "Country *", placeholder = "e.g., USA, Canada. You can put multiple countries, seperate with comma", width = "100%")),
         column(4, textInput(ns("location_state_province"), "State / Province", placeholder = "e.g., Washington, BC. You can put multiple states or provinces, seperate with comma", width = "100%"))
       ),
       fluidRow(
@@ -81,11 +81,11 @@ upload_ui <- function(id) {
       ),
 
       # Descriptions & Formulas
-      fluidRow(
-        column(8, offset = 2, textAreaInput(ns("overview"), "Overview Description", placeholder = "Comprehensively outline the data, theory, mechanism, and pathway of effects underlying the SR Function. This should be as detailed as possible.", height = "120px", width = "100%"))
+            fluidRow(
+        column(4, offset = 2, textAreaInput(ns("function_derivation"), "Function Derivation", placeholder = "Describe the source of the function (e.g., expert opinion, mechanistic). You can put multiple derivation methods, seperate with comma.", height = "120px", width = "100%"))
       ),
       fluidRow(
-        column(8, offset = 2, textAreaInput(ns("function_derivation"), "Function Derivation", placeholder = "Describe the source of the function (e.g., expert opinion, mechanistic). This can have multiple derivations, seperate with comma.", height = "120px", width = "100%"))
+        column(8, offset = 2, textAreaInput(ns("overview"), "Overview Description *", placeholder = "Comprehensively outline the data, theory, mechanism, and pathway of effects underlying the SR Function. This should be as detailed as possible.", height = "120px", width = "100%"))
       ),
       fluidRow(
         column(8, offset = 2, textAreaInput(ns("transferability_of_function"), "Transferability of Function", placeholder = "Describe whether the function can effectively be extended to systems beyond the intended target. Discuss situations where transfer might be unsuitable.", height = "80px", width = "100%"))
@@ -115,7 +115,7 @@ upload_ui <- function(id) {
 
       # Citations (Dynamic)
       fluidRow(
-        column(8, offset = 2, h4("Citations", style = "margin-top: 20px; border-bottom: 1px solid #ddd; padding-bottom: 5px;"))
+        column(8, offset = 2, h4("Citations *", style = "margin-top: 20px; border-bottom: 1px solid #ddd; padding-bottom: 5px;"))
       ),
       fluidRow(
         column(8, offset = 2,
