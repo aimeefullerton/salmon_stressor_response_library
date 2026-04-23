@@ -97,8 +97,8 @@ upload_ui <- function(id) {
             "SRF Formula ", 
             span("(Supports LaTeX math)", style = "font-weight: normal; font-size: 0.8em; color: #666; margin-left: 5px; margin-right: 5px;"),
             
-            # Using actionButton styled to look like a link to bypass Posit Connect URL routing
-            actionButton(ns("show_latex_guide"), label = NULL, icon = icon("circle-question"), 
+            # Using an empty string for the label instead of NULL
+            actionButton(ns("show_latex_guide"), label = "", icon = icon("circle-question"), 
               style = "background: none; border: none; padding: 0; color: #0073e6; font-size: 1.1em; box-shadow: none;"
             )
           ),
@@ -426,27 +426,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       })
     })
 
-# Preview modal logic (1:1 WYSIWYG matched to render_article_ui)
-    observeEvent(input$preview, {
-      req(input$title)
-      
-      # 1. Dynamically grab all the citations the user added so far
-      cit_list <- tagList()
-      for (i in 1:citation_count()) {
-        c_text <- input[[paste0("citation_text_", i)]]
-        c_title <- input[[paste0("citation_title_", i)]]
-        c_url <- input[[paste0("citation_url_", i)]]
-        
-        if (!is.null(c_text) && trimws(c_text) != "") {
-          link_tag <- if (!is.null(c_url) && trimws(c_url) != "") {
-            tags$a(href = c_url, target = "_blank", if (!is.null(c_title) && trimws(c_title) != "") c_title else "Link")
-          } else {
-            span(if (!is.null(c_title)) c_title else "")
-          }
-          cit_list <- tagAppendChild(cit_list, tags$li(c_text, " ", link_tag))
-        }
-      }
-# LaTeX Cheat Sheet Modal
+# ── 1. LaTeX Cheat Sheet Modal ──
     observeEvent(input$show_latex_guide, {
       showModal(modalDialog(
         title = tagList(icon("calculator"), " Math Formatting Guide"),
@@ -480,11 +460,32 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
         )
       ))
     })
+
+    # ── 2. Preview modal logic (1:1 WYSIWYG matched to render_article_ui) ──
+    observeEvent(input$preview, {
+      req(input$title)
+      
+      # Dynamically grab all the citations the user added so far
+      cit_list <- tagList()
+      for (i in 1:citation_count()) {
+        c_text <- input[[paste0("citation_text_", i)]]
+        c_title <- input[[paste0("citation_title_", i)]]
+        c_url <- input[[paste0("citation_url_", i)]]
+        
+        if (!is.null(c_text) && trimws(c_text) != "") {
+          link_tag <- if (!is.null(c_url) && trimws(c_url) != "") {
+            tags$a(href = c_url, target = "_blank", if (!is.null(c_title) && trimws(c_title) != "") c_title else "Link")
+          } else {
+            span(if (!is.null(c_title)) c_title else "")
+          }
+          cit_list <- tagAppendChild(cit_list, tags$li(c_text, " ", link_tag))
+        }
+      }
                  
       # Helper to handle empty inputs
       show_val <- function(val) { if (is.null(val) || trimws(val) == "") em("Not provided") else val }
 
-      # 2. Build the exact modal matching render_article_ui
+      # Build the exact modal matching render_article_ui
       showModal(modalDialog(
         title = "Preview: Final Submission Layout",
         size = "xl", 
@@ -532,7 +533,6 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
             style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
             tags$strong("Confidence Rankings & Uncertainty ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
             div(style = "font-size:1.1em;",
-              # Mimicking the table view
               tags$table(class = "table table-bordered table-sm",
                 tags$thead(tags$tr(tags$th("Metric"), tags$th("Rank"))),
                 tags$tbody(
@@ -578,7 +578,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       ))
     })
 
-    # CSV Template Download
+    # ── 3. CSV Template Download ──
     output$download_csv_template <- downloadHandler(
       filename = function() { paste0("SRF_template_", Sys.Date(), ".csv") },
       content = function(file) {
