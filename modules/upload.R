@@ -91,7 +91,13 @@ upload_ui <- function(id) {
         column(8, offset = 2, textAreaInput(ns("transferability_of_function"), "Transferability of Function", placeholder = "Describe whether the function can effectively be extended to systems beyond the intended target. Discuss situations where transfer might be unsuitable.", height = "80px", width = "100%"))
       ),
       fluidRow(
-        column(8, offset = 2, textInput(ns("srf_formula"), "SRF Formula", placeholder = "Enter the mathematical formula if applicable", width = "100%"))
+        column(8, offset = 2, textAreaInput(
+          inputId = ns("srf_formula"), 
+          label = tagList("SRF Formula ", span("(Supports LaTeX math)", style = "font-weight: normal; font-size: 0.8em; color: #666;")), 
+          placeholder = "Example: $$ y = \\frac{\\alpha}{\\beta + x} $$", 
+          height = "80px",
+          width = "100%"
+        ))
       ),
       fluidRow(
         column(8, offset = 2, textAreaInput(ns("source_of_stressor_data"), "Source of Stressor Data", placeholder = "Describe the source of stressor data needed to apply the function", height = "80px", width = "100%"))
@@ -469,7 +475,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
               strong("Detailed SR Function Description"), br(), p(show_val(input$overview)),
               strong("Function Derivation"), br(), p(show_val(input$function_derivation)),
               if(trimws(input$transferability_of_function) != "") tagList(strong("Transferability"), br(), p(input$transferability_of_function)),
-              if(trimws(input$srf_formula) != "") tagList(strong("SRF Formula"), br(), p(input$srf_formula))
+              if(trimws(input$srf_formula) != "") tagList(strong("SRF Formula"), br(), withMathJax(p(input$srf_formula)))
             )
           ),
 
