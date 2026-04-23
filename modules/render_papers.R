@@ -66,24 +66,24 @@ render_papers_server <- function(output, paginated_data, input, session) {
 # Metadata rows - CSS classes paper-meta-row and paper-meta-item do the aligning!
             div(
               class = "paper-meta-row",
-              HTML(format_field("Common Name", paper$species_common_name)),
-              HTML(format_field("Life Stage", paper$life_stages)),
               HTML(format_field("Type", paper$article_type)),
-              HTML(format_field("Activity", paper$activity))
+              HTML(format_field("Common Name", paper$species_common_name)),
+              HTML(format_field("Latin Name", paper$latin_name)),
+              HTML(format_field("Life Stage", paper$life_stages))
             ),
             div(
               class = "paper-meta-row",
               HTML(format_field("Stressor", paper$stressor_name)),
-              HTML(format_field("Metric", paper$specific_stressor_metric)),
+              HTML(format_field("Stressor Metric", paper$specific_stressor_metric)),
               HTML(format_field("Response", paper$response)),
-              HTML(format_field("Latin Name", paper$latin_name))
+              HTML(format_field("Activity", paper$activity))
             ),
             div(
               class = "paper-meta-row",
-              HTML(format_field("River/Creek", paper$location_river_creek)),
-              HTML(format_field("Watershed/Lab", paper$location_watershed_lab)),
+              HTML(format_field("Country", paper$location_country)),
               HTML(format_field("State/Province", paper$location_state_province)),
-              HTML(format_field("Country", paper$location_country))
+              HTML(format_field("Watershed/Lab", paper$location_watershed_lab)),
+              HTML(format_field("River/Creek", paper$location_river_creek))
             )
           )
         )
