@@ -92,13 +92,18 @@ upload_ui <- function(id) {
       ),
       fluidRow(
         column(8, offset = 2, 
-          # 1. Custom Label built OUTSIDE the text input
-          div(style = "margin-bottom: 5px; font-weight: bold;",
+          # Custom Label with an invisible button instead of a link
+          div(style = "margin-bottom: 5px; font-weight: bold; display: flex; align-items: center;",
             "SRF Formula ", 
-            span("(Supports LaTeX math)", style = "font-weight: normal; font-size: 0.8em; color: #666; margin-right: 5px;"),
-            actionLink(ns("show_latex_guide"), icon("circle-question"), style = "font-size: 1.1em; color: #0073e6;")
+            span("(Supports LaTeX math)", style = "font-weight: normal; font-size: 0.8em; color: #666; margin-left: 5px; margin-right: 5px;"),
+            
+            # Using actionButton styled to look like a link to bypass Posit Connect URL routing
+            actionButton(ns("show_latex_guide"), label = NULL, icon = icon("circle-question"), 
+              style = "background: none; border: none; padding: 0; color: #0073e6; font-size: 1.1em; box-shadow: none;"
+            )
           ),
-          # 2. Text input with label set to NULL
+          
+          # Text input with label set to NULL
           textAreaInput(
             inputId = ns("srf_formula"), 
             label = NULL, 
