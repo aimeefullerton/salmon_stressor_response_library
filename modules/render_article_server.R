@@ -200,7 +200,7 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
     tagList(
       br(), br(),
       strong("SRF Formula"), br(), 
-      div(val)
+      withMathJax(div(val)) # <-- Wrapped div(val) in withMathJax()
     )
   })
   # ── Render confidence rankings ────────────────────────────────────────────────
