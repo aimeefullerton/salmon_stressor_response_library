@@ -93,7 +93,12 @@ upload_ui <- function(id) {
       fluidRow(
         column(8, offset = 2, textAreaInput(
           inputId = ns("srf_formula"), 
-          label = tagList("SRF Formula ", span("(Supports LaTeX math)", style = "font-weight: normal; font-size: 0.8em; color: #666;")), 
+          label = tagList(
+            "SRF Formula ", 
+            span("(Supports LaTeX math)", style = "font-weight: normal; font-size: 0.8em; color: #666; margin-right: 5px;"),
+            # Adds the clickable question mark icon
+            actionLink(ns("show_latex_guide"), icon("circle-question"), style = "font-size: 0.9em; color: #0073e6;")
+          ), 
           placeholder = "Example: $$ y = \\frac{\\alpha}{\\beta + x} $$", 
           height = "80px",
           width = "100%"
