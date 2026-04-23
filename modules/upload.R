@@ -91,18 +91,22 @@ upload_ui <- function(id) {
         column(8, offset = 2, textAreaInput(ns("transferability_of_function"), "Transferability of Function", placeholder = "Describe whether the function can effectively be extended to systems beyond the intended target. Discuss situations where transfer might be unsuitable.", height = "80px", width = "100%"))
       ),
       fluidRow(
-        column(8, offset = 2, textAreaInput(
-          inputId = ns("srf_formula"), 
-          label = tagList(
+        column(8, offset = 2, 
+          # 1. Custom Label built OUTSIDE the text input
+          div(style = "margin-bottom: 5px; font-weight: bold;",
             "SRF Formula ", 
             span("(Supports LaTeX math)", style = "font-weight: normal; font-size: 0.8em; color: #666; margin-right: 5px;"),
-            # Adds the clickable question mark icon
-            actionLink(ns("show_latex_guide"), icon("circle-question"), style = "font-size: 0.9em; color: #0073e6;")
-          ), 
-          placeholder = "Example: $$ y = \\frac{\\alpha}{\\beta + x} $$", 
-          height = "80px",
-          width = "100%"
-        ))
+            actionLink(ns("show_latex_guide"), icon("circle-question"), style = "font-size: 1.1em; color: #0073e6;")
+          ),
+          # 2. Text input with label set to NULL
+          textAreaInput(
+            inputId = ns("srf_formula"), 
+            label = NULL, 
+            placeholder = "Example: $$ y = \\frac{\\alpha}{\\beta + x} $$", 
+            height = "80px",
+            width = "100%"
+          )
+        )
       ),
       fluidRow(
         column(8, offset = 2, textAreaInput(ns("source_of_stressor_data"), "Source of Stressor Data", placeholder = "Describe the source of stressor data needed to apply the function", height = "80px", width = "100%"))
