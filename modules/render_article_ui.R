@@ -75,7 +75,7 @@ render_article_ui <- function(article_id, data) {
         strong("Function Derivation"), br(), textOutput(paste0("function_derivation_", article_id)),
         # Dynamic UI placeholders for conditional fields
         uiOutput(paste0("transferability_ui_", article_id)),
-        withMathJax(uiOutput(paste0("srf_formula_ui", article_id)))
+        withMathJax(uiOutput(paste0("srf_formula_ui_", article_id)))
       ))
     ),
 
