@@ -437,7 +437,41 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
           cit_list <- tagAppendChild(cit_list, tags$li(c_text, " ", link_tag))
         }
       }
-      
+# LaTeX Cheat Sheet Modal
+    observeEvent(input$show_latex_guide, {
+      showModal(modalDialog(
+        title = tagList(icon("calculator"), " Math Formatting Guide"),
+        size = "m",
+        easyClose = TRUE,
+        footer = modalButton("Got it!"),
+        
+        tagList(
+          p("You can format mathematical equations in the SRF Formula box using standard LaTeX syntax. To ensure the math renders correctly, always wrap your equations in double dollar signs: ", code("$$")),
+          
+          tags$table(class = "table table-bordered table-striped table-sm", style = "margin-top: 15px;",
+            tags$thead(tags$tr(
+              tags$th("To get this result...", style = "width: 40%;"), 
+              tags$th("Type exactly this...")
+            )),
+            tags$tbody(
+              tags$tr(tags$td("Fractions"), tags$td(code("$$ \\frac{numerator}{denominator} $$"))),
+              tags$tr(tags$td("Greek Letters"), tags$td(code("$$ \\alpha, \\beta, \\mu, \\sigma $$"))),
+              tags$tr(tags$td("Exponents / Superscripts"), tags$td(code("$$ R^2, e^{-x} $$"))),
+              tags$tr(tags$td("Subscripts"), tags$td(code("$$ S_0, X_{max} $$"))),
+              tags$tr(tags$td("Multiplication"), tags$td(code("$$ a \\cdot b \\times c $$")))
+            )
+          ),
+          
+          hr(),
+          h5("Common Examples (Copy & Paste):", style = "color: #6082B6; margin-top: 15px;"),
+          strong("Ricker Model:"), br(),
+          code("$$ R = \\alpha S e^{-\\beta S} $$"), br(), br(),
+          strong("Beverton-Holt Model:"), br(),
+          code("$$ R = \\frac{\\alpha S}{1 + \\frac{\\alpha S}{R_{max}}} $$")
+        )
+      ))
+    })
+                 
       # Helper to handle empty inputs
       show_val <- function(val) { if (is.null(val) || trimws(val) == "") em("Not provided") else val }
 
