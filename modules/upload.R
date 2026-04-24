@@ -179,6 +179,45 @@ upload_ui <- function(id) {
 upload_server <- function(id, db_conn = pool, current_user = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+    # ── Populate Dropdowns with Existing Database Values ──
+    observe({
+      # Helper for regular columns
+      get_distinct <- function(col) {
+        tryCatch({
+          res <- dbGetQuery(db_conn, sprintf("SELECT DISTINCT %s AS val FROM stressor_responses WHERE %s IS NOT NULL", col, col))
+          sort(res$val[res$val != ""])
+        }, error = function(e) character(0))
+      }
+      
+      # Helper for Postgres Array columns (unnests them to get individual tags)
+      get_distinct_array <- function(col) {
+        tryCatch({
+          res <- dbGetQuery(db_conn, sprintf("SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL", col, col))
+          sort(res$val[res$val != ""])
+        }, error = function(e) character(0))
+      }
+
+      # Single value fields
+      updateSelectizeInput(session, "article_type", choices = get_distinct("article_type"), server = FALSE)
+      updateSelectizeInput(session, "response", choices = get_distinct("response"), server = FALSE)
+      updateSelectizeInput(session, "stressor_name", choices = get_distinct("stressor_name"), server = FALSE)
+      updateSelectizeInput(session, "broad_stressor_name", choices = get_distinct("broad_stressor_name"), server = FALSE)
+      updateSelectizeInput(session, "specific_stressor_metric", choices = get_distinct("specific_stressor_metric"), server = FALSE)
+
+      # Multi-value (Array) fields
+      updateSelectizeInput(session, "species_common_name", choices = get_distinct_array("species_common_name"), server = FALSE)
+      updateSelectizeInput(session, "latin_name", choices = get_distinct_array("latin_name"), server = FALSE)
+      updateSelectizeInput(session, "life_stages", choices = get_distinct_array("life_stages"), server = FALSE)
+      updateSelectizeInput(session, "activity", choices = get_distinct_array("activity"), server = FALSE)
+      updateSelectizeInput(session, "season", choices = get_distinct_array("season"), server = FALSE)
+      updateSelectizeInput(session, "location_country", choices = get_distinct_array("location_country"), server = FALSE)
+      updateSelectizeInput(session, "location_state_province", choices = get_distinct_array("location_state_province"), server = FALSE)
+      updateSelectizeInput(session, "location_watershed_lab", choices = get_distinct_array("location_watershed_lab"), server = FALSE)
+      updateSelectizeInput(session, "location_river_creek", choices = get_distinct_array("location_river_creek"), server = FALSE)
+      updateSelectizeInput(session, "function_derivation", choices = get_distinct_array("function_derivation"), server = FALSE)
+    })
+
     output$sr_csv_file_ui <- renderUI({
       fileInput(ns("sr_csv_file"), NULL, accept = ".csv", buttonLabel = "Choose File", placeholder = "No file chosen", width = "100%")
     })
@@ -270,10 +309,11 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       # Handle Confidence Rankings (Convert empty strings back to NA)
       get_conf <- function(val) if (is.null(val) || trimws(val) == "") NA_character_ else trimws(val)
 
-      # Handle comma-separated Postgres Arrays (e.g., "Adult, Fry" -> '{"Adult","Fry"}')
+      # UPDATED: Handle vector to Postgres Arrays (e.g., c("Adult", "Fry") -> '{"Adult","Fry"}')
       to_pg_array <- function(val) {
-        if (is.null(val) || trimws(val) == "") return(NA_character_)
-        parts <- trimws(strsplit(val, ",")[[1]])
+        if (is.null(val) || length(val) == 0) return(NA_character_)
+        # Unlist ensures it works whether Shiny returns a vector or a comma-string
+        parts <- unlist(lapply(val, function(x) trimws(strsplit(x, ",")[[1]])))
         parts <- parts[parts != ""]
         if (length(parts) == 0) return(NA_character_)
         paste0("{", paste(sprintf('"%s"', gsub('"', '\\"', parts, fixed = TRUE)), collapse = ","), "}")
@@ -349,7 +389,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
 
           # Large Text / Description Columns
           input$overview, 
-          to_pg_array_single(input$function_derivation), 
+          to_pg_array(input$function_derivation),  # <-- UPDATED to standard array for the new dropdown!
           input$transferability_of_function, 
           
           # Confidence Rankings
@@ -399,18 +439,22 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
         try({ updateTextInput(session, "citation_title_1", value = "") }, silent = TRUE)
         try({ updateTextInput(session, "citation_url_1", value = "") }, silent = TRUE)
         
+        # UPDATED: Clear text and selectize inputs
         all_text_inputs <- c(
           "title", "article_type", "response", "stressor_name", "broad_stressor_name", 
           "specific_stressor_metric", "species_common_name", "latin_name", "life_stages", 
           "activity", "season", "location_country", "location_state_province", 
           "location_watershed_lab", "location_river_creek", "srf_formula", 
-          "conf_source", "conf_shape", "conf_variance", "conf_applicability", "conf_interactions"
+          "conf_source", "conf_shape", "conf_variance", "conf_applicability", "conf_interactions",
+          "function_derivation"
         )
         for (tid in all_text_inputs) {
+          try({ updateSelectizeInput(session, inputId = tid, selected = character(0)) }, silent = TRUE)
           try({ updateTextInput(session, inputId = tid, value = "") }, silent = TRUE)
         }
         
-        textarea_inputs <- c("overview", "function_derivation", "transferability_of_function", "source_of_stressor_data", "revision_log")
+        # UPDATED: function_derivation removed from here because it's now handled above
+        textarea_inputs <- c("overview", "transferability_of_function", "source_of_stressor_data", "revision_log")
         for (tid in textarea_inputs) {
           try({ updateTextAreaInput(session, inputId = tid, value = "") }, silent = TRUE)
         }
@@ -427,7 +471,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       })
     })
 
-# ── 1. LaTeX Cheat Sheet Modal ──
+    # ── 1. LaTeX Cheat Sheet Modal ──
     observeEvent(input$show_latex_guide, {
       showModal(modalDialog(
         title = tagList(icon("calculator"), " Math Formatting Guide"),
@@ -484,7 +528,10 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       }
                  
       # Helper to handle empty inputs
-      show_val <- function(val) { if (is.null(val) || trimws(val) == "") em("Not provided") else val }
+      show_val <- function(val) { 
+        # UPDATED: Handle vector elements for previewing the new dropdown tags
+        if (is.null(val) || length(val) == 0 || all(trimws(val) == "")) em("Not provided") else paste(val, collapse = ", ") 
+      }
 
       # Build the exact modal matching render_article_ui
       showModal(modalDialog(
@@ -510,10 +557,10 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
               fluidRow(column(4, strong("Specific Stressor Metric:")), column(8, show_val(input$specific_stressor_metric))),
               fluidRow(column(4, strong("Response:")), column(8, show_val(input$response))),
               fluidRow(column(4, strong("Life Stage:")), column(8, show_val(input$life_stages))),
-              if(trimws(input$location_country) != "") fluidRow(column(4, strong("Country:")), column(8, input$location_country)),
-              if(trimws(input$location_state_province) != "") fluidRow(column(4, strong("State / Province:")), column(8, input$location_state_province)),
-              if(trimws(input$location_watershed_lab) != "") fluidRow(column(4, strong("Watershed / Lab:")), column(8, input$location_watershed_lab)),
-              if(trimws(input$location_river_creek) != "") fluidRow(column(4, strong("River / Creek:")), column(8, input$location_river_creek))
+              if(length(input$location_country) > 0 && any(trimws(input$location_country) != "")) fluidRow(column(4, strong("Country:")), column(8, show_val(input$location_country))),
+              if(length(input$location_state_province) > 0 && any(trimws(input$location_state_province) != "")) fluidRow(column(4, strong("State / Province:")), column(8, show_val(input$location_state_province))),
+              if(length(input$location_watershed_lab) > 0 && any(trimws(input$location_watershed_lab) != "")) fluidRow(column(4, strong("Watershed / Lab:")), column(8, show_val(input$location_watershed_lab))),
+              if(length(input$location_river_creek) > 0 && any(trimws(input$location_river_creek) != "")) fluidRow(column(4, strong("River / Creek:")), column(8, show_val(input$location_river_creek)))
             )
           ),
 
@@ -596,5 +643,4 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
     )
   })
 }
-
 # nolint end
