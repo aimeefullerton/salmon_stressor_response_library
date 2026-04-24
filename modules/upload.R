@@ -15,8 +15,15 @@ upload_ui <- function(id) {
     ),
     div(
       id = ns("upload_form"),
-      fluidRow(
-        column(12, h3("Submit New SRF Relationship", style = "text-align: center; color: #6082B6; margin-bottom: 30px;"))
+        fluidRow(
+        column(12, 
+          h3("Submit New SRF Relationship", style = "text-align: center; color: #6082B6; margin-bottom: 10px;"),
+          p(
+            style = "text-align: center; font-size: 1.05em; color: #555; margin-bottom: 30px; padding-left: 15px; padding-right: 15px;",
+            "Fields marked with an asterisk (", strong("*"), ") and the ", strong("SR Curve Data CSV"), " are required.", br(),
+            em("Note: For dropdown menus, you may select an existing option or type your own text to add a new entry to the database.")
+          )
+        )
       ),
 
       # Core Metadata
