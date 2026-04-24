@@ -180,17 +180,17 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    # ── Populate Dropdowns with Existing Database Values ──
+# ── Populate Dropdowns with Existing Database Values ──
     observe({
-      # Helper for regular columns
+      # Helper for regular columns (Added c("", ...) so single-selects start blank!)
       get_distinct <- function(col) {
         tryCatch({
           res <- dbGetQuery(db_conn, sprintf("SELECT DISTINCT %s AS val FROM stressor_responses WHERE %s IS NOT NULL", col, col))
-          sort(res$val[res$val != ""])
-        }, error = function(e) character(0))
+          c("", sort(res$val[res$val != ""])) # <-- Added the empty string here!
+        }, error = function(e) "")
       }
       
-      # Helper for Postgres Array columns (unnests them to get individual tags)
+      # Helper for Postgres Array columns (No empty string needed for multiple=TRUE)
       get_distinct_array <- function(col) {
         tryCatch({
           res <- dbGetQuery(db_conn, sprintf("SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL", col, col))
@@ -198,24 +198,24 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
         }, error = function(e) character(0))
       }
 
-      # Single value fields
-      updateSelectizeInput(session, "article_type", choices = get_distinct("article_type"), server = FALSE)
-      updateSelectizeInput(session, "response", choices = get_distinct("response"), server = FALSE)
-      updateSelectizeInput(session, "stressor_name", choices = get_distinct("stressor_name"), server = FALSE)
-      updateSelectizeInput(session, "broad_stressor_name", choices = get_distinct("broad_stressor_name"), server = FALSE)
-      updateSelectizeInput(session, "specific_stressor_metric", choices = get_distinct("specific_stressor_metric"), server = FALSE)
+      # Single value fields (Added options = list(create = TRUE) to prevent overwriting the UI)
+      updateSelectizeInput(session, "article_type", choices = get_distinct("article_type"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "response", choices = get_distinct("response"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "stressor_name", choices = get_distinct("stressor_name"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "broad_stressor_name", choices = get_distinct("broad_stressor_name"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "specific_stressor_metric", choices = get_distinct("specific_stressor_metric"), server = FALSE, options = list(create = TRUE))
 
       # Multi-value (Array) fields
-      updateSelectizeInput(session, "species_common_name", choices = get_distinct_array("species_common_name"), server = FALSE)
-      updateSelectizeInput(session, "latin_name", choices = get_distinct_array("latin_name"), server = FALSE)
-      updateSelectizeInput(session, "life_stages", choices = get_distinct_array("life_stages"), server = FALSE)
-      updateSelectizeInput(session, "activity", choices = get_distinct_array("activity"), server = FALSE)
-      updateSelectizeInput(session, "season", choices = get_distinct_array("season"), server = FALSE)
-      updateSelectizeInput(session, "location_country", choices = get_distinct_array("location_country"), server = FALSE)
-      updateSelectizeInput(session, "location_state_province", choices = get_distinct_array("location_state_province"), server = FALSE)
-      updateSelectizeInput(session, "location_watershed_lab", choices = get_distinct_array("location_watershed_lab"), server = FALSE)
-      updateSelectizeInput(session, "location_river_creek", choices = get_distinct_array("location_river_creek"), server = FALSE)
-      updateSelectizeInput(session, "function_derivation", choices = get_distinct_array("function_derivation"), server = FALSE)
+      updateSelectizeInput(session, "species_common_name", choices = get_distinct_array("species_common_name"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "latin_name", choices = get_distinct_array("latin_name"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "life_stages", choices = get_distinct_array("life_stages"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "activity", choices = get_distinct_array("activity"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "season", choices = get_distinct_array("season"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "location_country", choices = get_distinct_array("location_country"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "location_state_province", choices = get_distinct_array("location_state_province"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "location_watershed_lab", choices = get_distinct_array("location_watershed_lab"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "location_river_creek", choices = get_distinct_array("location_river_creek"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "function_derivation", choices = get_distinct_array("function_derivation"), server = FALSE, options = list(create = TRUE))
     })
 
     output$sr_csv_file_ui <- renderUI({
