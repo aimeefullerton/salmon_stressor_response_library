@@ -155,9 +155,10 @@ server <- function(input, output, session) {
         {
           paper_row <- paginated_data()[paginated_data()$article_id == mid, , drop = FALSE]
 
-          showModal(modalDialog(
+            showModal(modalDialog(
             title     = paste("Article", mid),
-            render_article_ui(mid, paginated_data()),
+            withMathJax(render_article_ui(mid, paginated_data())),
+            tags$script(HTML("if (window.MathJax) MathJax.Hub.Queue(['Typeset', MathJax.Hub]);")), # <--- Forces MathJax to re-scan!
             easyClose = TRUE,
             size      = "l"
           ))

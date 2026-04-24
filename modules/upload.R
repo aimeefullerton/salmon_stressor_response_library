@@ -15,8 +15,15 @@ upload_ui <- function(id) {
     ),
     div(
       id = ns("upload_form"),
-      fluidRow(
-        column(12, h3("Submit New SRF Relationship", style = "text-align: center; color: #6082B6; margin-bottom: 30px;"))
+        fluidRow(
+        column(12, 
+          h3("Submit New SRF Relationship", style = "text-align: center; color: #6082B6; margin-bottom: 10px;"),
+          p(
+            style = "text-align: center; font-size: 1.05em; color: #555; margin-bottom: 30px; padding-left: 15px; padding-right: 15px;",
+            "Fields marked with an asterisk (", strong("*"), ") and the ", strong("SR Curve Data CSV"), " are required.", br(),
+            em("Note: For dropdown menus, you may select an existing option or type your own text to add a new entry to the database.")
+          )
+        )
       ),
 
       # Core Metadata
@@ -24,8 +31,8 @@ upload_ui <- function(id) {
         column(8, offset = 2, textInput(ns("title"), "Article Title *", placeholder = "Add a short descriptive title", width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("article_type"), "Article Type", placeholder = "e.g., Peer-reviewed, Report", width = "100%")),
-        column(4, textInput(ns("response"), "Response", placeholder = "e.g., Mean System Capacity", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("article_type"), "Article Type *", choices = NULL, options = list(create = TRUE, placeholder = "e.g., Peer-reviewed, Report"), width = "100%")),
+        column(4, selectizeInput(ns("response"), "Response *", choices = NULL, options = list(create = TRUE, placeholder = "e.g., Mean System Capacity"), width = "100%"))
       ),
 
       # CSV Upload
@@ -35,7 +42,7 @@ upload_ui <- function(id) {
           strong("SR Curve Data CSV"),
           uiOutput(ns("sr_csv_file_ui")),
           helpText(
-            "Upload a CSV data file for the SR relationship.",
+            "Upload a CSV data file for the SR relationship. This is required.",
             br(),
             "Required columns: curve.id, stressor.label, stressor.x, units.x, response.label, response.y, units.y.",
             br(),
@@ -50,48 +57,69 @@ upload_ui <- function(id) {
       
       # Stressor Information
       fluidRow(
-        column(4, offset = 2, textInput(ns("stressor_name"), "Stressor Name", placeholder = "e.g., Temperature", width = "100%")),
-        column(4, textInput(ns("broad_stressor_name"), "Broad Stressor Name", placeholder = "e.g., Water Quality", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("stressor_name"), "Stressor Name *", choices = NULL, options = list(create = TRUE, placeholder = "e.g., Temperature"), width = "100%")),
+        column(4, selectizeInput(ns("broad_stressor_name"), "Broad Stressor Name *", choices = NULL, options = list(create = TRUE, placeholder = "e.g., Water Quality"), width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("specific_stressor_metric"), "Specific Stressor Metric", placeholder = "e.g., 7DADM, Celsius, % Capacity", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("specific_stressor_metric"), "Specific Stressor Metric *", choices = NULL, options = list(create = TRUE, placeholder = "e.g., 7DADM, Celsius"), width = "100%"))
       ),
 
-      # Species Info
+      # Species Info (Notice multiple = TRUE can pick/create multiple tags)
       fluidRow(
-        column(4, offset = 2, textInput(ns("species_common_name"), "Species Common Name", placeholder = "e.g., Chinook Salmon. You can put multiple species, seperate with comma", width = "100%")),
-        column(4, textInput(ns("latin_name"), "Latin Name", placeholder = "e.g., Oncorhynchus tshawytscha. You can put multiple species, seperate with comma", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("species_common_name"), "Species Common Name *", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%")),
+        column(4, selectizeInput(ns("latin_name"), "Latin Name *", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("life_stages"), "Life Stages", placeholder = "e.g., Adult, Fry. You can put multiple life stages, seperate with comma", width = "100%")),
-        column(4, textInput(ns("activity"), "Activity", placeholder = "e.g., Migration, Spawning. You can put multiple activities, seperate with comma", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("life_stages"), "Life Stages", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%")),
+        column(4, selectizeInput(ns("activity"), "Activity", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("season"), "Season", placeholder = "e.g., Summer, Fall. You can put multiple seasons, seperate with comma", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("season"), "Season", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%"))
       ),
 
       # Location Info
       fluidRow(
-        column(4, offset = 2, textInput(ns("location_country"), "Country", placeholder = "e.g., USA, Canada. You can put multiple countries, seperate with comma", width = "100%")),
-        column(4, textInput(ns("location_state_province"), "State / Province", placeholder = "e.g., Washington, BC. You can put multiple states or provinces, seperate with comma", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("location_country"), "Country *", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%")),
+        column(4, selectizeInput(ns("location_state_province"), "State / Province", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("location_watershed_lab"), "Watershed / Lab", placeholder = "e.g., Columbia River Basin. You can put multiple Watersheds or Labs, seperate with comma", width = "100%")),
-        column(4, textInput(ns("location_river_creek"), "River / Creek", placeholder = "e.g., Snake River. You can put multiple rivers or creeks, seperate with comma", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("location_watershed_lab"), "Watershed / Lab", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%")),
+        column(4, selectizeInput(ns("location_river_creek"), "River / Creek", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%"))
       ),
 
       # Descriptions & Formulas
       fluidRow(
-        column(8, offset = 2, textAreaInput(ns("overview"), "Overview Description", placeholder = "Comprehensively outline the data, theory, mechanism, and pathway of effects underlying the SR Function. This should be as detailed as possible.", height = "120px", width = "100%"))
+        column(4, offset = 2, selectizeInput(
+          ns("function_derivation"), "Function Derivation", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "e.g., Expert opinion, Mechanistic. Type to search or add..."), width = "100%"))
       ),
       fluidRow(
-        column(8, offset = 2, textAreaInput(ns("function_derivation"), "Function Derivation", placeholder = "Describe the source of the function (e.g., expert opinion, mechanistic). This can have multiple derivations, seperate with comma.", height = "120px", width = "100%"))
+        column(8, offset = 2, textAreaInput(ns("overview"), "Overview Description *", placeholder = "Comprehensively outline the data, theory, mechanism, and pathway of effects underlying the SR Function. This should be as detailed as possible.", height = "120px", width = "100%"))
       ),
       fluidRow(
         column(8, offset = 2, textAreaInput(ns("transferability_of_function"), "Transferability of Function", placeholder = "Describe whether the function can effectively be extended to systems beyond the intended target. Discuss situations where transfer might be unsuitable.", height = "80px", width = "100%"))
       ),
       fluidRow(
-        column(8, offset = 2, textInput(ns("srf_formula"), "SRF Formula", placeholder = "Enter the mathematical formula if applicable", width = "100%"))
+        column(8, offset = 2, 
+          # Custom Label with an invisible button instead of a link
+          div(style = "margin-bottom: 5px; font-weight: bold; display: flex; align-items: center;",
+            "SRF Formula ", 
+            span("(Supports LaTeX math)", style = "font-weight: normal; font-size: 0.8em; color: #666; margin-left: 5px; margin-right: 5px;"),
+            
+            # Using an empty string for the label instead of NULL
+            actionButton(ns("show_latex_guide"), label = "", icon = icon("circle-question"), 
+              style = "background: none; border: none; padding: 0; color: #0073e6; font-size: 1.1em; box-shadow: none;"
+            )
+          ),
+          
+          # Text input with label set to NULL
+          textAreaInput(
+            inputId = ns("srf_formula"), 
+            label = NULL, 
+            placeholder = "Example: $$ y = \\frac{\\alpha}{\\beta + x} $$", 
+            height = "80px",
+            width = "100%"
+          )
+        )
       ),
       fluidRow(
         column(8, offset = 2, textAreaInput(ns("source_of_stressor_data"), "Source of Stressor Data", placeholder = "Describe the source of stressor data needed to apply the function", height = "80px", width = "100%"))
@@ -115,7 +143,7 @@ upload_ui <- function(id) {
 
       # Citations (Dynamic)
       fluidRow(
-        column(8, offset = 2, h4("Citations", style = "margin-top: 20px; border-bottom: 1px solid #ddd; padding-bottom: 5px;"))
+        column(8, offset = 2, h4("Citations *", style = "margin-top: 20px; border-bottom: 1px solid #ddd; padding-bottom: 5px;"))
       ),
       fluidRow(
         column(8, offset = 2,
@@ -158,6 +186,45 @@ upload_ui <- function(id) {
 upload_server <- function(id, db_conn = pool, current_user = NULL) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
+    
+# ── Populate Dropdowns with Existing Database Values ──
+    observe({
+      # Helper for regular columns (Added c("", ...) so single-selects start blank!)
+      get_distinct <- function(col) {
+        tryCatch({
+          res <- dbGetQuery(db_conn, sprintf("SELECT DISTINCT %s AS val FROM stressor_responses WHERE %s IS NOT NULL", col, col))
+          c("", sort(res$val[res$val != ""])) # <-- Added the empty string here!
+        }, error = function(e) "")
+      }
+      
+      # Helper for Postgres Array columns (No empty string needed for multiple=TRUE)
+      get_distinct_array <- function(col) {
+        tryCatch({
+          res <- dbGetQuery(db_conn, sprintf("SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL", col, col))
+          sort(res$val[res$val != ""])
+        }, error = function(e) character(0))
+      }
+
+      # Single value fields (Added options = list(create = TRUE) to prevent overwriting the UI)
+      updateSelectizeInput(session, "article_type", choices = get_distinct("article_type"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "response", choices = get_distinct("response"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "stressor_name", choices = get_distinct("stressor_name"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "broad_stressor_name", choices = get_distinct("broad_stressor_name"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "specific_stressor_metric", choices = get_distinct("specific_stressor_metric"), server = FALSE, options = list(create = TRUE))
+
+      # Multi-value (Array) fields
+      updateSelectizeInput(session, "species_common_name", choices = get_distinct_array("species_common_name"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "latin_name", choices = get_distinct_array("latin_name"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "life_stages", choices = get_distinct_array("life_stages"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "activity", choices = get_distinct_array("activity"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "season", choices = get_distinct_array("season"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "location_country", choices = get_distinct_array("location_country"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "location_state_province", choices = get_distinct_array("location_state_province"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "location_watershed_lab", choices = get_distinct_array("location_watershed_lab"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "location_river_creek", choices = get_distinct_array("location_river_creek"), server = FALSE, options = list(create = TRUE))
+      updateSelectizeInput(session, "function_derivation", choices = get_distinct_array("function_derivation"), server = FALSE, options = list(create = TRUE))
+    })
+
     output$sr_csv_file_ui <- renderUI({
       fileInput(ns("sr_csv_file"), NULL, accept = ".csv", buttonLabel = "Choose File", placeholder = "No file chosen", width = "100%")
     })
@@ -249,10 +316,11 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       # Handle Confidence Rankings (Convert empty strings back to NA)
       get_conf <- function(val) if (is.null(val) || trimws(val) == "") NA_character_ else trimws(val)
 
-      # Handle comma-separated Postgres Arrays (e.g., "Adult, Fry" -> '{"Adult","Fry"}')
+      # UPDATED: Handle vector to Postgres Arrays (e.g., c("Adult", "Fry") -> '{"Adult","Fry"}')
       to_pg_array <- function(val) {
-        if (is.null(val) || trimws(val) == "") return(NA_character_)
-        parts <- trimws(strsplit(val, ",")[[1]])
+        if (is.null(val) || length(val) == 0) return(NA_character_)
+        # Unlist ensures it works whether Shiny returns a vector or a comma-string
+        parts <- unlist(lapply(val, function(x) trimws(strsplit(x, ",")[[1]])))
         parts <- parts[parts != ""]
         if (length(parts) == 0) return(NA_character_)
         paste0("{", paste(sprintf('"%s"', gsub('"', '\\"', parts, fixed = TRUE)), collapse = ","), "}")
@@ -328,7 +396,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
 
           # Large Text / Description Columns
           input$overview, 
-          to_pg_array_single(input$function_derivation), 
+          to_pg_array(input$function_derivation),  # <-- UPDATED to standard array for the new dropdown!
           input$transferability_of_function, 
           
           # Confidence Rankings
@@ -378,18 +446,22 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
         try({ updateTextInput(session, "citation_title_1", value = "") }, silent = TRUE)
         try({ updateTextInput(session, "citation_url_1", value = "") }, silent = TRUE)
         
+        # UPDATED: Clear text and selectize inputs
         all_text_inputs <- c(
           "title", "article_type", "response", "stressor_name", "broad_stressor_name", 
           "specific_stressor_metric", "species_common_name", "latin_name", "life_stages", 
           "activity", "season", "location_country", "location_state_province", 
           "location_watershed_lab", "location_river_creek", "srf_formula", 
-          "conf_source", "conf_shape", "conf_variance", "conf_applicability", "conf_interactions"
+          "conf_source", "conf_shape", "conf_variance", "conf_applicability", "conf_interactions",
+          "function_derivation"
         )
         for (tid in all_text_inputs) {
+          try({ updateSelectizeInput(session, inputId = tid, selected = character(0)) }, silent = TRUE)
           try({ updateTextInput(session, inputId = tid, value = "") }, silent = TRUE)
         }
         
-        textarea_inputs <- c("overview", "function_derivation", "transferability_of_function", "source_of_stressor_data", "revision_log")
+        # UPDATED: function_derivation removed from here because it's now handled above
+        textarea_inputs <- c("overview", "transferability_of_function", "source_of_stressor_data", "revision_log")
         for (tid in textarea_inputs) {
           try({ updateTextAreaInput(session, inputId = tid, value = "") }, silent = TRUE)
         }
@@ -406,24 +478,162 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
       })
     })
 
-    # Preview modal logic (simplified to just display the inputs)
-    observeEvent(input$preview, {
-      req(input$title)
+    # ── 1. LaTeX Cheat Sheet Modal ──
+    observeEvent(input$show_latex_guide, {
       showModal(modalDialog(
-        title = "Preview Your Submission",
-        size = "l",
-        tagList(
-          h4("Title:"), p(input$title),
-          h4("Stressor Name:"), p(input$stressor_name),
-          h4("Species:"), p(input$species_common_name),
-          h4("Location:"), p(paste(input$location_country, input$location_state_province, sep = " - "))
-        ),
+        title = tagList(icon("calculator"), " Math Formatting Guide"),
+        size = "m",
         easyClose = TRUE,
-        footer = modalButton("Close")
+        footer = modalButton("Got it!"),
+        
+        tagList(
+          p("You can format mathematical equations in the SRF Formula box using standard LaTeX syntax. To ensure the math renders correctly, always wrap your equations in double dollar signs: ", code("$$")),
+          
+          tags$table(class = "table table-bordered table-striped table-sm", style = "margin-top: 15px;",
+            tags$thead(tags$tr(
+              tags$th("To get this result...", style = "width: 40%;"), 
+              tags$th("Type exactly this...")
+            )),
+            tags$tbody(
+              tags$tr(tags$td("Fractions"), tags$td(code("$$ \\frac{numerator}{denominator} $$"))),
+              tags$tr(tags$td("Greek Letters"), tags$td(code("$$ \\alpha, \\beta, \\mu, \\sigma $$"))),
+              tags$tr(tags$td("Exponents / Superscripts"), tags$td(code("$$ R^2, e^{-x} $$"))),
+              tags$tr(tags$td("Subscripts"), tags$td(code("$$ S_0, X_{max} $$"))),
+              tags$tr(tags$td("Multiplication"), tags$td(code("$$ a \\cdot b \\times c $$")))
+            )
+          ),
+          
+          hr(),
+          h5("Common Examples (Copy & Paste):", style = "color: #6082B6; margin-top: 15px;"),
+          strong("Ricker Model:"), br(),
+          code("$$ R = \\alpha S e^{-\\beta S} $$"), br(), br(),
+          strong("Beverton-Holt Model:"), br(),
+          code("$$ R = \\frac{\\alpha S}{1 + \\frac{\\alpha S}{R_{max}}} $$")
+        )
       ))
     })
 
-    # CSV Template Download
+    # ── 2. Preview modal logic (1:1 WYSIWYG matched to render_article_ui) ──
+    observeEvent(input$preview, {
+      req(input$title)
+      
+      # Dynamically grab all the citations the user added so far
+      cit_list <- tagList()
+      for (i in 1:citation_count()) {
+        c_text <- input[[paste0("citation_text_", i)]]
+        c_title <- input[[paste0("citation_title_", i)]]
+        c_url <- input[[paste0("citation_url_", i)]]
+        
+        if (!is.null(c_text) && trimws(c_text) != "") {
+          link_tag <- if (!is.null(c_url) && trimws(c_url) != "") {
+            tags$a(href = c_url, target = "_blank", if (!is.null(c_title) && trimws(c_title) != "") c_title else "Link")
+          } else {
+            span(if (!is.null(c_title)) c_title else "")
+          }
+          cit_list <- tagAppendChild(cit_list, tags$li(c_text, " ", link_tag))
+        }
+      }
+                 
+      # Helper to handle empty inputs
+      show_val <- function(val) { 
+        # UPDATED: Handle vector elements for previewing the new dropdown tags
+        if (is.null(val) || length(val) == 0 || all(trimws(val) == "")) em("Not provided") else paste(val, collapse = ", ") 
+      }
+
+      # Build the exact modal matching render_article_ui
+      showModal(modalDialog(
+        title = "Preview: Final Submission Layout",
+        size = "xl", 
+        easyClose = TRUE,
+        footer = modalButton("Close Preview"),
+        
+        tagList(
+          # ── Title ──
+          fluidRow(
+            column(12, align = "center", tags$h3(input$title, style = "margin-top: 10px; margin-bottom: 20px;"))
+          ),
+
+          # ── Article Metadata ──
+          div(
+            style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #f8f9fa; border-radius: 8px;",
+            tags$strong("Article Metadata ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
+            div(style = "font-size:1.1em;",
+              fluidRow(column(4, strong("Species Common Name:")), column(8, show_val(input$species_common_name))),
+              fluidRow(column(4, strong("Latin Name (Genus species):")), column(8, em(show_val(input$latin_name)))),
+              fluidRow(column(4, strong("Stressor Name:")), column(8, show_val(input$stressor_name))),
+              fluidRow(column(4, strong("Specific Stressor Metric:")), column(8, show_val(input$specific_stressor_metric))),
+              fluidRow(column(4, strong("Response:")), column(8, show_val(input$response))),
+              fluidRow(column(4, strong("Life Stage:")), column(8, show_val(input$life_stages))),
+              if(length(input$location_country) > 0 && any(trimws(input$location_country) != "")) fluidRow(column(4, strong("Country:")), column(8, show_val(input$location_country))),
+              if(length(input$location_state_province) > 0 && any(trimws(input$location_state_province) != "")) fluidRow(column(4, strong("State / Province:")), column(8, show_val(input$location_state_province))),
+              if(length(input$location_watershed_lab) > 0 && any(trimws(input$location_watershed_lab) != "")) fluidRow(column(4, strong("Watershed / Lab:")), column(8, show_val(input$location_watershed_lab))),
+              if(length(input$location_river_creek) > 0 && any(trimws(input$location_river_creek) != "")) fluidRow(column(4, strong("River / Creek:")), column(8, show_val(input$location_river_creek)))
+            )
+          ),
+
+          # ── Description & Function Details ──
+          div(
+            style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
+            tags$strong("Description & Function Details ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
+            div(style = "font-size:1.1em;",
+              strong("Detailed SR Function Description"), br(), p(show_val(input$overview)),
+              strong("Function Derivation"), br(), p(show_val(input$function_derivation)),
+              if(trimws(input$transferability_of_function) != "") tagList(strong("Transferability"), br(), p(input$transferability_of_function)),
+              if(trimws(input$srf_formula) != "") tagList(strong("SRF Formula"), br(), withMathJax(p(input$srf_formula)))
+            )
+          ),
+
+          # ── Confidence Rankings ──
+          div(
+            style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
+            tags$strong("Confidence Rankings & Uncertainty ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
+            div(style = "font-size:1.1em;",
+              tags$table(class = "table table-bordered table-sm",
+                tags$thead(tags$tr(tags$th("Metric"), tags$th("Rank"))),
+                tags$tbody(
+                  tags$tr(tags$td("Data Source"), tags$td(show_val(input$conf_source))),
+                  tags$tr(tags$td("Shape"), tags$td(show_val(input$conf_shape))),
+                  tags$tr(tags$td("Variance"), tags$td(show_val(input$conf_variance))),
+                  tags$tr(tags$td("Applicability"), tags$td(show_val(input$conf_applicability))),
+                  tags$tr(tags$td("Interactions"), tags$td(show_val(input$conf_interactions)))
+                )
+              )
+            )
+          ),
+
+          # ── Citations ──
+          div(
+            style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px;",
+            tags$strong("Citation(s) ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
+            div(style = "font-size:1.1em;",
+              if (length(cit_list$children) > 0) tags$ul(cit_list) else p(em("No citations added yet."))
+            )
+          ),
+
+          # ── CSV Data Table (Placeholder) ──
+          div(
+            style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px; opacity: 0.7;",
+            tags$strong("Stressor Response Data ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
+            div(style = "font-size:1.1em; text-align: center; padding: 20px;",
+              icon("table", "fa-2x"), br(),
+              em("A preview of the uploaded CSV data table will render here in the final dashboard.")
+            )
+          ),
+
+          # ── Interactive Plot (Placeholder) ──
+          div(
+            style = "border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; background-color: #ffffff; border-radius: 8px; opacity: 0.7;",
+            tags$strong("Stressor Response Chart ▼", class = "section-title", style = "display:block; margin-bottom:15px; color:#0073e6; font-size:1.1em;"),
+            div(style = "font-size:1.1em; text-align: center; padding: 20px;",
+              icon("chart-line", "fa-2x"), br(),
+              em("An interactive Plotly chart will automatically render here based on your uploaded CSV data.")
+            )
+          )
+        )
+      ))
+    })
+
+    # ── 3. CSV Template Download ──
     output$download_csv_template <- downloadHandler(
       filename = function() { paste0("SRF_template_", Sys.Date(), ".csv") },
       content = function(file) {
@@ -440,5 +650,4 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
     )
   })
 }
-
 # nolint end

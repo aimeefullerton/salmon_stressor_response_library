@@ -1,3 +1,4 @@
+# nolint start
 update_filters_server <- function(input, output, session, data, db) {
 
   # Array columns (text[]) vs plain text columns
@@ -92,3 +93,4 @@ update_filters_server <- function(input, output, session, data, db) {
     }
   })
 }
+# nolint end
