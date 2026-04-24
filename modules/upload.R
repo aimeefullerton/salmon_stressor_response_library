@@ -24,8 +24,8 @@ upload_ui <- function(id) {
         column(8, offset = 2, textInput(ns("title"), "Article Title *", placeholder = "Add a short descriptive title", width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("article_type"), "Article Type *", placeholder = "e.g., Peer-reviewed, Report", width = "100%")),
-        column(4, textInput(ns("response"), "Response *", placeholder = "e.g., Mean System Capacity", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("article_type"), "Article Type *", choices = NULL, options = list(create = TRUE, placeholder = "e.g., Peer-reviewed, Report"), width = "100%")),
+        column(4, selectizeInput(ns("response"), "Response *", choices = NULL, options = list(create = TRUE, placeholder = "e.g., Mean System Capacity"), width = "100%"))
       ),
 
       # CSV Upload
@@ -50,39 +50,40 @@ upload_ui <- function(id) {
       
       # Stressor Information
       fluidRow(
-        column(4, offset = 2, textInput(ns("stressor_name"), "Stressor Name *", placeholder = "e.g., Temperature", width = "100%")),
-        column(4, textInput(ns("broad_stressor_name"), "Broad Stressor Name *", placeholder = "e.g., Water Quality", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("stressor_name"), "Stressor Name *", choices = NULL, options = list(create = TRUE, placeholder = "e.g., Temperature"), width = "100%")),
+        column(4, selectizeInput(ns("broad_stressor_name"), "Broad Stressor Name *", choices = NULL, options = list(create = TRUE, placeholder = "e.g., Water Quality"), width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("specific_stressor_metric"), "Specific Stressor Metric *", placeholder = "e.g., 7DADM, Celsius, % Capacity", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("specific_stressor_metric"), "Specific Stressor Metric *", choices = NULL, options = list(create = TRUE, placeholder = "e.g., 7DADM, Celsius"), width = "100%"))
       ),
 
-      # Species Info
+      # Species Info (Notice multiple = TRUE can pick/create multiple tags)
       fluidRow(
-        column(4, offset = 2, textInput(ns("species_common_name"), "Species Common Name *", placeholder = "e.g., Chinook Salmon. You can put multiple species, seperate with comma", width = "100%")),
-        column(4, textInput(ns("latin_name"), "Latin Name *", placeholder = "e.g., Oncorhynchus tshawytscha. You can put multiple species, seperate with comma", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("species_common_name"), "Species Common Name *", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%")),
+        column(4, selectizeInput(ns("latin_name"), "Latin Name *", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("life_stages"), "Life Stages", placeholder = "e.g., Adult, Fry. You can put multiple life stages, seperate with comma", width = "100%")),
-        column(4, textInput(ns("activity"), "Activity", placeholder = "e.g., Migration, Spawning. You can put multiple activities, seperate with comma", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("life_stages"), "Life Stages", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%")),
+        column(4, selectizeInput(ns("activity"), "Activity", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("season"), "Season", placeholder = "e.g., Summer, Fall. You can put multiple seasons, seperate with comma", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("season"), "Season", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%"))
       ),
 
       # Location Info
       fluidRow(
-        column(4, offset = 2, textInput(ns("location_country"), "Country *", placeholder = "e.g., USA, Canada. You can put multiple countries, seperate with comma", width = "100%")),
-        column(4, textInput(ns("location_state_province"), "State / Province", placeholder = "e.g., Washington, BC. You can put multiple states or provinces, seperate with comma", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("location_country"), "Country *", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%")),
+        column(4, selectizeInput(ns("location_state_province"), "State / Province", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%"))
       ),
       fluidRow(
-        column(4, offset = 2, textInput(ns("location_watershed_lab"), "Watershed / Lab", placeholder = "e.g., Columbia River Basin. You can put multiple Watersheds or Labs, seperate with comma", width = "100%")),
-        column(4, textInput(ns("location_river_creek"), "River / Creek", placeholder = "e.g., Snake River. You can put multiple rivers or creeks, seperate with comma", width = "100%"))
+        column(4, offset = 2, selectizeInput(ns("location_watershed_lab"), "Watershed / Lab", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%")),
+        column(4, selectizeInput(ns("location_river_creek"), "River / Creek", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "Type to search or add..."), width = "100%"))
       ),
 
       # Descriptions & Formulas
-            fluidRow(
-        column(4, offset = 2, textAreaInput(ns("function_derivation"), "Function Derivation", placeholder = "Describe the source of the function (e.g., expert opinion, mechanistic). You can put multiple derivation methods, seperate with comma.", height = "120px", width = "100%"))
+      fluidRow(
+        column(8, offset = 2, selectizeInput(
+          ns("function_derivation"), "Function Derivation", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "e.g., Expert opinion, Mechanistic. Type to search or add..."), width = "100%"))
       ),
       fluidRow(
         column(8, offset = 2, textAreaInput(ns("overview"), "Overview Description *", placeholder = "Comprehensively outline the data, theory, mechanism, and pathway of effects underlying the SR Function. This should be as detailed as possible.", height = "120px", width = "100%"))
