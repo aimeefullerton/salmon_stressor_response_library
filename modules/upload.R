@@ -82,7 +82,7 @@ upload_ui <- function(id) {
 
       # Descriptions & Formulas
       fluidRow(
-        column(8, offset = 2, selectizeInput(
+        column(4, offset = 2, selectizeInput(
           ns("function_derivation"), "Function Derivation", choices = NULL, multiple = TRUE, options = list(create = TRUE, placeholder = "e.g., Expert opinion, Mechanistic. Type to search or add..."), width = "100%"))
       ),
       fluidRow(
