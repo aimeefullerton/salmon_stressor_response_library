@@ -115,7 +115,7 @@ server <- function(input, output, session) {
   setup_download_csv(output, filtered_data, paginated_data, db, input, session)
   
 # ── Admin Upload Tab (Protected by Posit Connect) ────────────────────────
-  admin_users <- c("aimee.fullerton", "paxton.calhoun") 
+  admin_users <- c("aimee.fullerton", "paxton.calhoun", "morgan.bond") 
 
   observe({
     req(session$user) 
