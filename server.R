@@ -78,6 +78,14 @@ server <- function(input, output, session) {
   output$page_info_top <- renderText(pagination$page_info())
   output$page_info_bottom <- renderText(pagination$page_info())
 
+  print("==== DATA DIAGNOSTIC ====")
+  print(paste("Class of species column:", class(data$species_common_name)))
+  print("Oldest 3 Species entries (Original Data):")
+  print(head(data$species_common_name, 3))
+  print("Newest 3 Species entries (Admin Uploaded Data):")
+  print(tail(data$species_common_name, 3))
+  print("=========================")
+
   # ── Modules ────────────────────────────────────────────────────────────────
   update_filters_server(input, output, session, data, db)
   toggle_filters_server(input, session)
