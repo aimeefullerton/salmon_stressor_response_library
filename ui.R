@@ -87,8 +87,16 @@ ui <- navbarPage(
           )
         ),
         
-conditionalPanel(
+    conditionalPanel(
           condition = "input.toggle_filters % 2 == 1",
+          fluidRow(
+              column(12, 
+              actionButton("apply_cascading", "Update Filter Options", 
+                   class = "btn-info btn-sm w-100", 
+                   icon = icon("sync")),
+      tags$small("Click this after selecting values to see only relevant options in other filters.")
+    )
+  ),
           fluidRow(
             column(3, selectizeInput("stressor", "Stressor Name", choices = NULL, multiple = TRUE)),
             column(3, selectizeInput("stressor_metric", "Stressor Metric", choices = NULL, multiple = TRUE)),
