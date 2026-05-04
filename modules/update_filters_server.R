@@ -1,12 +1,14 @@
 # nolint start
 update_filters_server <- function(input, output, session, data, db) {
 
+  # 1. Define array columns
   array_cols <- c(
     "species_common_name", "latin_name", "life_stages", "activity", "season",
     "location_country", "location_state_province",
     "location_watershed_lab", "location_river_creek", "function_derivation"
   )
 
+  # 2. Map IDs to columns
   filter_specs <- list(
     list(id = "stressor", col = "stressor_name"),
     list(id = "stressor_metric", col = "specific_stressor_metric"),
@@ -22,6 +24,7 @@ update_filters_server <- function(input, output, session, data, db) {
     list(id = "broad_stressor_name", col = "broad_stressor_name")
   )
 
+  # Helper: Apply a single filter
   apply_filter <- function(df, vals, col) {
     if (is.null(vals) || length(vals) == 0) return(df)
     if (col %in% array_cols) {
@@ -36,59 +39,46 @@ update_filters_server <- function(input, output, session, data, db) {
     df[keep, ]
   }
 
+  # Helper: Extract unique choices
   get_dynamic_vals <- function(df, col) {
     if (nrow(df) == 0) return(character(0))
     clean_cells <- df[[col]][!is.na(df[[col]]) & df[[col]] != ""]
-    
     if (col %in% array_cols) {
-      parts <- unlist(lapply(clean_cells, function(x) {
-        trimws(strsplit(as.character(x), ",")[[1]])
-      }))
+      parts <- unlist(lapply(clean_cells, function(x) trimws(strsplit(as.character(x), ",")[[1]])))
       vals <- unique(parts)
     } else {
       vals <- unique(clean_cells)
     }
-    
     vals <- vals[vals != "" & vals != "NA" & vals != "NULL"]
     return(sort(vals))
   }
 
-# nolint start
-update_filters_server <- function(input, output, session, data, db) {
-
-  # ... (Keep the array_cols, filter_specs, apply_filter, and get_dynamic_vals helpers exactly as they are) ...
-
+  # 3. Reactive Observer for Cascading Filters
   observe({
+    # Only run if dashboard is visible
     req(input$main_navbar == "dashboard")
     
-    # THE KEY: Isolate the input check so the update doesn't trigger itself
-    current_inputs <- isolate({
-      lapply(filter_specs, function(spec) input[[spec$id]])
-    })
+    # Capture current selections
+    current_inputs <- lapply(filter_specs, function(spec) input[[spec$id]])
     names(current_inputs) <- sapply(filter_specs, function(s) s$id)
 
     for (spec in filter_specs) {
-      # 1. Calculate what the choices SHOULD be
+      # Calculate valid choices based on ALL OTHER filters
       df_sub <- data
       for (other_spec in filter_specs) {
         if (other_spec$id != spec$id) {
-          val <- current_inputs[[other_spec$id]]
-          df_sub <- apply_filter(df_sub, val, other_spec$col)
+          df_sub <- apply_filter(df_sub, current_inputs[[other_spec$id]], other_spec$col)
         }
       }
 
-      lookup_vals <- get_dynamic_vals(data, spec$col)
-      dynamic_vals <- get_dynamic_vals(df_sub, spec$col)
-      valid_choices <- lookup_vals[lookup_vals %in% dynamic_vals]
-
-      # 2. THE FIX: Freeze the input. 
-      # This prevents the "jumping/glitching" by telling Shiny 
-      # NOT to trigger a data refresh just because the choices list changed.
+      valid_choices <- get_dynamic_vals(df_sub, spec$col)
+      
+      # Tell Shiny to 'Freeze' this input.
       freezeReactiveValue(input, spec$id)
-
+      
       updateSelectizeInput(session, spec$id,
         choices  = valid_choices,
-        selected = current_inputs[[spec$id]], # Keep what the user actually clicked
+        selected = current_inputs[[spec$id]],
         server   = TRUE 
       )
     }
