@@ -97,26 +97,28 @@ ui <- navbarPage(
       tags$small("Click this after selecting values to see only relevant options in other filters.")
     )
   ),
-          fluidRow(
-            column(3, selectizeInput("stressor", "Stressor Name", choices = NULL, multiple = TRUE)),
-            column(3, selectizeInput("stressor_metric", "Stressor Metric", choices = NULL, multiple = TRUE)),
-            column(3, selectizeInput("species", "Species Common Name", choices = NULL, multiple = TRUE)),
-            column(3, selectizeInput("broad_stressor_name", "Broad Stressor Name", choices = NULL, multiple = TRUE))
-          ),
-          fluidRow(
-            column(3, selectizeInput("life_stage", "Life Stage", choices = NULL, multiple = TRUE)),
-            column(3, selectizeInput("activity", "Activity", choices = NULL, multiple = TRUE)),
-            column(3, selectizeInput("latin_name", "Latin Name", choices = NULL, multiple = TRUE))
-          ),
-          fluidRow(
-            column(3, selectizeInput("article_type", "Article Type", choices = NULL, multiple = TRUE)),
-            column(3, selectizeInput("location_country", "Country", choices = NULL, multiple = TRUE)),
-            column(3, selectizeInput("location_state_province", "State / Province", choices = NULL, multiple = TRUE)),
-            column(3, selectizeInput("location_watershed_lab", "Watershed / Lab", choices = NULL, multiple = TRUE))
-          ),
-          fluidRow(
-            column(3, selectizeInput("location_river_creek", "River / Creek", choices = NULL, multiple = TRUE))
-          ),
+fluidRow(
+  column(3, selectizeInput("stressor", "Stressor Name", choices = stressor_names, multiple = TRUE)),
+  column(3, selectizeInput("stressor_metric", "Stressor Metric", choices = stressor_metrics, multiple = TRUE)),
+  column(3, selectizeInput("species", "Species Common Name", choices = species_names, multiple = TRUE)),
+  column(3, selectizeInput("broad_stressor_name", "Broad Stressor Name", choices = broad_stressor_names, multiple = TRUE))
+),
+fluidRow(
+  column(3, selectizeInput("life_stage", "Life Stage", choices = life_stages, multiple = TRUE)),
+  column(3, selectizeInput("activity", "Activity", choices = activities, multiple = TRUE)),
+  column(3, selectizeInput("latin_name", "Latin Name", choices = latin_name, multiple = TRUE)),
+  column(3, selectizeInput("season", "Season", choices = NULL, multiple = TRUE)) # Added
+),
+fluidRow(
+  column(3, selectizeInput("article_type", "Article Type", choices = article_types, multiple = TRUE)),
+  column(3, selectizeInput("location_country", "Country", choices = location_countries, multiple = TRUE)),
+  column(3, selectizeInput("location_state_province", "State / Province", choices = location_states_provinces, multiple = TRUE)),
+  column(3, selectizeInput("location_watershed_lab", "Watershed / Lab", choices = location_watersheds_labs, multiple = TRUE))
+),
+fluidRow(
+  column(3, selectizeInput("location_river_creek", "River / Creek", choices = location_rivers_creeks, multiple = TRUE)),
+  column(3, selectizeInput("function_derivation", "Function Derivation", choices = NULL, multiple = TRUE)) # Added
+),
           fluidRow(
             column(12, div(
               style = "text-align: right;",
