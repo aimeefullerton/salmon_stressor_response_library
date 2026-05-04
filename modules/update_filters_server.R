@@ -1,6 +1,7 @@
 # nolint start
 update_filters_server <- function(input, output, session, data, db) {
 
+  # 1. Standard config (Keep as is)
   array_cols <- c(
     "species_common_name", "latin_name", "life_stages", "activity", "season",
     "location_country", "location_state_province",
@@ -22,6 +23,7 @@ update_filters_server <- function(input, output, session, data, db) {
     list(id = "broad_stressor_name", col = "broad_stressor_name")
   )
 
+  # ... (Keep apply_filter and get_dynamic_vals helpers exactly as they are) ...
   apply_filter <- function(df, vals, col) {
     if (is.null(vals) || length(vals) == 0) return(df)
     if (col %in% array_cols) {
@@ -49,30 +51,38 @@ update_filters_server <- function(input, output, session, data, db) {
     return(sort(vals))
   }
 
-  # 1. INITIAL POPULATION: This runs exactly once when the app starts
-  # It fills the dropdowns with every possible choice from the database.
-  for (spec in filter_specs) {
-    choices <- get_dynamic_vals(data, spec$col)
-    updateSelectizeInput(session, spec$id, choices = choices, server = TRUE)
-  }
+  # 2. THE SECRET SAUCE: Debounced Input Watcher
+  # This collects all filter inputs into one bucket and waits 800ms 
+  # after the last click before telling the server to update choices.
+  to_watch <- reactive({
+    lapply(filter_specs, function(s) input[[s$id]])
+  })
+  
+  # Wait for 800ms of "silence" before triggering cascading updates
+  debounced_watch <- to_watch %>% debounce(800)
 
-  # 2. MANUAL UPDATE: This ONLY runs when the user clicks the "Update Filter Options" button
-  # This breaks the "Glitching" loop by giving you control over when updates happen.
-  observeEvent(input$apply_cascading, {
-    # Show a small loading message
-    showNotification("Updating filter options...", id = "filter_note", duration = 2, type = "message")
+  # 3. Automatic Cascading Observer
+  observeEvent(debounced_watch(), {
+    req(input$main_navbar == "dashboard")
     
-    current_selections <- lapply(filter_specs, function(spec) input[[spec$id]])
+    # Get the static values currently in the inputs
+    current_selections <- isolate(to_watch())
     names(current_selections) <- sapply(filter_specs, function(s) s$id)
 
     for (spec in filter_specs) {
+      # Calculate subset of valid data based on OTHER selections
       df_sub <- data
       for (other_spec in filter_specs) {
         if (other_spec$id != spec$id) {
           df_sub <- apply_filter(df_sub, current_selections[[other_spec$id]], other_spec$col)
         }
       }
+
       valid_choices <- get_dynamic_vals(df_sub, spec$col)
+      
+      # Stop the loop: only update if the choices are actually different
+      # We use 'freeze' to keep the UI from jumping
+      freezeReactiveValue(input, spec$id)
       
       updateSelectizeInput(session, spec$id,
         choices  = valid_choices,
@@ -80,6 +90,6 @@ update_filters_server <- function(input, output, session, data, db) {
         server   = TRUE 
       )
     }
-  })
+  }, ignoreInit = FALSE)
 }
 # nolint end
