@@ -1,7 +1,7 @@
 # nolint start
 update_filters_server <- function(input, output, session, data, db) {
 
-  # 1. Define exactly which columns contain comma-separated arrays
+  # 1. Define exactly which columns are Postgres Arrays
   array_cols <- c(
     "species_common_name", "latin_name", "life_stages", "activity", "season",
     "location_country", "location_state_province",
@@ -10,97 +10,59 @@ update_filters_server <- function(input, output, session, data, db) {
 
   # 2. Map the UI input IDs to the database column names
   filter_specs <- list(
-    stressor = list(input_id = "stressor", column = "stressor_name"),
-    stressor_metric = list(input_id = "stressor_metric", column = "specific_stressor_metric"),
-    species = list(input_id = "species", column = "species_common_name"),
-    life_stage = list(input_id = "life_stage", column = "life_stages"),
-    activity = list(input_id = "activity", column = "activity"),
-    latin_name = list(input_id = "latin_name", column = "latin_name"),
-    article_type = list(input_id = "article_type", column = "article_type"),
-    location_country = list(input_id = "location_country", column = "location_country"),
-    location_state_province = list(input_id = "location_state_province", column = "location_state_province"),
-    location_watershed_lab = list(input_id = "location_watershed_lab", column = "location_watershed_lab"),
-    location_river_creek = list(input_id = "location_river_creek", column = "location_river_creek"),
-    broad_stressor_name = list(input_id = "broad_stressor_name", column = "broad_stressor_name")
+    list(id = "stressor", col = "stressor_name"),
+    list(id = "stressor_metric", col = "specific_stressor_metric"),
+    list(id = "species", col = "species_common_name"),
+    list(id = "life_stage", col = "life_stages"),
+    list(id = "activity", col = "activity"),
+    list(id = "latin_name", col = "latin_name"),
+    list(id = "article_type", col = "article_type"),
+    list(id = "location_country", col = "location_country"),
+    list(id = "location_state_province", col = "location_state_province"),
+    list(id = "location_watershed_lab", col = "location_watershed_lab"),
+    list(id = "location_river_creek", col = "location_river_creek"),
+    list(id = "broad_stressor_name", col = "broad_stressor_name")
   )
 
-  # Helper: Apply a single filter to the dataframe
-  apply_filter <- function(df, vals, col) {
-    if (is.null(vals) || length(vals) == 0) return(df)
-    
-    if (col %in% array_cols) {
-      keep <- vapply(df[[col]], function(cell) {
-        if (is.na(cell) || !nzchar(cell)) return(FALSE)
-        # Safely split by comma and trim whitespace so old and new data matches perfectly
-        cell_parts <- trimws(strsplit(as.character(cell), ",")[[1]])
-        any(cell_parts %in% vals)
-      }, logical(1))
-    } else {
-      keep <- df[[col]] %in% vals
-    }
-    df[keep, ]
-  }
-
-  # Helper: Extract unique, clean choices from a column
-  get_dynamic_vals <- function(df, col) {
-    if (nrow(df) == 0) return(character(0))
-    
-    clean_cells <- df[[col]][!is.na(df[[col]]) & df[[col]] != ""]
-    
-    if (col %in% array_cols) {
-      # Flatten comma-separated rows into individual tags
-      parts <- unlist(lapply(clean_cells, function(x) {
-        trimws(strsplit(as.character(x), ",")[[1]])
-      }))
-      vals <- unique(parts)
-    } else {
-      vals <- unique(clean_cells)
-    }
-    
-    vals <- vals[vals != "" & vals != "NA" & vals != "NULL"]
-    return(sort(vals))
-  }
-
-  # 3. The main observer that listens to inputs and cascades the filters!
-  observe({
-    # Only run this heavy logic if the user is actually looking at the dashboard tab
-    req(input$main_navbar == "dashboard")
-
-    # Capture the current state of all filter dropdowns
-    current_inputs <- lapply(filter_specs, function(spec) {
-      input[[spec$input_id]]
-    })
-    names(current_inputs) <- names(filter_specs)
-
-    # Update each filter one by one based on what else is selected
-    for (name in names(filter_specs)) {
-      spec <- filter_specs[[name]]
-
-      # A) Filter the data based on ALL OTHER selections
-      df_sub <- data
-      for (other_name in names(filter_specs)) {
-        if (other_name != name) {
-          other_spec <- filter_specs[[other_name]]
-          val <- current_inputs[[other_name]]
-          df_sub <- apply_filter(df_sub, val, other_spec$column)
-        }
+  # 3. Query PostgreSQL directly for the choices
+  get_live_db_choices <- function(col_name) {
+    tryCatch({
+      
+      # Ask Postgres to unnest the array and give us distinct values
+      if (col_name %in% array_cols) {
+        query <- sprintf("SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL", col_name, col_name)
+      } else {
+        # Standard distinct query for plain text columns
+        query <- sprintf("SELECT DISTINCT %s AS val FROM stressor_responses WHERE %s IS NOT NULL", col_name, col_name)
       }
 
-      # B) Extract full universe of choices (unfiltered)
-      lookup_vals <- get_dynamic_vals(data, spec$column)
+      # Fire the query directly to the database
+      res <- dbGetQuery(db, query)
 
-      # C) Extract subset of choices (filtered)
-      dynamic_vals <- get_dynamic_vals(df_sub, spec$column)
+      # Clean up the SQL results
+      vals <- unlist(res$val) 
+      vals <- as.character(vals)
+      vals <- trimws(vals)
+      
+      # Remove any garbage values that might exist in the database
+      vals <- vals[!is.na(vals) & vals != "" & vals != "NA" & vals != "NULL"]
 
-      # D) Only show choices that exist in both
-      valid_choices <- lookup_vals[lookup_vals %in% dynamic_vals]
+      return(sort(unique(vals)))
+      
+    }, error = function(e) {
+      print(paste("❌ Live DB Query Failed for", col_name, ":", e$message))
+      return(character(0))
+    })
+  }
 
-      # E) Update UI with the cascading options
-      updatePickerInput(session, spec$input_id,
-        choices  = valid_choices,
-        selected = intersect(current_inputs[[name]], valid_choices)
-      )
+  # 4. Populate the filters IMMEDIATELY on load using live database calls
+  for (spec in filter_specs) {
+    choices <- get_live_db_choices(spec$col)
+    
+    if (length(choices) > 0) {
+      updatePickerInput(session, inputId = spec$id, choices = choices)
     }
-  })
+  }
+
 }
 # nolint end
