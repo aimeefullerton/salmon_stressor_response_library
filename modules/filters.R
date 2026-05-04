@@ -4,8 +4,8 @@
 match_array_col <- function(col, selected) {
   vapply(col, function(cell) {
     if (is.na(cell) || !nzchar(cell)) return(FALSE)
-    # Split the string back into individual items using the comma-space
-    cell_parts <- strsplit(as.character(cell), ", ")[[1]]
+    # Split by comma and trim whitespace (matches server logic)
+    cell_parts <- trimws(strsplit(as.character(cell), ",")[[1]])
     any(cell_parts %in% selected)
   }, logical(1), USE.NAMES = FALSE)
 }
