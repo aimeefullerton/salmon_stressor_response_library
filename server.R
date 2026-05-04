@@ -54,30 +54,37 @@ server <- function(input, output, session) {
       })
     })
 }
+  
 # ── Filter dropdowns ───────────────────────────────────────────────────────
   getCategoryChoices <- function(column_name) {
-    # 1. Fallback if column doesn't exist
-    if (!column_name %in% names(data)) return(character(0))
-    
-    # 2. Extract the column directly from the pre-loaded 'data' dataframe
-    vals <- data[[column_name]]
-    vals <- vals[!is.na(vals) & vals != ""]
-    
-    # 3. Array columns were collapsed into comma-separated strings (e.g. "Adult, Fry") 
-    # during the initial data load, so we split them back up to get individual tags.
+    # 1. Define exactly which columns are Postgres Arrays (Multi-selects)
     array_cols <- c("species_common_name", "latin_name", "life_stages", "activity", 
                     "season", "location_country", "location_state_province", 
                     "location_watershed_lab", "location_river_creek", "function_derivation")
     
-    if (column_name %in% array_cols) {
-      vals <- unlist(strsplit(vals, ",\\s*"))
-    }
-    
-    # 4. Clean and sort
-    vals <- trimws(vals)
-    vals <- vals[vals != "" & vals != "NA" & vals != "N/A"]
-    
-    return(sort(unique(vals)))
+    tryCatch({
+      # 2. Use the correct SQL depending on the column type
+      if (column_name %in% array_cols) {
+        # Unpacks Arrays into individual tags
+        query <- sprintf("SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL", column_name, column_name)
+      } else {
+        # Standard query for Text columns
+        query <- sprintf("SELECT DISTINCT %s AS val FROM stressor_responses WHERE %s IS NOT NULL", column_name, column_name)
+      }
+      
+      # 3. Fetch from DB
+      res <- dbGetQuery(db, query)
+      
+      # 4. Clean up the results
+      vals <- res$val
+      vals <- vals[!is.na(vals) & vals != "" & vals != "NA" & vals != "N/A"]
+      
+      return(sort(unique(vals)))
+      
+    }, error = function(e) {
+      # If one fails, fail gracefully so it doesn't break the other filters
+      return(character(0)) 
+    })
   }
 
   updateFilterDropdowns <- function() {
@@ -96,21 +103,24 @@ server <- function(input, output, session) {
       "broad_stressor_name"     = "broad_stressor_name"
     )
     for (input_id in names(cols)) {
-      updatePickerInput(session, input_id, choices = getCategoryChoices(cols[[input_id]]))
+      try({
+        updatePickerInput(session, input_id, choices = getCategoryChoices(cols[[input_id]]))
+      }, silent = TRUE)
     }
   }
 
-  # FORCE the dropdowns to populate immediately when the app loads!
+  # Force the filters to populate the instant the app boots up
   updateFilterDropdowns()
 
-  observeEvent(input$main_navbar,
-    {
-      # Refresh them if the user navigates away and comes back
-      if (input$main_navbar == "dashboard") updateFilterDropdowns()
+  observeEvent(input$main_navbar, {
+      # Instantly refresh the filters with any NEW admin tags when clicking the dashboard tab
+      if (input$main_navbar == "dashboard") {
+        updateFilterDropdowns()
+      }
     },
     ignoreInit = TRUE
   )
-
+  
   # ── Filtered & paginated data ──────────────────────────────────────────────
   filtered_data <- filter_data_server(input, data, session)
   pagination <- pagination_server(input, output, session, filtered_data)
