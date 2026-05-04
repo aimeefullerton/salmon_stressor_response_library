@@ -3,9 +3,9 @@ update_filters_server <- function(input, output, session, data, db) {
 
   # Array columns (text[]) vs plain text columns
   array_cols <- c(
-    "species_common_name", "latin_name", "life_stages", "activity",
+    "species_common_name", "latin_name", "life_stages", "activity", "season",
     "location_country", "location_state_province",
-    "location_watershed_lab", "location_river_creek"
+    "location_watershed_lab", "location_river_creek", "function_derivation"
   )
 
   filter_specs <- list(
@@ -28,9 +28,9 @@ update_filters_server <- function(input, output, session, data, db) {
     if (is.null(vals) || length(vals) == 0) return(df)
     if (col %in% array_cols) {
       keep <- vapply(df[[col]], function(cell) {
-        if (is.na(cell)) return(FALSE)
-        # Split the string back into individual items using the comma-space
-        cell_parts <- strsplit(cell, ", ")[[1]]
+        if (is.na(cell) || !nzchar(cell)) return(FALSE)
+        # Split the string back into individual items (handles commas with or without spaces)
+        cell_parts <- trimws(strsplit(as.character(cell), ",")[[1]])
         any(cell_parts %in% vals)
       }, logical(1))
     } else {
@@ -41,51 +41,40 @@ update_filters_server <- function(input, output, session, data, db) {
 
 # Get distinct values from a column for dropdown choices
   get_dynamic_vals <- function(df, col) {
+    if (nrow(df) == 0) return(character(0))
+    
+    clean_cells <- df[[col]][!is.na(df[[col]]) & df[[col]] != ""]
+    
     if (col %in% array_cols) {
-      # Remove NAs, then split all strings by comma-space, then unlist to a flat vector
-      clean_cells <- df[[col]][!is.na(df[[col]])]
-      vals <- unique(unlist(strsplit(clean_cells, ", ")))
+      # Split all strings by comma, flatten, trim whitespace, and find unique
+      parts <- unlist(lapply(clean_cells, function(x) trimws(strsplit(as.character(x), ",")[[1]])))
+      vals <- unique(parts)
     } else {
-      vals <- unique(df[[col]])
+      vals <- unique(clean_cells)
     }
-    sort(vals[!is.na(vals) & nzchar(vals)])
+    sort(vals[vals != "" & vals != "NA"])
   }
 
   observe({
     for (name in names(filter_specs)) {
       spec <- filter_specs[[name]]
 
-      # Filter data using all OTHER active filters
+      # Filter data using all OTHER active filters to get context-aware dropdowns
       df_sub <- data
       for (other in filter_specs[names(filter_specs) != name]) {
         df_sub <- apply_filter(df_sub, input[[other$input_id]], other$column)
       }
 
-      # Full universe of choices from DB (using unnest for array cols)
-      if (spec$column %in% array_cols) {
-        lookup_vals <- tryCatch(
-          dbGetQuery(db, sprintf(
-            "SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL ORDER BY val",
-            spec$column, spec$column
-          ))[["val"]],
-          error = function(e) character(0)
-        )
-      } else {
-        lookup_vals <- tryCatch(
-          dbGetQuery(db, sprintf(
-            "SELECT DISTINCT %s FROM stressor_responses WHERE %s IS NOT NULL ORDER BY %s",
-            spec$column, spec$column, spec$column
-          ))[[spec$column]],
-          error = function(e) character(0)
-        )
-      }
+      # 1. Full universe of choices (from the entire downloaded dataset, not SQL)
+      lookup_vals <- get_dynamic_vals(data, spec$column)
 
-      # Dynamic subset from currently filtered data
+      # 2. Dynamic subset from currently filtered data
       dynamic_vals <- get_dynamic_vals(df_sub, spec$column)
 
-      # Only show choices that exist in both the DB universe and the filtered subset
+      # 3. Only show choices that exist in both the universe and the filtered subset
       valid_choices <- lookup_vals[lookup_vals %in% dynamic_vals]
 
+      # Update the picker
       updatePickerInput(session, spec$input_id,
         choices  = valid_choices,
         selected = intersect(input[[spec$input_id]], valid_choices)
