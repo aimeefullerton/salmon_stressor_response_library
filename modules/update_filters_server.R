@@ -24,12 +24,13 @@ update_filters_server <- function(input, output, session, data, db) {
     list(id = "broad_stressor_name", col = "broad_stressor_name")
   )
 
-  # Helper: Apply a single filter
+  # Helper: Apply a single filter with robust comma splitting
   apply_filter <- function(df, vals, col) {
     if (is.null(vals) || length(vals) == 0) return(df)
     if (col %in% array_cols) {
       keep <- vapply(df[[col]], function(cell) {
         if (is.na(cell) || !nzchar(cell)) return(FALSE)
+        # Split by comma and trim whitespace to be safe
         cell_parts <- trimws(strsplit(as.character(cell), ",")[[1]])
         any(cell_parts %in% vals)
       }, logical(1))
@@ -55,11 +56,12 @@ update_filters_server <- function(input, output, session, data, db) {
 
   # 3. Reactive Observer for Cascading Filters
   observe({
-    # Only run if dashboard is visible
     req(input$main_navbar == "dashboard")
     
-    # Capture current selections
-    current_inputs <- lapply(filter_specs, function(spec) input[[spec$id]])
+    # Isolate inputs to prevent immediate re-triggering
+    current_inputs <- isolate({
+      lapply(filter_specs, function(spec) input[[spec$id]])
+    })
     names(current_inputs) <- sapply(filter_specs, function(s) s$id)
 
     for (spec in filter_specs) {
@@ -73,7 +75,7 @@ update_filters_server <- function(input, output, session, data, db) {
 
       valid_choices <- get_dynamic_vals(df_sub, spec$col)
       
-      # Tell Shiny to 'Freeze' this input.
+      # THE FIX: Tell Shiny to 'Freeze' this input to prevent the glitching loop
       freezeReactiveValue(input, spec$id)
       
       updateSelectizeInput(session, spec$id,
