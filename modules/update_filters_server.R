@@ -63,7 +63,9 @@ update_filters_server <- function(input, output, session, data, db) {
       # Filter data using all OTHER active filters to get context-aware dropdowns
       df_sub <- data
       for (other in filter_specs[names(filter_specs) != name]) {
-        df_sub <- apply_filter(df_sub, input[[other$input_id]], other$column)
+        # THE FIX: Isolate the input read so it doesn't crash outside the reactive loop!
+        val <- isolate(input[[other$input_id]])
+        df_sub <- apply_filter(df_sub, val, other$column)
       }
 
       # 1. Full universe of choices (from the entire downloaded dataset)
@@ -75,10 +77,12 @@ update_filters_server <- function(input, output, session, data, db) {
       # 3. Only show choices that exist in both the universe and the filtered subset
       valid_choices <- lookup_vals[lookup_vals %in% dynamic_vals]
 
-      # Update the picker
+      # THE FIX: Isolate the input read here too
+      val_selected <- isolate(input[[spec$input_id]])
+      
       updatePickerInput(session, spec$input_id,
         choices  = valid_choices,
-        selected = intersect(input[[spec$input_id]], valid_choices)
+        selected = intersect(val_selected, valid_choices)
       )
     }
   }
@@ -94,9 +98,11 @@ update_filters_server <- function(input, output, session, data, db) {
     run_filter_updates()
   })
   
-  # 2. THE FIX: Force initialization only AFTER the UI has completely flushed to the browser!
+  # 2. Force initialization only AFTER the UI has completely flushed to the browser!
   session$onFlushed(function() {
-    run_filter_updates()
+    isolate({
+      run_filter_updates()
+    })
   }, once = TRUE)
 
 }
