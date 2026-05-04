@@ -54,30 +54,30 @@ server <- function(input, output, session) {
       })
     })
 }
-  # ── Filter dropdowns ───────────────────────────────────────────────────────
+# ── Filter dropdowns ───────────────────────────────────────────────────────
   getCategoryChoices <- function(column_name) {
-    tryCatch({
-      # 1. First, attempt to unnest the column (Works for Postgres Array columns like Species)
-      res <- dbGetQuery(
-        db,
-        sprintf("SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL", column_name, column_name)
-      )
-      vals <- res$val[res$val != ""]
-      sort(unique(vals[!is.na(vals)]))
-      
-    }, error = function(e) {
-      
-      # 2. If unnest fails (because it's a standard text column like Stressor Name), fallback to a normal SELECT
-      tryCatch({
-        res <- dbGetQuery(
-          db,
-          sprintf("SELECT DISTINCT %s AS val FROM stressor_responses WHERE %s IS NOT NULL", column_name, column_name)
-        )
-        vals <- res$val[res$val != ""]
-        sort(unique(vals[!is.na(vals)]))
-      }, error = function(e2) character(0)) # Returns empty if totally broken
-      
-    })
+    # 1. Fallback if column doesn't exist
+    if (!column_name %in% names(data)) return(character(0))
+    
+    # 2. Extract the column directly from the pre-loaded 'data' dataframe
+    vals <- data[[column_name]]
+    vals <- vals[!is.na(vals) & vals != ""]
+    
+    # 3. Array columns were collapsed into comma-separated strings (e.g. "Adult, Fry") 
+    # during the initial data load, so we split them back up to get individual tags.
+    array_cols <- c("species_common_name", "latin_name", "life_stages", "activity", 
+                    "season", "location_country", "location_state_province", 
+                    "location_watershed_lab", "location_river_creek", "function_derivation")
+    
+    if (column_name %in% array_cols) {
+      vals <- unlist(strsplit(vals, ",\\s*"))
+    }
+    
+    # 4. Clean and sort
+    vals <- trimws(vals)
+    vals <- vals[vals != "" & vals != "NA" & vals != "N/A"]
+    
+    return(sort(unique(vals)))
   }
 
   updateFilterDropdowns <- function() {
@@ -100,8 +100,12 @@ server <- function(input, output, session) {
     }
   }
 
+  # FORCE the dropdowns to populate immediately when the app loads!
+  updateFilterDropdowns()
+
   observeEvent(input$main_navbar,
     {
+      # Refresh them if the user navigates away and comes back
       if (input$main_navbar == "dashboard") updateFilterDropdowns()
     },
     ignoreInit = TRUE
