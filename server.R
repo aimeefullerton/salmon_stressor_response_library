@@ -114,6 +114,75 @@ server <- function(input, output, session) {
       }
     },
     ignoreInit = TRUE
+  )# ── Filter dropdowns ───────────────────────────────────────────────────────
+  getCategoryChoices <- function(column_name) {
+    tryCatch({
+      # 1. Ask Postgres to cast the column to raw text so R doesn't panic
+      query <- sprintf("SELECT DISTINCT %s::text AS val FROM stressor_responses WHERE %s IS NOT NULL", column_name, column_name)
+      res <- dbGetQuery(db, query)
+      
+      vals <- res$val
+      if (length(vals) == 0) return(character(0))
+      
+      # 2. Clean up Postgres Array formatting (e.g., '{"Chinook Salmon","Coho Salmon"}')
+      vals <- gsub("^\\{|\\}$", "", vals)
+      
+      # 3. Split into individual items using a regex that handles commas between quotes
+      parts <- unlist(strsplit(vals, '","|,"|",|,'))
+      
+      # 4. Remove leftover quotes and spaces
+      parts <- gsub('^"|"$', "", trimws(parts))
+      
+      # 5. Remove blanks
+      parts <- parts[parts != "" & parts != "NULL" & parts != "NA" & !is.na(parts)]
+      
+      return(sort(unique(parts)))
+      
+    }, error = function(e) {
+      # PRINT THE ERROR so we aren't flying blind!
+      print(paste("❌ Error loading filter for", column_name, ":", e$message))
+      return(character(0))
+    })
+  }
+
+  updateFilterDropdowns <- function() {
+    print("🔄 Updating Filter Dropdowns...")
+    
+    cols <- c(
+      "stressor"                = "stressor_name",
+      "stressor_metric"         = "specific_stressor_metric",
+      "species"                 = "species_common_name",
+      "life_stage"              = "life_stages",
+      "activity"                = "activity",
+      "latin_name"              = "latin_name",
+      "article_type"            = "article_type",
+      "location_country"        = "location_country",
+      "location_state_province" = "location_state_province",
+      "location_watershed_lab"  = "location_watershed_lab",
+      "location_river_creek"    = "location_river_creek",
+      "broad_stressor_name"     = "broad_stressor_name"
+    )
+    
+    for (input_id in names(cols)) {
+      tryCatch({
+        choices <- getCategoryChoices(cols[[input_id]])
+        updatePickerInput(session, input_id, choices = choices)
+      }, error = function(e) {
+        print(paste("❌ Failed to update picker for", input_id, ":", e$message))
+      })
+    }
+    print("✅ Filter Update Complete!")
+  }
+
+  # Force the filters to populate the instant the app loads
+  updateFilterDropdowns()
+
+  observeEvent(input$main_navbar, {
+      if (input$main_navbar == "dashboard") {
+        updateFilterDropdowns()
+      }
+    },
+    ignoreInit = TRUE
   )
   # ── Filtered & paginated data ──────────────────────────────────────────────
   filtered_data <- filter_data_server(input, data, session)
