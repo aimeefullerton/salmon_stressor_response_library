@@ -50,36 +50,37 @@ update_filters_server <- function(input, output, session, data, db) {
     return(sort(vals))
   }
 
+# This only runs when the app starts (Initial Population)
   observe({
     req(input$main_navbar == "dashboard")
-    
-    # Capture current state
-    current_inputs <- lapply(filter_specs, function(spec) input[[spec$input_id]])
-    names(current_inputs) <- names(filter_specs)
+    # Loop through and populate everything ONCE
+    for (spec in filter_specs) {
+      choices <- get_dynamic_vals(data, spec$col)
+      updateSelectizeInput(session, spec$id, choices = choices, server = TRUE)
+    }
+  }, once = TRUE)
 
-    for (name in names(filter_specs)) {
-      spec <- filter_specs[[name]]
-      
-      # Filter data by OTHER selections
+  # This ONLY runs when the user clicks the "Update Filter Options" button
+  observeEvent(input$apply_cascading, {
+    current_selections <- lapply(filter_specs, function(spec) input[[spec$id]])
+    names(current_selections) <- sapply(filter_specs, function(s) s$id)
+
+    for (spec in filter_specs) {
       df_sub <- data
-      for (other_name in names(filter_specs)) {
-        if (other_name != name) {
-          other_spec <- filter_specs[[other_name]]
-          df_sub <- apply_filter(df_sub, current_inputs[[other_name]], other_spec$column)
+      for (other_spec in filter_specs) {
+        if (other_spec$id != spec$id) {
+          df_sub <- apply_filter(df_sub, current_selections[[other_spec$id]], other_spec$col)
         }
       }
-
-      valid_choices <- get_dynamic_vals(df_sub, spec$column)
+      valid_choices <- get_dynamic_vals(df_sub, spec$col)
       
-      # THE SAFETY VALVE: Prevents glitching loop
-      freezeReactiveValue(input, spec$input_id)
-      
-      updateSelectizeInput(session, spec$input_id,
+      updateSelectizeInput(session, spec$id,
         choices  = valid_choices,
-        selected = current_inputs[[name]],
+        selected = current_selections[[spec$id]],
         server   = TRUE 
       )
     }
+    showNotification("Filter options updated based on your selections.", type = "message")
   })
 }
 # nolint end
