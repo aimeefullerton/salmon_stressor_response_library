@@ -55,7 +55,8 @@ update_filters_server <- function(input, output, session, data, db) {
     sort(vals[vals != "" & vals != "NA"])
   }
 
-  observe({
+  # Main function to run the updates
+  run_filter_updates <- function() {
     for (name in names(filter_specs)) {
       spec <- filter_specs[[name]]
 
@@ -65,7 +66,7 @@ update_filters_server <- function(input, output, session, data, db) {
         df_sub <- apply_filter(df_sub, input[[other$input_id]], other$column)
       }
 
-      # 1. Full universe of choices (from the entire downloaded dataset, not SQL)
+      # 1. Full universe of choices (from the entire downloaded dataset)
       lookup_vals <- get_dynamic_vals(data, spec$column)
 
       # 2. Dynamic subset from currently filtered data
@@ -80,6 +81,23 @@ update_filters_server <- function(input, output, session, data, db) {
         selected = intersect(input[[spec$input_id]], valid_choices)
       )
     }
+  }
+
+  # 1. Observe input changes to dynamically update filters
+  observe({
+    # Touch all inputs so this observe knows to re-run when users make selections
+    lapply(filter_specs, function(x) input[[x$input_id]])
+    
+    # Do not run unless the dashboard is actually active
+    req(input$main_navbar == "dashboard")
+    
+    run_filter_updates()
   })
+  
+  # 2. THE FIX: Force initialization only AFTER the UI has completely flushed to the browser!
+  session$onFlushed(function() {
+    run_filter_updates()
+  }, once = TRUE)
+
 }
 # nolint end
