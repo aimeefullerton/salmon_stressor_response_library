@@ -57,34 +57,30 @@ server <- function(input, output, session) {
   
 # ── Filter dropdowns ───────────────────────────────────────────────────────
   getCategoryChoices <- function(column_name) {
-    # 1. Define exactly which columns are Postgres Arrays (Multi-selects)
-    array_cols <- c("species_common_name", "latin_name", "life_stages", "activity", 
-                    "season", "location_country", "location_state_province", 
-                    "location_watershed_lab", "location_river_creek", "function_derivation")
+    # 1. Ensure the column exists in the data
+    if (!column_name %in% names(data)) return(character(0))
     
-    tryCatch({
-      # 2. Use the correct SQL depending on the column type
-      if (column_name %in% array_cols) {
-        # Unpacks Arrays into individual tags
-        query <- sprintf("SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL", column_name, column_name)
-      } else {
-        # Standard query for Text columns
-        query <- sprintf("SELECT DISTINCT %s AS val FROM stressor_responses WHERE %s IS NOT NULL", column_name, column_name)
-      }
-      
-      # 3. Fetch from DB
-      res <- dbGetQuery(db, query)
-      
-      # 4. Clean up the results
-      vals <- res$val
-      vals <- vals[!is.na(vals) & vals != "" & vals != "NA" & vals != "N/A"]
-      
-      return(sort(unique(vals)))
-      
-    }, error = function(e) {
-      # If one fails, fail gracefully so it doesn't break the other filters
-      return(character(0)) 
-    })
+    vals <- data[[column_name]]
+    
+    # 2. FLATTEN THE LIST: This prevents the Javascript freeze!
+    if (is.list(vals)) {
+      vals <- unlist(vals)
+    }
+    
+    vals <- as.character(vals)
+    
+    # 3. SPLIT TAGS: Turns "Chinook Salmon, Coho Salmon" into individual selectable filters
+    vals <- unlist(strsplit(vals, ",\\s*"))
+    
+    # 4. STRIP POSTGRES FORMATTING: Removes any curly braces or quotes that snuck through
+    vals <- gsub("^\\{|\\}$", "", vals)
+    vals <- gsub('^"|"$', "", vals)
+    
+    # 5. CLEAN UP: Remove blanks, NAs, and extra whitespace
+    vals <- trimws(vals)
+    vals <- vals[!is.na(vals) & vals != "" & vals != "NA" & vals != "N/A" & vals != "NULL"]
+    
+    return(sort(unique(vals)))
   }
 
   updateFilterDropdowns <- function() {
@@ -109,18 +105,16 @@ server <- function(input, output, session) {
     }
   }
 
-  # Force the filters to populate the instant the app boots up
+  # Force the filters to populate the instant the app loads
   updateFilterDropdowns()
 
   observeEvent(input$main_navbar, {
-      # Instantly refresh the filters with any NEW admin tags when clicking the dashboard tab
       if (input$main_navbar == "dashboard") {
         updateFilterDropdowns()
       }
     },
     ignoreInit = TRUE
   )
-  
   # ── Filtered & paginated data ──────────────────────────────────────────────
   filtered_data <- filter_data_server(input, data, session)
   pagination <- pagination_server(input, output, session, filtered_data)
