@@ -87,63 +87,27 @@ ui <- navbarPage(
           )
         ),
         
-        conditionalPanel(
+conditionalPanel(
           condition = "input.toggle_filters % 2 == 1",
           fluidRow(
-            column(3, pickerInput("stressor", "Stressor Name",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("stressor_metric", "Stressor Metric",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("species", "Species Common Name",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("broad_stressor_name", "Broad Stressor Name",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            ))
+            column(3, selectizeInput("stressor", "Stressor Name", choices = NULL, multiple = TRUE)),
+            column(3, selectizeInput("stressor_metric", "Stressor Metric", choices = NULL, multiple = TRUE)),
+            column(3, selectizeInput("species", "Species Common Name", choices = NULL, multiple = TRUE)),
+            column(3, selectizeInput("broad_stressor_name", "Broad Stressor Name", choices = NULL, multiple = TRUE))
           ),
           fluidRow(
-            column(3, pickerInput("life_stage", "Life Stage",
-              choices = life_stages, multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("activity", "Activity",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("latin_name", "Latin Name",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            ))
+            column(3, selectizeInput("life_stage", "Life Stage", choices = NULL, multiple = TRUE)),
+            column(3, selectizeInput("activity", "Activity", choices = NULL, multiple = TRUE)),
+            column(3, selectizeInput("latin_name", "Latin Name", choices = NULL, multiple = TRUE))
           ),
           fluidRow(
-            column(3, pickerInput("article_type", "Article Type",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("location_country", "Country",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("location_state_province", "State / Province",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("location_watershed_lab", "Watershed / Lab",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            ))
+            column(3, selectizeInput("article_type", "Article Type", choices = NULL, multiple = TRUE)),
+            column(3, selectizeInput("location_country", "Country", choices = NULL, multiple = TRUE)),
+            column(3, selectizeInput("location_state_province", "State / Province", choices = NULL, multiple = TRUE)),
+            column(3, selectizeInput("location_watershed_lab", "Watershed / Lab", choices = NULL, multiple = TRUE))
           ),
           fluidRow(
-            column(3, pickerInput("location_river_creek", "River / Creek",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            ))
+            column(3, selectizeInput("location_river_creek", "River / Creek", choices = NULL, multiple = TRUE))
           ),
           fluidRow(
             column(12, div(
