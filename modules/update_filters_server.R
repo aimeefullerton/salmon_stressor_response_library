@@ -24,13 +24,12 @@ update_filters_server <- function(input, output, session, data, db) {
     list(id = "broad_stressor_name", col = "broad_stressor_name")
   )
 
-  # Helper: Apply a single filter with robust comma splitting
+  # Helper: Apply a single filter
   apply_filter <- function(df, vals, col) {
     if (is.null(vals) || length(vals) == 0) return(df)
     if (col %in% array_cols) {
       keep <- vapply(df[[col]], function(cell) {
         if (is.na(cell) || !nzchar(cell)) return(FALSE)
-        # Split by comma and trim whitespace to be safe
         cell_parts <- trimws(strsplit(as.character(cell), ",")[[1]])
         any(cell_parts %in% vals)
       }, logical(1))
@@ -54,33 +53,38 @@ update_filters_server <- function(input, output, session, data, db) {
     return(sort(vals))
   }
 
-  # 3. Reactive Observer for Cascading Filters
+  # 3. Dynamic Observer: This triggers whenever ANY filter changes
   observe({
     req(input$main_navbar == "dashboard")
     
-    # Isolate inputs to prevent immediate re-triggering
-    current_inputs <- isolate({
-      lapply(filter_specs, function(spec) input[[spec$id]])
-    })
-    names(current_inputs) <- sapply(filter_specs, function(s) s$id)
+    # TRIGGER: By listing the inputs here, the observer wakes up when you click a filter
+    # We use 'lapply' to check all filter IDs
+    current_selections <- lapply(filter_specs, function(spec) input[[spec$id]])
+    names(current_selections) <- sapply(filter_specs, function(s) s$id)
 
+    # Now, update every filter's CHOICES based on what is selected in the OTHERS
     for (spec in filter_specs) {
-      # Calculate valid choices based on ALL OTHER filters
+      
+      # Step A: Filter the data by everything EXCEPT the filter we are currently updating
       df_sub <- data
       for (other_spec in filter_specs) {
         if (other_spec$id != spec$id) {
-          df_sub <- apply_filter(df_sub, current_inputs[[other_spec$id]], other_spec$col)
+          df_sub <- apply_filter(df_sub, current_selections[[other_spec$id]], other_spec$col)
         }
       }
 
+      # Step B: Get the new valid choices
       valid_choices <- get_dynamic_vals(df_sub, spec$col)
       
-      # THE FIX: Tell Shiny to 'Freeze' this input to prevent the glitching loop
+      # Step C: THE SAFETY SHIELD
+      # This tells Shiny: "I'm changing the options in this menu, but don't 
+      # refresh the articles or jump the page yet."
       freezeReactiveValue(input, spec$id)
       
+      # Step D: Update the UI
       updateSelectizeInput(session, spec$id,
         choices  = valid_choices,
-        selected = current_inputs[[spec$id]],
+        selected = current_selections[[spec$id]], # Keep the user's current selection
         server   = TRUE 
       )
     }
