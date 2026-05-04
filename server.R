@@ -26,7 +26,6 @@ server <- function(input, output, session) {
     warning("Table `stressor_responses` does not exist in the database.")
     data <- data.frame()
   } else {
-    # UPDATED: Added LEFT JOIN to pull the user's name from the users table
     data <- dbGetQuery(db, "
       SELECT 
         sr.*, 
@@ -36,19 +35,35 @@ server <- function(input, output, session) {
       ORDER BY sr.article_id ASC
     ")
 
-    # Parse Postgres text[] columns into R character vectors AND collapse into strings
-    pq_array_cols <- names(data)[sapply(data, inherits, "pq__text")]
-    data[pq_array_cols] <- lapply(data[pq_array_cols], function(col) {
+    # ── THE FIX: Explicitly define arrays instead of relying on the broken pq__text label ──
+    array_cols <- c(
+      "species_common_name", "latin_name", "life_stages", "activity", "season",
+      "location_country", "location_state_province", 
+      "location_watershed_lab", "location_river_creek", "function_derivation"
+    )
+    
+    # Only process columns that actually exist in the table
+    valid_array_cols <- intersect(array_cols, names(data))
+
+    data[valid_array_cols] <- lapply(data[valid_array_cols], function(col) {
       sapply(col, function(x) {
-        # Return true NA instead of "N/A"
-        if (is.null(x) || is.na(x) || !nzchar(x)) return(NA_character_)
-        x <- gsub("^\\{|\\}$", "", x)
-        parts <- strsplit(x, ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", perl = TRUE)[[1]]
+        # 1. Flatten if it's an R list
+        x <- unlist(x)
+        
+        # 2. Check for empty
+        if (is.null(x) || length(x) == 0 || all(is.na(x))) return(NA_character_)
+        
+        # 3. Convert to string and strip Postgres curly braces/quotes
+        x_str <- paste(as.character(x), collapse = ",")
+        x_str <- gsub("^\\{|\\}$", "", x_str)
+        parts <- unlist(strsplit(x_str, '","|,"|",|,'))
         parts <- gsub('^"|"$', "", trimws(parts))
-        valid_parts <- parts[parts != "NULL" & nzchar(parts)]
-        # If the array was empty (e.g., {""}), return true NA
+        
+        # 4. Clean up tags
+        valid_parts <- parts[parts != "NULL" & parts != "" & parts != "NA"]
         if (length(valid_parts) == 0) return(NA_character_)
-        # Collapse valid items
+        
+        # 5. Return as a clean, comma-separated string that the filters can read!
         return(paste(valid_parts, collapse = ", "))
       })
     })
@@ -78,12 +93,10 @@ server <- function(input, output, session) {
   observe({
     req(session$user) 
     
-    # Check if the viewer is on the admin list
     if (session$user %in% admin_users) {
-      
       insertTab(
         inputId = "main_navbar", 
-        target = "submit_relationship", # Matches the 'value' of the tab in ui.R
+        target = "submit_relationship",
         position = "after",
         tabPanel(
           title = "Admin Upload",
@@ -92,7 +105,6 @@ server <- function(input, output, session) {
           upload_ui("secure_admin_upload") 
         )
       )
-      
       upload_server("secure_admin_upload", db_conn = db, current_user = session$user)
     }
   })
@@ -106,7 +118,6 @@ server <- function(input, output, session) {
     lapply(ids, function(mid) {
       mid_str <- as.character(mid)
 
-      # ── Open modal ──────────────────────────────────────────────────────────
       observeEvent(input[[paste0("view_article_", mid)]], {
         paper_row <- paginated_data()[paginated_data()$article_id == mid, , drop = FALSE]
 
@@ -121,7 +132,6 @@ server <- function(input, output, session) {
         if (!mid_str %in% initialized_articles) {
           render_article_server(input, output, session, mid, paper_row, db)
 
-          # ── Expand all ────────────────────────────────────────────────────
           observeEvent(input[[paste0("expand_all_", mid)]], {
             shinyjs::show(paste0("metadata_section_", mid))
             shinyjs::show(paste0("description_section_", mid))
@@ -131,7 +141,6 @@ server <- function(input, output, session) {
             shinyjs::show(paste0("interactive_plot_section_", mid))
           }, ignoreInit = TRUE)
 
-          # ── Collapse all ──────────────────────────────────────────────────
           observeEvent(input[[paste0("collapse_all_", mid)]], {
             shinyjs::hide(paste0("metadata_section_", mid))
             shinyjs::hide(paste0("description_section_", mid))
@@ -141,7 +150,6 @@ server <- function(input, output, session) {
             shinyjs::hide(paste0("interactive_plot_section_", mid))
           }, ignoreInit = TRUE)
 
-          # ── Section toggles ───────────────────────────────────────────────
           for (section in c("metadata", "description", "confidence", "citations", "csv", "interactive_plot")) {
             local({
               s <- section
@@ -151,7 +159,6 @@ server <- function(input, output, session) {
               }, ignoreInit = TRUE)
             })
           }
-
           initialized_articles <<- c(initialized_articles, mid_str)
         }
       }, ignoreInit = TRUE)
