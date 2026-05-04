@@ -20,28 +20,22 @@ server <- function(input, output, session) {
   db <- pool
 
   # ── Initial data load ──────────────────────────────────────────────────────
-  table_exists <- dbExistsTable(db, Id(schema = db_config$schema, table = "stressor_responses"))
+ table_exists <- dbExistsTable(db, Id(schema = db_config$schema, table = "stressor_responses"))
 
-if (!table_exists) {
-  warning("Table `stressor_responses` does not exist.")
-  data <- data.frame()
-} else {
-  # Qualify tables with schema and add error handling
-  data <- tryCatch({
-    dbGetQuery(db, sprintf("
+  if (!table_exists) {
+    warning("Table `stressor_responses` does not exist in the database.")
+    data <- data.frame()
+  } else {
+    data <- dbGetQuery(db, "
       SELECT 
         sr.*, 
         u.name AS contributor_name 
-      FROM %s.stressor_responses sr
-      LEFT JOIN public.users u ON sr.user_id = u.user_id 
+      FROM stressor_responses sr
+      LEFT JOIN users u ON sr.user_id = u.user_id 
       ORDER BY sr.article_id ASC
-    ", db_config$schema))
-  }, error = function(e) {
-    message("Query failed: ", e$message)
-    return(data.frame()) 
-  })
+    ")
 
-    # ── THE FIX: Explicitly define arrays instead of relying on the broken pq__text label ──
+    # Explicitly define arrays instead of relying on the broken pq__text label
     array_cols <- c(
       "species_common_name", "latin_name", "life_stages", "activity", "season",
       "location_country", "location_state_province", 
