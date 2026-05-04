@@ -19,9 +19,7 @@ ui <- navbarPage(
   id = "main_navbar",
   title = "Pacific Salmonid Stressor-Response eLibrary",
   selected = "dashboard",
-  # use Bootstrap 5 for better styling and responsiveness
-  # https://bootswatch.com/5/ for themes if desired
-  theme = bslib::bs_theme(version = 5), # can add a default bootstrap theme via bootswatch if desired, e.g., bootswatch = "flatly"
+  theme = bslib::bs_theme(version = 5), 
 
   # About Tab
   tabPanel(
@@ -81,12 +79,14 @@ ui <- navbarPage(
           column(8, textInput("search", "Search All Text", placeholder = "Type keywords...")),
           column(4, actionButton("toggle_filters", "Show Filters", icon = icon("filter")))
         ),
+        
+        # ── THE FIX: Removed the duplicate page_size numericInput! ──
         shinyjs::hidden(
           fluidRow(
-            column(6, numericInput("page", NULL, value = 1, min = 1)),
-            column(6, numericInput("page_size", NULL, value = 10, min = 1))
+            column(12, numericInput("page", NULL, value = 1, min = 1))
           )
         ),
+        
         conditionalPanel(
           condition = "input.toggle_filters % 2 == 1",
           fluidRow(
@@ -159,7 +159,7 @@ ui <- navbarPage(
           column(12, align = "center",
             style = "margin-top: 10px; margin-bottom: 15px;",
             
-            # Page size selector
+            # Page size selector (This is the one that stays!)
             selectInput("page_size", "Articles per page:", 
                         choices = c(5, 10, 25, 50), 
                         selected = 10, 
