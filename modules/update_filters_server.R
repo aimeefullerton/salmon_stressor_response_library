@@ -1,30 +1,28 @@
+# modules/update_filters_server.R
 # nolint start
 update_filters_server <- function(input, output, session, data, db) {
 
-  # 1. Define array columns
   array_cols <- c(
     "species_common_name", "latin_name", "life_stages", "activity", "season",
     "location_country", "location_state_province",
     "location_watershed_lab", "location_river_creek", "function_derivation"
   )
 
-  # 2. Map IDs to columns
   filter_specs <- list(
-    list(id = "stressor", col = "stressor_name"),
-    list(id = "stressor_metric", col = "specific_stressor_metric"),
-    list(id = "species", col = "species_common_name"),
-    list(id = "life_stage", col = "life_stages"),
-    list(id = "activity", col = "activity"),
-    list(id = "latin_name", col = "latin_name"),
-    list(id = "article_type", col = "article_type"),
-    list(id = "location_country", col = "location_country"),
-    list(id = "location_state_province", col = "location_state_province"),
-    list(id = "location_watershed_lab", col = "location_watershed_lab"),
-    list(id = "location_river_creek", col = "location_river_creek"),
-    list(id = "broad_stressor_name", col = "broad_stressor_name")
+    stressor = list(input_id = "stressor", column = "stressor_name"),
+    stressor_metric = list(input_id = "stressor_metric", column = "specific_stressor_metric"),
+    species = list(input_id = "species", column = "species_common_name"),
+    life_stage = list(input_id = "life_stage", column = "life_stages"),
+    activity = list(input_id = "activity", column = "activity"),
+    latin_name = list(input_id = "latin_name", column = "latin_name"),
+    article_type = list(input_id = "article_type", column = "article_type"),
+    location_country = list(input_id = "location_country", column = "location_country"),
+    location_state_province = list(input_id = "location_state_province", column = "location_state_province"),
+    location_watershed_lab = list(input_id = "location_watershed_lab", column = "location_watershed_lab"),
+    location_river_creek = list(input_id = "location_river_creek", column = "location_river_creek"),
+    broad_stressor_name = list(input_id = "broad_stressor_name", column = "broad_stressor_name")
   )
 
-  # Helper: Apply a single filter
   apply_filter <- function(df, vals, col) {
     if (is.null(vals) || length(vals) == 0) return(df)
     if (col %in% array_cols) {
@@ -39,7 +37,6 @@ update_filters_server <- function(input, output, session, data, db) {
     df[keep, ]
   }
 
-  # Helper: Extract unique choices
   get_dynamic_vals <- function(df, col) {
     if (nrow(df) == 0) return(character(0))
     clean_cells <- df[[col]][!is.na(df[[col]]) & df[[col]] != ""]
@@ -53,38 +50,33 @@ update_filters_server <- function(input, output, session, data, db) {
     return(sort(vals))
   }
 
-  # 3. Dynamic Observer: This triggers whenever ANY filter changes
   observe({
     req(input$main_navbar == "dashboard")
     
-    # TRIGGER: By listing the inputs here, the observer wakes up when you click a filter
-    # We use 'lapply' to check all filter IDs
-    current_selections <- lapply(filter_specs, function(spec) input[[spec$id]])
-    names(current_selections) <- sapply(filter_specs, function(s) s$id)
+    # Capture current state
+    current_inputs <- lapply(filter_specs, function(spec) input[[spec$input_id]])
+    names(current_inputs) <- names(filter_specs)
 
-    # Now, update every filter's CHOICES based on what is selected in the OTHERS
-    for (spec in filter_specs) {
+    for (name in names(filter_specs)) {
+      spec <- filter_specs[[name]]
       
-      # Step A: Filter the data by everything EXCEPT the filter we are currently updating
+      # Filter data by OTHER selections
       df_sub <- data
-      for (other_spec in filter_specs) {
-        if (other_spec$id != spec$id) {
-          df_sub <- apply_filter(df_sub, current_selections[[other_spec$id]], other_spec$col)
+      for (other_name in names(filter_specs)) {
+        if (other_name != name) {
+          other_spec <- filter_specs[[other_name]]
+          df_sub <- apply_filter(df_sub, current_inputs[[other_name]], other_spec$column)
         }
       }
 
-      # Step B: Get the new valid choices
-      valid_choices <- get_dynamic_vals(df_sub, spec$col)
+      valid_choices <- get_dynamic_vals(df_sub, spec$column)
       
-      # Step C: THE SAFETY SHIELD
-      # This tells Shiny: "I'm changing the options in this menu, but don't 
-      # refresh the articles or jump the page yet."
-      freezeReactiveValue(input, spec$id)
+      # THE SAFETY VALVE: Prevents glitching loop
+      freezeReactiveValue(input, spec$input_id)
       
-      # Step D: Update the UI
-      updateSelectizeInput(session, spec$id,
+      updateSelectizeInput(session, spec$input_id,
         choices  = valid_choices,
-        selected = current_selections[[spec$id]], # Keep the user's current selection
+        selected = current_inputs[[name]],
         server   = TRUE 
       )
     }
