@@ -56,17 +56,28 @@ server <- function(input, output, session) {
 }
   # ── Filter dropdowns ───────────────────────────────────────────────────────
   getCategoryChoices <- function(column_name) {
-    # Use unnest() so each array element becomes its own distinct row
-    tryCatch(
-      dbGetQuery(
+    tryCatch({
+      # 1. First, attempt to unnest the column (Works for Postgres Array columns like Species)
+      res <- dbGetQuery(
         db,
-        sprintf(
-          "SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL ORDER BY val",
-          column_name, column_name
+        sprintf("SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL", column_name, column_name)
+      )
+      vals <- res$val[res$val != ""]
+      sort(unique(vals[!is.na(vals)]))
+      
+    }, error = function(e) {
+      
+      # 2. If unnest fails (because it's a standard text column like Stressor Name), fallback to a normal SELECT
+      tryCatch({
+        res <- dbGetQuery(
+          db,
+          sprintf("SELECT DISTINCT %s AS val FROM stressor_responses WHERE %s IS NOT NULL", column_name, column_name)
         )
-      )[["val"]],
-      error = function(e) character(0)
-    )
+        vals <- res$val[res$val != ""]
+        sort(unique(vals[!is.na(vals)]))
+      }, error = function(e2) character(0)) # Returns empty if totally broken
+      
+    })
   }
 
   updateFilterDropdowns <- function() {
