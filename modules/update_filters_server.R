@@ -53,13 +53,22 @@ update_filters_server <- function(input, output, session, data, db) {
     return(sort(vals))
   }
 
+# nolint start
+update_filters_server <- function(input, output, session, data, db) {
+
+  # ... (Keep the array_cols, filter_specs, apply_filter, and get_dynamic_vals helpers exactly as they are) ...
+
   observe({
-    current_inputs <- lapply(filter_specs, function(spec) {
-      input[[spec$id]]
+    req(input$main_navbar == "dashboard")
+    
+    # THE KEY: Isolate the input check so the update doesn't trigger itself
+    current_inputs <- isolate({
+      lapply(filter_specs, function(spec) input[[spec$id]])
     })
     names(current_inputs) <- sapply(filter_specs, function(s) s$id)
 
     for (spec in filter_specs) {
+      # 1. Calculate what the choices SHOULD be
       df_sub <- data
       for (other_spec in filter_specs) {
         if (other_spec$id != spec$id) {
@@ -72,10 +81,14 @@ update_filters_server <- function(input, output, session, data, db) {
       dynamic_vals <- get_dynamic_vals(df_sub, spec$col)
       valid_choices <- lookup_vals[lookup_vals %in% dynamic_vals]
 
-      # Native Shiny function that fully supports Bootstrap 5
+      # 2. THE FIX: Freeze the input. 
+      # This prevents the "jumping/glitching" by telling Shiny 
+      # NOT to trigger a data refresh just because the choices list changed.
+      freezeReactiveValue(input, spec$id)
+
       updateSelectizeInput(session, spec$id,
         choices  = valid_choices,
-        selected = intersect(current_inputs[[spec$id]], valid_choices),
+        selected = current_inputs[[spec$id]], # Keep what the user actually clicked
         server   = TRUE 
       )
     }
