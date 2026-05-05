@@ -20,6 +20,9 @@ source("modules/submit_relationship.R", local = TRUE)
 server <- function(input, output, session) {
   db <- pool
 
+# Hide the filter panel on load so pickerInputs have time to initialize
+  shinyjs::hide("filter_panel")
+
   # ── Initial data load ──────────────────────────────────────────────────────
   table_exists <- dbExistsTable(db, Id(schema = db_config$schema, table = "stressor_responses"))
 
