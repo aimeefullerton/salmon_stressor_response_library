@@ -21,7 +21,7 @@ ui <- navbarPage(
   selected = "dashboard",
   # use Bootstrap 5 for better styling and responsiveness
   # https://bootswatch.com/5/ for themes if desired
-  theme = bslib::bs_theme(version = 4), # can add a default bootstrap theme via bootswatch if desired, e.g., bootswatch = "flatly"
+  theme = bslib::bs_theme(version = 5), # can add a default bootstrap theme via bootswatch if desired, e.g., bootswatch = "flatly"
 
   # About Tab
   tabPanel(
