@@ -2,7 +2,6 @@
 library(shinyjs)
 library(shiny)
 library(shinyWidgets)
-library(bslib)
 
 # Source all necessary modules
 source("modules/upload.R", local = TRUE)
@@ -21,8 +20,7 @@ ui <- navbarPage(
   title = "Pacific Salmonid Stressor-Response eLibrary",
   selected = "dashboard",
   
-  # Downgraded to Bootstrap 4 for shinyWidgets/pickerInput compatibility
-  theme = bs_theme(version = 4), 
+  # Removed bslib theme argument entirely. Falling back to native Shiny.
 
   # About Tab
   tabPanel(
@@ -89,7 +87,7 @@ ui <- navbarPage(
           )
         ),
         
-        # ── FIXED FILTER PANEL ──
+        # ── RESTORED PICKER INPUTS WITH SHINYJS HIDDEN FIX ──
         shinyjs::hidden(
           div(
             id = "filter_panel",
@@ -165,14 +163,12 @@ ui <- navbarPage(
           column(12, align = "center",
             style = "margin-top: 10px; margin-bottom: 15px;",
             
-            # Page size selector
             selectInput("page_size", "Articles per page:", 
                         choices = c(5, 10, 25, 50), 
                         selected = 10, 
                         width = "150px"),
             br(),
             
-            # Top Buttons
             actionButton("prev_page_top", "← Previous", class = "btn-primary btn-sm"),
             span(textOutput("page_info_top", inline = TRUE), style = "margin: 0 15px; font-weight: bold;"),
             actionButton("next_page_top", "Next →", class = "btn-primary btn-sm")
@@ -185,7 +181,6 @@ ui <- navbarPage(
           icon = icon("download"),
           tooltip = tooltipOptions(title = "Choose what to download"),
 
-          # Download type selector
           radioButtons("download_option",
             label = NULL,
             choices = c(
@@ -196,7 +191,6 @@ ui <- navbarPage(
             selected = "filtered"
           ),
 
-          # Wrapped Confirm Download button with proper styling
           div(
             style = "width: 100%;",
             downloadButton("download_csv", "Confirm Download", class = "btn btn-success text-white btn-block")
@@ -214,7 +208,6 @@ ui <- navbarPage(
           column(12, align = "center",
             style = "margin-top: 20px; margin-bottom: 20px;",
             
-            # Bottom Buttons
             actionButton("prev_page_bottom", "← Previous", class = "btn-primary"),
             span(textOutput("page_info_bottom", inline = TRUE), style = "margin: 0 15px; font-weight: bold;"),
             actionButton("next_page_bottom", "Next →", class = "btn-primary")
@@ -228,7 +221,7 @@ ui <- navbarPage(
             inputId = "back_to_top",
             label = NULL,
             icon = icon("arrow-up"),
-            class = "btn btn-outline-secondary rounded-circle",
+            class = "btn btn-default rounded-circle",
             style = "width: 50px; height: 50px; font-size: 24px;"
           )
         ),
