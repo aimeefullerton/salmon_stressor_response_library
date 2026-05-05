@@ -19,7 +19,9 @@ ui <- navbarPage(
   id = "main_navbar",
   title = "Pacific Salmonid Stressor-Response eLibrary",
   selected = "dashboard",
-  theme = bslib::bs_theme(version = 5), 
+  # use Bootstrap 5 for better styling and responsiveness
+  # https://bootswatch.com/5/ for themes if desired
+  theme = bslib::bs_theme(version = 5), # can add a default bootstrap theme via bootswatch if desired, e.g., bootswatch = "flatly"
 
   # About Tab
   tabPanel(
@@ -79,53 +81,79 @@ ui <- navbarPage(
           column(8, textInput("search", "Search All Text", placeholder = "Type keywords...")),
           column(4, actionButton("toggle_filters", "Show Filters", icon = icon("filter")))
         ),
-        
-        # ── THE FIX: Removed the duplicate page_size numericInput! ──
         shinyjs::hidden(
           fluidRow(
-            column(12, numericInput("page", NULL, value = 1, min = 1))
+            column(6, numericInput("page", NULL, value = 1, min = 1)),
+            column(6, numericInput("page_size", NULL, value = 10, min = 1))
           )
         ),
-        
-    conditionalPanel(
-          condition = "input.toggle_filters % 2 == 1",
-          fluidRow(
-              column(12, 
-              actionButton("apply_cascading", "Update Filter Options", 
-                   class = "btn-info btn-sm w-100", 
-                   icon = icon("sync")),
-      tags$small("Click this after selecting values to see only relevant options in other filters.")
-    )
-  ),
-fluidRow(
-  column(3, selectizeInput("stressor", "Stressor Name", choices = stressor_names, multiple = TRUE)),
-  column(3, selectizeInput("stressor_metric", "Stressor Metric", choices = stressor_metrics, multiple = TRUE)),
-  column(3, selectizeInput("species", "Species Common Name", choices = species_names, multiple = TRUE)),
-  column(3, selectizeInput("broad_stressor_name", "Broad Stressor Name", choices = broad_stressor_names, multiple = TRUE))
-),
-fluidRow(
-  column(3, selectizeInput("life_stage", "Life Stage", choices = life_stages, multiple = TRUE)),
-  column(3, selectizeInput("activity", "Activity", choices = activities, multiple = TRUE)),
-  column(3, selectizeInput("latin_name", "Latin Name", choices = latin_name, multiple = TRUE)),
-  column(3, selectizeInput("season", "Season", choices = NULL, multiple = TRUE)) # Added
-),
-fluidRow(
-  column(3, selectizeInput("article_type", "Article Type", choices = article_types, multiple = TRUE)),
-  column(3, selectizeInput("location_country", "Country", choices = location_countries, multiple = TRUE)),
-  column(3, selectizeInput("location_state_province", "State / Province", choices = location_states_provinces, multiple = TRUE)),
-  column(3, selectizeInput("location_watershed_lab", "Watershed / Lab", choices = location_watersheds_labs, multiple = TRUE))
-),
-fluidRow(
-  column(3, selectizeInput("location_river_creek", "River / Creek", choices = location_rivers_creeks, multiple = TRUE)),
-  column(3, selectizeInput("function_derivation", "Function Derivation", choices = NULL, multiple = TRUE)) # Added
-),
-          fluidRow(
-            column(12, div(
-              style = "text-align: right;",
-              actionLink("reset_filters", "Reset Filters",
-                style = "color: #0073e6; font-size: 14px; text-decoration: none; margin-right: 10px;"
-              )
-            ))
+        shinyjs::hidden(
+          div(
+            id = "filter_panel",
+            fluidRow(
+              column(3, pickerInput("stressor", "Stressor Name",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("stressor_metric", "Stressor Metric",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("species", "Species Common Name",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("broad_stressor_name", "Broad Stressor Name",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              ))
+            ),
+            fluidRow(
+              column(3, pickerInput("life_stage", "Life Stage",
+                choices = life_stages, multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("activity", "Activity",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("latin_name", "Latin Name",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              ))
+            ),
+            fluidRow(
+              column(3, pickerInput("article_type", "Article Type",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("location_country", "Country",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("location_state_province", "State / Province",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("location_watershed_lab", "Watershed / Lab",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              ))
+            ),
+            fluidRow(
+              column(3, pickerInput("location_river_creek", "River / Creek",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              ))
+            ),
+            fluidRow(
+              column(12, div(
+                style = "text-align: right;",
+                actionLink("reset_filters", "Reset Filters",
+                  style = "color: #0073e6; font-size: 14px; text-decoration: none; margin-right: 10px;"
+                )
+              ))
+            )
           )
         ),
         # ── 1. Top Pagination Controls ──
@@ -133,7 +161,7 @@ fluidRow(
           column(12, align = "center",
             style = "margin-top: 10px; margin-bottom: 15px;",
             
-            # Page size selector (This is the one that stays!)
+            # Page size selector
             selectInput("page_size", "Articles per page:", 
                         choices = c(5, 10, 25, 50), 
                         selected = 10, 
