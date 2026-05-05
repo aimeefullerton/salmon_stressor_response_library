@@ -4,8 +4,8 @@
 match_array_col <- function(col, selected) {
   vapply(col, function(cell) {
     if (is.na(cell) || !nzchar(cell)) return(FALSE)
-    # THE FIX: Robust splitting that matches server logic
-    cell_parts <- trimws(strsplit(as.character(cell), ",")[[1]])
+    # Split the string back into individual items using the comma-space
+    cell_parts <- strsplit(as.character(cell), ", ")[[1]]
     any(cell_parts %in% selected)
   }, logical(1), USE.NAMES = FALSE)
 }
@@ -58,12 +58,6 @@ filter_data_server <- function(input, data, session) {
 
     if (!is.null(input$stressor_metric) && length(input$stressor_metric) > 0)
       data_filtered <- data_filtered[data_filtered$specific_stressor_metric %in% input$stressor_metric, ]
-    
-    if (!is.null(input$season) && length(input$season) > 0)
-      data_filtered <- data_filtered[match_array_col(data_filtered$season, input$season), ]
-
-    if (!is.null(input$function_derivation) && length(input$function_derivation) > 0)
-      data_filtered <- data_filtered[match_array_col(data_filtered$function_derivation, input$function_derivation), ]
 
     # Search
     if (!is.null(input$search) && input$search != "") {
