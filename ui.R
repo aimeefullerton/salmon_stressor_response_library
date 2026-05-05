@@ -87,7 +87,6 @@ ui <- navbarPage(
             column(6, numericInput("page_size", NULL, value = 10, min = 1))
           )
         ),
-        shinyjs::hidden(
           div(
             id = "filter_panel",
             fluidRow(
@@ -154,8 +153,7 @@ ui <- navbarPage(
                 )
               ))
             )
-          )
-        ),
+          ),
         # ── 1. Top Pagination Controls ──
         fluidRow(
           column(12, align = "center",
