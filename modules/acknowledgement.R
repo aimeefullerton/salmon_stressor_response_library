@@ -1,6 +1,10 @@
 # nolint start
-acknowledgement_ui <- function(id, n) {
+acknowledgement_ui <- function(id, n = NULL) {
   ns <- NS(id)
+  
+  # DYNAMIC IMAGE FIX: Look inside the folder and only get valid image names!
+  # This prevents broken images if a file is deleted from GitHub.
+  valid_pics <- list.files("modules/images/highlight", pattern = "(?i)\\.(jpg|jpeg|png)$", full.names = FALSE)
 
   tagList(
     div(
@@ -10,14 +14,14 @@ acknowledgement_ui <- function(id, n) {
         column(12, h3("Photos", style = "text-align: center; color: #2c3e50; font-weight: 600; margin-top: 20px; margin-bottom: 30px;"))
       ),
 
-      # Dynamic Pictures Section (Modernized Grid)
+      # Dynamic Pictures Section (Reads directly from folder contents)
       fluidRow(
         style = "display: flex; justify-content: center; flex-wrap: wrap; gap: 15px; margin-top: 10px;",
-        lapply(1:n, function(i) {
+        lapply(valid_pics, function(pic_name) {
           tags$div(
             style = "width: 180px; height: 180px; overflow: hidden; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); transition: transform 0.2s;",
             tags$img(
-              src = paste0("teamimg/highlight/pic", i, ".jpg"),
+              src = paste0("teamimg/highlight/", pic_name),
               style = "width: 100%; height: 100%; object-fit: cover;"
             )
           )
@@ -36,7 +40,7 @@ acknowledgement_ui <- function(id, n) {
         column(12, h4("NOAA Team-Sponsors", style = "text-align: center; color: #555; margin-bottom: 25px;"))
       ),
 
-      # Sponsors' Photos (Circular Avatars)
+      # Sponsors' Photos
       fluidRow(
         style = "display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin-bottom: 40px;",
         tags$div(
@@ -61,15 +65,15 @@ acknowledgement_ui <- function(id, n) {
         )
       ),
 
-      # Original designers (Cleaned up list styling)
+      # Original designers
       fluidRow(
         column(
           12,
           tags$div(
             style = "background-color: #f8f9fa; border-radius: 10px; padding: 25px; max-width: 800px; margin: 0 auto 50px auto; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);",
-            h5("The original design/layout for this e-library came from the following collaborators in Canada:", style = "color: #444; margin-bottom: 15px;"),
+            h5("The original design/layout for this e-library came from the following collaborators in Canada:", style = "color: #444; margin-bottom: 15px; font-size: 18px;"),
             tags$ul(
-              style = "list-style-type: none; padding: 0; text-align: center; color: #555; line-height: 1.8;",
+              style = "list-style-type: none; padding: 0; text-align: center; color: #555; line-height: 1.8; font-size: 16px;",
               tags$li("Sierra Sullivan (The University of British Columbia)"),
               tags$li("Jordan Rosenfeld (British Columbia Ministry of Environment)"),
               tags$li("Matthew Bayly (M.J. Bayly Analytics Ltd.)"),
@@ -87,7 +91,6 @@ acknowledgement_ui <- function(id, n) {
       fluidRow(
         style = "display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 50px; margin-bottom: 50px;",
 
-        # Group Photo Block
         tags$div(
           style = "width: 350px; text-align: center;",
           tags$img(
@@ -98,7 +101,6 @@ acknowledgement_ui <- function(id, n) {
           tags$p("From left to right: Maelice Yamdjieu, Garrett Ringler, Lavanya Bunadri, and Ruqhaiya Syeda", style = "font-size: 14px; font-style: italic; color: #666; margin-top: 5px;")
         ),
 
-        # Individual Team Member Block
         tags$div(
           style = "width: 250px; text-align: center;",
           tags$img(
@@ -114,12 +116,12 @@ acknowledgement_ui <- function(id, n) {
 
       # Additional Sources Section
       fluidRow(
-        column(12, h5("Additional Sources", style = "text-align: left; color: #444; font-weight: 600;"))
+        column(12, h5("Additional Sources", style = "text-align: left; color: #444; font-weight: 600; font-size: 18px;"))
       ),
       fluidRow(
         column(12,
           tags$ul(
-            style = "list-style-type: none; padding: 0; display: flex; gap: 20px; font-size: 15px; margin-bottom: 40px;",
+            style = "list-style-type: none; padding: 0; display: flex; gap: 20px; font-size: 16px; margin-bottom: 40px;",
             tags$li(tags$a(href = "https://www.noaa.gov", "NOAA Official Website", target = "_blank", style = "color: #6082B6; text-decoration: none; font-weight: 500;")),
             tags$li(tags$a(href = "https://www.fisheries.noaa.gov/region/west-coast/northwest-science", "NOAA Fisheries", target = "_blank", style = "color: #6082B6; text-decoration: none; font-weight: 500;"))
           )
