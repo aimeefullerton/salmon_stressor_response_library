@@ -2,6 +2,7 @@
 library(shinyjs)
 library(shiny)
 library(shinyWidgets)
+library(bslib)
 
 # Source all necessary modules
 source("modules/upload.R", local = TRUE)
@@ -19,9 +20,9 @@ ui <- navbarPage(
   id = "main_navbar",
   title = "Pacific Salmonid Stressor-Response eLibrary",
   selected = "dashboard",
-  # use Bootstrap 5 for better styling and responsiveness
-  # https://bootswatch.com/5/ for themes if desired
-  theme = bslib::bs_theme(version = 5), # can add a default bootstrap theme via bootswatch if desired, e.g., bootswatch = "flatly"
+  
+  # Downgraded to Bootstrap 4 for shinyWidgets/pickerInput compatibility
+  theme = bs_theme(version = 4), 
 
   # About Tab
   tabPanel(
@@ -32,25 +33,25 @@ ui <- navbarPage(
       tags$head(
         includeCSS("www/custom.css"),
         tags$style(HTML("
-    #back_to_top_fab {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      z-index: 9999;
-    }
-    .dropdown-menu {
-      padding: 20px;
-    }
-    .radio label {
-      font-size: 16px;
-      font-weight: 500;
-    }
-  ")),
+          #back_to_top_fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+          }
+          .dropdown-menu {
+            padding: 20px;
+          }
+          .radio label {
+            font-size: 16px;
+            font-weight: 500;
+          }
+        ")),
         tags$script(HTML("
-    Shiny.addCustomMessageHandler('download_csv', function(data) {
-      document.getElementById(data.id).click();
-    });
-  "))
+          Shiny.addCustomMessageHandler('download_csv', function(data) {
+            document.getElementById(data.id).click();
+          });
+        "))
       ),
       h1("Welcome to the Pacific Salmonid Stressor-Response e-Library"),
       tags$div(
@@ -87,6 +88,9 @@ ui <- navbarPage(
             column(6, numericInput("page_size", NULL, value = 10, min = 1))
           )
         ),
+        
+        # ── FIXED FILTER PANEL ──
+        shinyjs::hidden(
           div(
             id = "filter_panel",
             fluidRow(
@@ -109,7 +113,7 @@ ui <- navbarPage(
             ),
             fluidRow(
               column(3, pickerInput("life_stage", "Life Stage",
-                choices = life_stages, multiple = TRUE,
+                choices = list(), multiple = TRUE,
                 options = list("actions-box" = TRUE, "live-search" = TRUE)
               )),
               column(3, pickerInput("activity", "Activity",
@@ -153,7 +157,9 @@ ui <- navbarPage(
                 )
               ))
             )
-          ),
+          )
+        ),
+
         # ── 1. Top Pagination Controls ──
         fluidRow(
           column(12, align = "center",
@@ -197,11 +203,12 @@ ui <- navbarPage(
           )
         ),
 
-        # component for displaying the papers, displays all papers if no filters are applied
+        # component for displaying the papers
         fluidRow(
           column(6, offset = 3, uiOutput("paper_cards"))
         ),
         br(), br(),
+        
         # ── 2. Bottom Pagination Controls ──
         fluidRow(
           column(12, align = "center",
@@ -213,6 +220,7 @@ ui <- navbarPage(
             actionButton("next_page_bottom", "Next →", class = "btn-primary")
           )
         ),
+        
         # Back to Top floating button
         tags$div(
           id = "back_to_top_fab",
@@ -234,7 +242,7 @@ ui <- navbarPage(
             $('html, body').animate({ scrollTop: 0 }, 'smooth');
           });
         "))
-      ),
+      )
     )
   ),
 
