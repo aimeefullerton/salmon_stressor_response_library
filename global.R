@@ -8,8 +8,6 @@ library(RPostgres)
 library(pool)
 library(promises)
 library(openxlsx)
-library(bslib)
-library(bsicons)
 library(rlang)
 
 # Raise Shiny's maxRequestSize to allow server-side processing of larger file uploads (e.g., PDFs)
