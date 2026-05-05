@@ -17,31 +17,30 @@ about_us <- function(id) {
           style = "font-size: 1.1rem; color: #444; max-width: 900px; margin: 0 auto;")
       ),
       
-      # Side-by-side Info Cards
-      layout_columns(
-        col_widths = c(6, 6),
+      # Side-by-side Info Cards using native fluidRow and column
+      fluidRow(
         
         # Left Card: Conservation Efforts
-        card(
-          style = "border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid #2ecc71;",
-          card_header(h4("How This Tool Supports Conservation", style = "margin: 0; color: #333; font-weight: 600;"), style = "background-color: white; border-bottom: none;"),
-          card_body(
+        column(6,
+          div(
+            style = "background-color: white; border-radius: 8px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid #2ecc71; height: 100%;",
+            h4("How This Tool Supports Conservation", style = "margin-top: 0; color: #333; font-weight: 600; border-bottom: 1px solid #eee; padding-bottom: 10px;"),
             tags$ul(
-              style = "list-style-type: none; padding-left: 0;",
-              tags$li(style = "margin-bottom: 15px;", bs_icon("check-circle-fill", class = "text-success", size = "1.5rem"), strong(" Improve Model Accuracy:"), " Ensuring researchers and decision-makers have access to consistent, high-quality data reduces uncertainty in life cycle modeling."),
-              tags$li(style = "margin-bottom: 15px;", bs_icon("lightbulb-fill", class = "text-warning", size = "1.5rem"), strong(" Identify Knowledge Gaps:"), " Highlighting areas where data is lacking can guide future research and funding priorities."),
-              tags$li(style = "margin-bottom: 15px;", bs_icon("bar-chart-fill", class = "text-info", size = "1.5rem"), strong(" Support Policy & Management:"), " Reliable data on stressor-response functions can inform habitat restoration, water management, and conservation policy."),
-              tags$li(style = "margin-bottom: 15px;", bs_icon("globe", class = "text-primary", size = "1.5rem"), strong(" Encourage Open Science:"), " By making key data easily accessible, the e-library fosters collaboration and transparency within the life cycle modeling community.")
+              style = "list-style-type: none; padding-left: 0; margin-top: 15px;",
+              tags$li(style = "margin-bottom: 15px;", icon("circle-check", style = "color: #28a745; font-size: 1.5rem;"), strong(" Improve Model Accuracy:"), " Ensuring researchers and decision-makers have access to consistent, high-quality data reduces uncertainty in life cycle modeling."),
+              tags$li(style = "margin-bottom: 15px;", icon("lightbulb", style = "color: #ffc107; font-size: 1.5rem;"), strong(" Identify Knowledge Gaps:"), " Highlighting areas where data is lacking can guide future research and funding priorities."),
+              tags$li(style = "margin-bottom: 15px;", icon("chart-bar", style = "color: #17a2b8; font-size: 1.5rem;"), strong(" Support Policy & Management:"), " Reliable data on stressor-response functions can inform habitat restoration, water management, and conservation policy."),
+              tags$li(style = "margin-bottom: 15px;", icon("globe", style = "color: #007bff; font-size: 1.5rem;"), strong(" Encourage Open Science:"), " By making key data easily accessible, the e-library fosters collaboration and transparency within the life cycle modeling community.")
             )
           )
         ),
         
         # Right Card: Using the App & Credits
-        card(
-          style = "border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid #6082B6;",
-          card_header(h4("Using the e-Library", style = "margin: 0; color: #333; font-weight: 600;"), style = "background-color: white; border-bottom: none;"),
-          card_body(
-            p("If relevant studies appear, review the metadata and study details to determine whether the findings align with your research needs."),
+        column(6,
+          div(
+            style = "background-color: white; border-radius: 8px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-top: 4px solid #6082B6; height: 100%;",
+            h4("Using the e-Library", style = "margin-top: 0; color: #333; font-weight: 600; border-bottom: 1px solid #eee; padding-bottom: 10px;"),
+            p("If relevant studies appear, review the metadata and study details to determine whether the findings align with your research needs.", style = "margin-top: 15px;"),
             p("If no studies are returned, this may indicate:"),
             tags$ul(
               tags$li("The topic has not yet been researched by our team, AND/OR"),
