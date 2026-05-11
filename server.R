@@ -20,6 +20,9 @@ source("modules/submit_relationship.R", local = TRUE)
 server <- function(input, output, session) {
   db <- pool
 
+# Hide the filter panel on load so pickerInputs have time to initialize
+  shinyjs::hide("filter_panel")
+
   # ── Initial data load ──────────────────────────────────────────────────────
   table_exists <- dbExistsTable(db, Id(schema = db_config$schema, table = "stressor_responses"))
 
@@ -54,48 +57,7 @@ server <- function(input, output, session) {
       })
     })
 }
-  # ── Filter dropdowns ───────────────────────────────────────────────────────
-  getCategoryChoices <- function(column_name) {
-    # Use unnest() so each array element becomes its own distinct row
-    tryCatch(
-      dbGetQuery(
-        db,
-        sprintf(
-          "SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL ORDER BY val",
-          column_name, column_name
-        )
-      )[["val"]],
-      error = function(e) character(0)
-    )
-  }
-
-  updateFilterDropdowns <- function() {
-    cols <- c(
-      "stressor"                = "stressor_name",
-      "stressor_metric"         = "specific_stressor_metric",
-      "species"                 = "species_common_name",
-      "life_stage"              = "life_stages",
-      "activity"                = "activity",
-      "latin_name"              = "latin_name",
-      "article_type"            = "article_type",
-      "location_country"        = "location_country",
-      "location_state_province" = "location_state_province",
-      "location_watershed_lab"  = "location_watershed_lab",
-      "location_river_creek"    = "location_river_creek",
-      "broad_stressor_name"     = "broad_stressor_name"
-    )
-    for (input_id in names(cols)) {
-      updatePickerInput(session, input_id, choices = getCategoryChoices(cols[[input_id]]))
-    }
-  }
-
-  observeEvent(input$main_navbar,
-    {
-      if (input$main_navbar == "dashboard") updateFilterDropdowns()
-    },
-    ignoreInit = TRUE
-  )
-
+  
   # ── Filtered & paginated data ──────────────────────────────────────────────
   filtered_data <- filter_data_server(input, data, session)
   pagination <- pagination_server(input, output, session, filtered_data)

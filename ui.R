@@ -19,9 +19,8 @@ ui <- navbarPage(
   id = "main_navbar",
   title = "Pacific Salmonid Stressor-Response eLibrary",
   selected = "dashboard",
-  # use Bootstrap 5 for better styling and responsiveness
-  # https://bootswatch.com/5/ for themes if desired
-  theme = bslib::bs_theme(version = 5), # can add a default bootstrap theme via bootswatch if desired, e.g., bootswatch = "flatly"
+  
+  # Removed bslib theme argument entirely. Falling back to native Shiny.
 
   # About Tab
   tabPanel(
@@ -32,25 +31,25 @@ ui <- navbarPage(
       tags$head(
         includeCSS("www/custom.css"),
         tags$style(HTML("
-    #back_to_top_fab {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      z-index: 9999;
-    }
-    .dropdown-menu {
-      padding: 20px;
-    }
-    .radio label {
-      font-size: 16px;
-      font-weight: 500;
-    }
-  ")),
+          #back_to_top_fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+          }
+          .dropdown-menu {
+            padding: 20px;
+          }
+          .radio label {
+            font-size: 16px;
+            font-weight: 500;
+          }
+        ")),
         tags$script(HTML("
-    Shiny.addCustomMessageHandler('download_csv', function(data) {
-      document.getElementById(data.id).click();
-    });
-  "))
+          Shiny.addCustomMessageHandler('download_csv', function(data) {
+            document.getElementById(data.id).click();
+          });
+        "))
       ),
       h1("Welcome to the Pacific Salmonid Stressor-Response e-Library"),
       tags$div(
@@ -87,86 +86,89 @@ ui <- navbarPage(
             column(6, numericInput("page_size", NULL, value = 10, min = 1))
           )
         ),
-        conditionalPanel(
-          condition = "input.toggle_filters % 2 == 1",
-          fluidRow(
-            column(3, pickerInput("stressor", "Stressor Name",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("stressor_metric", "Stressor Metric",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("species", "Species Common Name",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("broad_stressor_name", "Broad Stressor Name",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            ))
-          ),
-          fluidRow(
-            column(3, pickerInput("life_stage", "Life Stage",
-              choices = life_stages, multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("activity", "Activity",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("latin_name", "Latin Name",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            ))
-          ),
-          fluidRow(
-            column(3, pickerInput("article_type", "Article Type",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("location_country", "Country",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("location_state_province", "State / Province",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            )),
-            column(3, pickerInput("location_watershed_lab", "Watershed / Lab",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            ))
-          ),
-          fluidRow(
-            column(3, pickerInput("location_river_creek", "River / Creek",
-              choices = list(), multiple = TRUE,
-              options = list("actions-box" = TRUE, "live-search" = TRUE)
-            ))
-          ),
-          fluidRow(
-            column(12, div(
-              style = "text-align: right;",
-              actionLink("reset_filters", "Reset Filters",
-                style = "color: #0073e6; font-size: 14px; text-decoration: none; margin-right: 10px;"
-              )
-            ))
+        
+        # ── RESTORED PICKER INPUTS WITH SHINYJS HIDDEN FIX ──
+        shinyjs::hidden(
+          div(
+            id = "filter_panel",
+            fluidRow(
+              column(3, pickerInput("stressor", "Stressor Name",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("stressor_metric", "Stressor Metric",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("species", "Species Common Name",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("broad_stressor_name", "Broad Stressor Name",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              ))
+            ),
+            fluidRow(
+              column(3, pickerInput("life_stage", "Life Stage",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("activity", "Activity",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("latin_name", "Latin Name",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              ))
+            ),
+            fluidRow(
+              column(3, pickerInput("article_type", "Article Type",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("location_country", "Country",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("location_state_province", "State / Province",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              )),
+              column(3, pickerInput("location_watershed_lab", "Watershed / Lab",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              ))
+            ),
+            fluidRow(
+              column(3, pickerInput("location_river_creek", "River / Creek",
+                choices = list(), multiple = TRUE,
+                options = list("actions-box" = TRUE, "live-search" = TRUE)
+              ))
+            ),
+            fluidRow(
+              column(12, div(
+                style = "text-align: right;",
+                actionLink("reset_filters", "Reset Filters",
+                  style = "color: #0073e6; font-size: 14px; text-decoration: none; margin-right: 10px;"
+                )
+              ))
+            )
           )
         ),
+
         # ── 1. Top Pagination Controls ──
         fluidRow(
           column(12, align = "center",
             style = "margin-top: 10px; margin-bottom: 15px;",
             
-            # Page size selector
             selectInput("page_size", "Articles per page:", 
                         choices = c(5, 10, 25, 50), 
                         selected = 10, 
                         width = "150px"),
             br(),
             
-            # Top Buttons
             actionButton("prev_page_top", "← Previous", class = "btn-primary btn-sm"),
             span(textOutput("page_info_top", inline = TRUE), style = "margin: 0 15px; font-weight: bold;"),
             actionButton("next_page_top", "Next →", class = "btn-primary btn-sm")
@@ -179,7 +181,6 @@ ui <- navbarPage(
           icon = icon("download"),
           tooltip = tooltipOptions(title = "Choose what to download"),
 
-          # Download type selector
           radioButtons("download_option",
             label = NULL,
             choices = c(
@@ -190,29 +191,29 @@ ui <- navbarPage(
             selected = "filtered"
           ),
 
-          # Wrapped Confirm Download button with proper styling
           div(
             style = "width: 100%;",
             downloadButton("download_csv", "Confirm Download", class = "btn btn-success text-white btn-block")
           )
         ),
 
-        # component for displaying the papers, displays all papers if no filters are applied
+        # component for displaying the papers
         fluidRow(
           column(6, offset = 3, uiOutput("paper_cards"))
         ),
         br(), br(),
+        
         # ── 2. Bottom Pagination Controls ──
         fluidRow(
           column(12, align = "center",
             style = "margin-top: 20px; margin-bottom: 20px;",
             
-            # Bottom Buttons
             actionButton("prev_page_bottom", "← Previous", class = "btn-primary"),
             span(textOutput("page_info_bottom", inline = TRUE), style = "margin: 0 15px; font-weight: bold;"),
             actionButton("next_page_bottom", "Next →", class = "btn-primary")
           )
         ),
+        
         # Back to Top floating button
         tags$div(
           id = "back_to_top_fab",
@@ -220,7 +221,7 @@ ui <- navbarPage(
             inputId = "back_to_top",
             label = NULL,
             icon = icon("arrow-up"),
-            class = "btn btn-outline-secondary rounded-circle",
+            class = "btn btn-default rounded-circle",
             style = "width: 50px; height: 50px; font-size: 24px;"
           )
         ),
@@ -234,7 +235,7 @@ ui <- navbarPage(
             $('html, body').animate({ scrollTop: 0 }, 'smooth');
           });
         "))
-      ),
+      )
     )
   ),
 

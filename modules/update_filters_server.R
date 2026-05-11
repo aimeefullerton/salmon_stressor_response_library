@@ -61,24 +61,8 @@ update_filters_server <- function(input, output, session, data, db) {
         df_sub <- apply_filter(df_sub, input[[other$input_id]], other$column)
       }
 
-      # Full universe of choices from DB (using unnest for array cols)
-      if (spec$column %in% array_cols) {
-        lookup_vals <- tryCatch(
-          dbGetQuery(db, sprintf(
-            "SELECT DISTINCT unnest(%s) AS val FROM stressor_responses WHERE %s IS NOT NULL ORDER BY val",
-            spec$column, spec$column
-          ))[["val"]],
-          error = function(e) character(0)
-        )
-      } else {
-        lookup_vals <- tryCatch(
-          dbGetQuery(db, sprintf(
-            "SELECT DISTINCT %s FROM stressor_responses WHERE %s IS NOT NULL ORDER BY %s",
-            spec$column, spec$column, spec$column
-          ))[[spec$column]],
-          error = function(e) character(0)
-        )
-      }
+      # Full universe of choices from the pre-loaded dataframe
+      lookup_vals <- get_dynamic_vals(data, spec$column)
 
       # Dynamic subset from currently filtered data
       dynamic_vals <- get_dynamic_vals(df_sub, spec$column)
