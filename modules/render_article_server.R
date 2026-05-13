@@ -189,6 +189,21 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
       div(val)
     )
   })
+# ── Conditional: Source of Stressor Data ──
+  output[[paste0("source_of_stressor_data_ui_", paper_id)]] <- renderUI({
+    val <- safe_get(paper, "source_of_stressor_data")
+    
+    # Check if null, NA, empty, or caught by safe_get's fallback
+    if (is.null(val) || length(val) == 0 || is.na(val) || val == "" || val == "NA" || val == "N/A" || val == "Not provided") {
+      return(NULL) 
+    }
+    
+    tagList(
+      br(), br(),
+      strong("Source of Stressor Data"), br(), 
+      div(val)
+    )
+  })
 
   # ── Conditional: SRF Formula ──
   output[[paste0("srf_formula_ui_", paper_id)]] <- renderUI({
