@@ -75,6 +75,7 @@ render_article_ui <- function(article_id, data) {
         strong("Function Derivation"), br(), textOutput(paste0("function_derivation_", article_id)),
         # Dynamic UI placeholders for conditional fields
         uiOutput(paste0("transferability_ui_", article_id)),
+        uiOutput(paste0("source_of_stressor_data_ui_", article_id)),
         
         # FORCED DISPLAY: This will always show up now, even if the DB is blank
         tagList(
