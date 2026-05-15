@@ -6,7 +6,7 @@ library(dplyr)
 library(ggplot2)
 library(RPostgres)
 library(pool)
-library(plotly) # <--- ADDED PLOTLY
+library(plotly)
 
 # UI for EDA module
 edaUI <- function(id) {
@@ -15,7 +15,6 @@ edaUI <- function(id) {
     fluidPage(
       h3("Exploratory Data Analysis", style = "color: #0077b6; text-align: center;"),
       tabsetPanel(
-        # Changed from plotOutput to plotlyOutput
         tabPanel("Stressor Distribution", plotlyOutput(ns("plot_stressor"))),
         tabPanel("Species", plotlyOutput(ns("plot_species"))),
         tabPanel("Life Stages", plotlyOutput(ns("plot_lifestage"))),
@@ -41,6 +40,10 @@ edaServer <- function(id) {
         GROUP BY %s
         ORDER BY n DESC
         LIMIT %d", col, col, col, col, n))
+      
+      # THE FIX: Convert integer64 to standard numeric for Plotly
+      df$n <- as.numeric(df$n)
+      
       df
     }
 
@@ -60,7 +63,6 @@ edaServer <- function(id) {
           panel.grid.major.x = element_blank()
         )
       
-      # Convert to interactive plotly chart
       ggplotly(p, tooltip = "text") %>% config(displayModeBar = FALSE)
     })
 
@@ -76,6 +78,9 @@ edaServer <- function(id) {
         ORDER BY n DESC
         LIMIT 10
       ")
+      
+      # THE FIX: Convert integer64 to standard numeric for Plotly
+      df1$n <- as.numeric(df1$n)
 
       p <- ggplot(df1, aes(x = reorder(raw, n), y = n, text = paste("Species:", raw, "<br>Count:", n))) +
         geom_col(fill = bar_fill) +
@@ -104,6 +109,9 @@ edaServer <- function(id) {
         ORDER BY n DESC
         LIMIT 10
       ")
+      
+      # THE FIX: Convert integer64 to standard numeric for Plotly
+      df1$n <- as.numeric(df1$n)
 
       p <- ggplot(df1, aes(x = reorder(raw, n), y = n, text = paste("Life Stage:", raw, "<br>Count:", n))) +
         geom_col(fill = bar_fill) +
@@ -132,6 +140,9 @@ edaServer <- function(id) {
         ORDER BY n DESC
         LIMIT 10
       ")
+      
+      # THE FIX: Convert integer64 to standard numeric for Plotly
+      df1$n <- as.numeric(df1$n)
 
       p <- ggplot(df1, aes(x = reorder(raw, n), y = n, text = paste("Location:", raw, "<br>Count:", n))) +
         geom_col(fill = bar_fill) +
