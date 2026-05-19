@@ -215,7 +215,7 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
     tagList(
       br(), br(),
       strong("SRF Formula"), br(), 
-      withMathJax(div(val)) # <-- Wrapped div(val) in withMathJax()
+      withMathJax(div(val))
     )
   })
   # ── Render confidence rankings ────────────────────────────────────────────────
@@ -275,11 +275,12 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
   })
 
   # ── Fetch CSV data from csv_data table ─────────────────────────────────────
+  # UPDATED: Added plot_type to the SELECT statement
   csv_rows <- dbGetQuery(db,
     "SELECT
        row_index, curve_id, stressor_label, stressor_x, units_x,
        response_label, response_y, units_y, stressor_value,
-       lower_limit, upper_limit, sd
+       lower_limit, upper_limit, sd, plot_type
      FROM csv_data
      WHERE article_id = $1
      ORDER BY row_index ASC",
@@ -426,6 +427,32 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
       return(empty_plot("Invalid data structure", "red"))
     }
 
+    # Always sort the entire dataframe by X right away to prevent spaghetti lines
+    df <- df[order(df[[x_idx]]), ]
+
+    # HELPER FUNCTION: Returns 'type' and 'mode' based on explicit metadata or fallback
+    get_plot_settings <- function(data_subset, x_values) {
+      plot_idx <- grep("^plot[._]type$", nm_lower)
+
+      if (length(plot_idx) > 0) {
+        # Get the first valid, non-NA plot type in this curve
+        ptype_vals <- na.omit(data_subset[[plot_idx[1]]])
+        
+        if (length(ptype_vals) > 0) {
+          ptype <- tolower(trimws(as.character(ptype_vals[1])))
+          
+          if (ptype == "scatter") return(list(type = "scatter", mode = "markers"))
+          if (ptype == "curve") return(list(type = "scatter", mode = "lines+markers"))
+          if (ptype == "bar") return(list(type = "bar", mode = NULL)) # Bar charts MUST have mode = NULL
+        }
+      }
+      
+      # FALLBACK for old CSVs without the column
+      is_scatter <- length(x_values) != length(unique(x_values))
+      if (is_scatter) return(list(type = "scatter", mode = "markers"))
+      return(list(type = "scatter", mode = "lines+markers"))
+    }
+
     if (has_multiple_curves && !is.null(curve_info)) {
       curve_id_idx <- which(nm_lower == "curve.id")
       p <- plot_ly()
@@ -433,39 +460,71 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
       for (i in seq_len(nrow(curve_info))) {
         cid <- curve_info$curve.id[i]
         curve_rows <- df[[curve_id_idx]] == cid
-        x_curve <- df[[x_idx]][curve_rows]
-        y_curve <- df[[y_idx]][curve_rows]
+        
+        subset_df <- df[curve_rows, ]
+        x_curve <- subset_df[[x_idx]]
+        y_curve <- subset_df[[y_idx]]
 
-        p <- p %>% add_trace(
-          x = x_curve,
-          y = y_curve,
-          type = "scatter",
-          mode = "lines+markers",
-          name = curve_info$label[i],
-          marker = list(size = 6),
-          line = list(width = 2)
-        )
+        # Get settings dynamically
+        settings <- get_plot_settings(subset_df, x_curve)
+
+        # Build the trace dynamically
+        if (settings$type == "bar") {
+          p <- p %>% add_trace(
+            x = x_curve, y = y_curve,
+            type = "bar",
+            name = curve_info$label[i]
+          )
+        } else {
+          p <- p %>% add_trace(
+            x = x_curve, y = y_curve,
+            type = "scatter",
+            mode = settings$mode, 
+            name = curve_info$label[i],
+            marker = list(size = 6),
+            line = if(settings$mode == "lines+markers") list(width = 2) else NULL
+          )
+        }
       }
 
       p <- p %>% layout(
         title = paste("Interactive Plot for", response_name, "vs", stressor_name),
         xaxis = list(title = stressor_label),
         yaxis = list(title = response_label),
-        hovermode = "closest"
+        hovermode = "closest",
+        barmode = "group"
       )
     } else {
-      x_vals <- ~ df[[x_idx]]
-      y_vals <- ~ df[[y_idx]]
-      plot_ly(
-        x = x_vals, y = y_vals,
-        type = "scatter", mode = "lines+markers",
-        line = list(color = "blue"), marker = list(size = 6)
-      ) %>%
-        layout(
-          title = paste("Interactive Plot for", response_name, "vs", stressor_name),
-          xaxis = list(title = stressor_label),
-          yaxis = list(title = response_label)
-        )
+      x_vals <- df[[x_idx]]
+      y_vals <- df[[y_idx]]
+      
+      # Get settings dynamically
+      settings <- get_plot_settings(df, x_vals)
+
+      # Build single curve dynamically
+      if (settings$type == "bar") {
+        plot_ly(
+          x = x_vals, y = y_vals,
+          type = "bar"
+        ) %>%
+          layout(
+            title = paste("Interactive Plot for", response_name, "vs", stressor_name),
+            xaxis = list(title = stressor_label),
+            yaxis = list(title = response_label)
+          )
+      } else {
+        plot_ly(
+          x = x_vals, y = y_vals,
+          type = "scatter", mode = settings$mode,
+          line = if(settings$mode == "lines+markers") list(color = "blue", width = 2) else NULL, 
+          marker = list(size = 6)
+        ) %>%
+          layout(
+            title = paste("Interactive Plot for", response_name, "vs", stressor_name),
+            xaxis = list(title = stressor_label),
+            yaxis = list(title = response_label)
+          )
+      }
     }
   })
 }

@@ -10,7 +10,8 @@
 | stressor.value | Optional curve-level descriptor (e.g., temperature 14, "low", replicate label) | any     | OPTIONAL; Can be any type, preferably a string or number                   |
 | lower.limit    | Optional lower confidence/uncertainty bound for response.y                     | numeric | OPTIONAL; NA allowed                                                       |
 | upper.limit    | Optional upper confidence/uncertainty bound for response.y                     | numeric | OPTIONAL; NA allowed                                                       |
-| sd             | Optional standard deviation for response.y                                     | numeric | OPTIONAL; NA allowed                                                       |
+| sd             | Optional standard deviation for response.y                                     | numeric | OPTIONAL; NA allowed
+| plot.type      | Visual format of the data (e.g., scatter plot, continuous curve, bar chart)    | string  | OPTIONAL; Must be 'scatter', 'curve', 'bar', or left blank                 |
 
 ### Examples of valid CSV files:
 

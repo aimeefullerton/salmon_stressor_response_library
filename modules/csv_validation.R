@@ -288,6 +288,7 @@ check_suspicious_patterns <- function(df) {
 #'   - units.y
 #'
 #' Optional: (if not present in submitted csv, added with NA values)
+#'   - plot.type     <--- NEW
 #'   - stressor.value
 #'   - lower.limit
 #'   - upper.limit
@@ -302,10 +303,10 @@ validate_csv_columns <- function(df) {
   # Required column names (exact match, case-insensitive)
   required_cols <- c("curve.id", "stressor.label", "stressor.x", "units.x", "response.label", "response.y", "units.y")
 
-  # Optional column names
-  optional_cols <- c("stressor.value", "lower.limit", "upper.limit", "sd")
+  # Optional column names --- UPDATED to include plot.type ---
+  optional_cols <- c("plot.type", "stressor.value", "lower.limit", "upper.limit", "sd")
 
-  # Initialize column map
+  # Initialize column map --- UPDATED to include plot_type ---
   col_map <- list(
     curve_id = NA_character_,
     stressor_label = NA_character_,
@@ -314,6 +315,7 @@ validate_csv_columns <- function(df) {
     response_label = NA_character_,
     response_y = NA_character_,
     units_y = NA_character_,
+    plot_type = NA_character_,
     stressor_value = NA_character_,
     lower_limit = NA_character_,
     upper_limit = NA_character_,
@@ -556,6 +558,23 @@ validate_csv_data <- function(df, col_map) {
     issues <- c(issues, curve_points_check$issues)
   }
 
+  # ---- NEW: Validate plot.type (must be scatter, curve, bar, or blank) ----
+  if (!is.na(col_map$plot_type)) {
+    valid_plot_types <- c("scatter", "curve", "bar", NA, "")
+    plot_vals <- tolower(trimws(df_normalized[[col_map$plot_type]]))
+    
+    # Check for any values that are NOT in the approved list
+    invalid_vals <- plot_vals[!plot_vals %in% valid_plot_types]
+    
+    if (length(invalid_vals) > 0) {
+      issues[[length(issues) + 1]] <- sprintf(
+        "Column '%s' contains invalid values: %s. Allowed values are 'scatter', 'curve', 'bar', or leave blank.",
+        col_map$plot_type,
+        paste(unique(invalid_vals), collapse = ", ")
+      )
+    }
+  }
+
   # ---- Validate stressor.value (string or numeric, optional) ----
   # No strict validation needed - can be any type
 
@@ -625,8 +644,8 @@ add_missing_optional_columns <- function(df, col_map) {
   # Normalize column names to lowercase for consistent handling
   colnames(df) <- tolower(trimws(colnames(df)))
 
-  # Define all optional columns
-  optional_columns <- c("stressor.value", "lower.limit", "upper.limit", "sd")
+  # Define all optional columns --- UPDATED to include plot.type ---
+  optional_columns <- c("plot.type", "stressor.value", "lower.limit", "upper.limit", "sd")
 
   # Check which optional columns are missing and add them
   for (opt_col in optional_columns) {
@@ -850,6 +869,7 @@ get_csv_error_message <- function(validation_result) {
         "• response.y\n",
         "• units.y\n",
         "\n<strong>Note:</strong> The following columns are optional:\n",
+        "• plot.type\n", # <--- UPDATED
         "• stressor.value\n",
         "• lower.limit\n",
         "• upper.limit\n",
