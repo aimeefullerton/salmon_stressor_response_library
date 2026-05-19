@@ -46,7 +46,8 @@ upload_ui <- function(id) {
             br(),
             "Required columns: curve.id, stressor.label, stressor.x, units.x, response.label, response.y, units.y.",
             br(),
-            "Optional columns: stressor.value, lower.limit, upper.limit, sd.",
+            # --- UPDATED INSTRUCTIONS FOR PLOT TYPE ---
+            "Optional columns: plot.type (use 'scatter' or 'curve'), stressor.value, lower.limit, upper.limit, sd.",
             br(),
             "Each curve must have at least 4 rows with valid (non-NA) stressor.x and response.y values."
           ),
@@ -419,6 +420,7 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
           # --- Generate the missing row_index! ---
           df_csv$row_index <- 1:nrow(df_csv) 
           
+          # --- ENSURE PLOT TYPE IS CAPTURED IF IT EXISTS ---
           names(df_csv) <- gsub("\\.", "_", names(df_csv)) 
           dbAppendTable(db_conn, "csv_data", df_csv)
         }
@@ -641,7 +643,10 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
           curve.id = rep("c1", 5), stressor.label = rep("temperature", 5),
           stressor.x = c(10, 15, 20, 25, 30), units.x = rep("degC", 5),
           response.label = rep("survival", 5), response.y = c(0.95, 0.85, 0.70, 0.50, 0.30),
-          units.y = rep("proportion", 5), stressor.value = rep("constant", 5),
+          units.y = rep("proportion", 5), 
+          # --- NEW PLOT TYPE COLUMN ADDED HERE ---
+          plot.type = c("curve", "curve", "curve", "curve", "scatter"),
+          stressor.value = rep("constant", 5),
           lower.limit = c(0.90, 0.80, 0.65, 0.45, 0.25), upper.limit = c(1.00, 0.90, 0.75, 0.55, 0.35),
           sd = c(0.05, 0.05, 0.05, 0.05, 0.05)
         )
