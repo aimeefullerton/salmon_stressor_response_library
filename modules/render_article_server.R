@@ -426,19 +426,20 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
       return(empty_plot("Invalid data structure", "red"))
     }
 
-    # Always sort the entire dataframe by X right away to prevent spaghetti lines
-    df <- df[order(df[[x_idx]]), ]
-
-    # HELPER FUNCTION: Returns BOTH 'type' and 'mode' based on explicit metadata or fallback
+# HELPER FUNCTION: Returns BOTH 'type' and 'mode' based on explicit metadata or fallback
     get_plot_settings <- function(data_subset, x_values) {
-      if ("plot_type" %in% nm_lower) {
-        ptype <- tolower(as.character(data_subset$plot_type[1]))
+      # Look for the column using its index to safely ignore dots, underscores, or caps
+      plot_idx <- grep("^plot[._]type$", nm_lower)
+      
+      if (length(plot_idx) > 0) {
+        ptype <- tolower(as.character(data_subset[[plot_idx[1]]][1]))
         if (!is.na(ptype) && ptype != "") {
           if (ptype == "scatter") return(list(type = "scatter", mode = "markers"))
           if (ptype == "curve") return(list(type = "scatter", mode = "lines+markers"))
-          if (ptype == "bar") return(list(type = "bar", mode = "markers")) # 'mode' is ignored for bars
+          if (ptype == "bar") return(list(type = "bar", mode = "markers"))
         }
       }
+      
       # FALLBACK for old CSVs without the column
       is_scatter <- length(x_values) != length(unique(x_values))
       if (is_scatter) return(list(type = "scatter", mode = "markers"))
