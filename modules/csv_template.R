@@ -8,6 +8,7 @@ get_csv_template <- function() {
     response.label = rep("survival", 5),
     response.y = c(0.95, 0.85, 0.70, 0.50, 0.30),
     units.y = rep("proportion", 5),
+    plot.type = c("curve", "curve", "curve", "curve", "scatter"), # <--- NEW COLUMN ADDED HERE
     stressor.value = rep("constant", 5),
     lower.limit = c(0.90, 0.80, 0.65, 0.45, 0.25),
     upper.limit = c(1.00, 0.90, 0.75, 0.55, 0.35),
