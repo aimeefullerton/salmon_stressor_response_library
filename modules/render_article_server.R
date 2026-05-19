@@ -399,7 +399,7 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
     display_df[, non_empty, drop = FALSE]
   }, striped = TRUE, hover = TRUE, bordered = TRUE)
 
-  # ── Interactive plot ───────────────────────────────────────────────────────
+# ── Interactive plot ───────────────────────────────────────────────────────
   output[[paste0("interactive_plot_", paper_id)]] <- renderPlotly({
     empty_plot <- function(msg, color = "black") {
       plot_ly(type = "scatter", mode = "markers", height = 200) %>%
@@ -426,6 +426,24 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
       return(empty_plot("Invalid data structure", "red"))
     }
 
+    # Always sort the entire dataframe by X right away to prevent spaghetti lines on old data
+    df <- df[order(df[[x_idx]]), ]
+
+    # HELPER FUNCTION: Determine plot mode based on explicit metadata OR fallback logic
+    get_plot_mode <- function(data_subset, x_values) {
+      # 1. Check if the explicit 'plot_type' column exists
+      if ("plot_type" %in% nm_lower) {
+        ptype <- tolower(as.character(data_subset$plot_type[1]))
+        if (!is.na(ptype)) {
+          if (ptype == "scatter") return("markers")
+          if (ptype == "curve") return("lines+markers")
+        }
+      }
+      # 2. FALLBACK for old CSVs without the column: The Scatter Detector
+      is_scatter <- length(x_values) != length(unique(x_values))
+      if (is_scatter) return("markers") else return("lines+markers")
+    }
+
     if (has_multiple_curves && !is.null(curve_info)) {
       curve_id_idx <- which(nm_lower == "curve.id")
       p <- plot_ly()
@@ -433,14 +451,18 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
       for (i in seq_len(nrow(curve_info))) {
         cid <- curve_info$curve.id[i]
         curve_rows <- df[[curve_id_idx]] == cid
-        x_curve <- df[[x_idx]][curve_rows]
-        y_curve <- df[[y_idx]][curve_rows]
+        
+        subset_df <- df[curve_rows, ]
+        x_curve <- subset_df[[x_idx]]
+        y_curve <- subset_df[[y_idx]]
+
+        # Get the mode using our new smart helper
+        plot_mode <- get_plot_mode(subset_df, x_curve)
 
         p <- p %>% add_trace(
-          x = x_curve,
-          y = y_curve,
+          x = x_curve, y = y_curve,
           type = "scatter",
-          mode = "lines+markers",
+          mode = plot_mode, 
           name = curve_info$label[i],
           marker = list(size = 6),
           line = list(width = 2)
@@ -454,11 +476,15 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
         hovermode = "closest"
       )
     } else {
-      x_vals <- ~ df[[x_idx]]
-      y_vals <- ~ df[[y_idx]]
+      x_vals <- df[[x_idx]]
+      y_vals <- df[[y_idx]]
+      
+      # Get the mode using our new smart helper for single curves
+      plot_mode <- get_plot_mode(df, x_vals)
+
       plot_ly(
-        x = x_vals, y = y_vals,
-        type = "scatter", mode = "lines+markers",
+        x = ~x_vals, y = ~y_vals,
+        type = "scatter", mode = plot_mode,
         line = list(color = "blue"), marker = list(size = 6)
       ) %>%
         layout(
@@ -468,6 +494,5 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
         )
     }
   })
-}
 
 # nolint end
