@@ -426,22 +426,23 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
       return(empty_plot("Invalid data structure", "red"))
     }
 
-    # Always sort the entire dataframe by X right away to prevent spaghetti lines on old data
+    # Always sort the entire dataframe by X right away to prevent spaghetti lines
     df <- df[order(df[[x_idx]]), ]
 
-    # HELPER FUNCTION: Determine plot mode based on explicit metadata OR fallback logic
-    get_plot_mode <- function(data_subset, x_values) {
-      # 1. Check if the explicit 'plot_type' column exists
+    # HELPER FUNCTION: Returns BOTH 'type' and 'mode' based on explicit metadata or fallback
+    get_plot_settings <- function(data_subset, x_values) {
       if ("plot_type" %in% nm_lower) {
         ptype <- tolower(as.character(data_subset$plot_type[1]))
-        if (!is.na(ptype)) {
-          if (ptype == "scatter") return("markers")
-          if (ptype == "curve") return("lines+markers")
+        if (!is.na(ptype) && ptype != "") {
+          if (ptype == "scatter") return(list(type = "scatter", mode = "markers"))
+          if (ptype == "curve") return(list(type = "scatter", mode = "lines+markers"))
+          if (ptype == "bar") return(list(type = "bar", mode = "markers")) # 'mode' is ignored for bars
         }
       }
-      # 2. FALLBACK for old CSVs without the column: The Scatter Detector
+      # FALLBACK for old CSVs without the column
       is_scatter <- length(x_values) != length(unique(x_values))
-      if (is_scatter) return("markers") else return("lines+markers")
+      if (is_scatter) return(list(type = "scatter", mode = "markers"))
+      return(list(type = "scatter", mode = "lines+markers"))
     }
 
     if (has_multiple_curves && !is.null(curve_info)) {
@@ -456,16 +457,16 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
         x_curve <- subset_df[[x_idx]]
         y_curve <- subset_df[[y_idx]]
 
-        # Get the mode using our new smart helper
-        plot_mode <- get_plot_mode(subset_df, x_curve)
+        # Get settings dynamically
+        settings <- get_plot_settings(subset_df, x_curve)
 
         p <- p %>% add_trace(
           x = x_curve, y = y_curve,
-          type = "scatter",
-          mode = plot_mode, 
+          type = settings$type,  # <--- Now dynamic!
+          mode = settings$mode,  # <--- Now dynamic!
           name = curve_info$label[i],
-          marker = list(size = 6),
-          line = list(width = 2)
+          marker = if(settings$type == "scatter") list(size = 6) else NULL,
+          line = if(settings$type == "scatter") list(width = 2) else NULL
         )
       }
 
@@ -473,19 +474,22 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
         title = paste("Interactive Plot for", response_name, "vs", stressor_name),
         xaxis = list(title = stressor_label),
         yaxis = list(title = response_label),
-        hovermode = "closest"
+        hovermode = "closest",
+        barmode = "group" # Ensures multiple bar charts sit side-by-side instead of stacking
       )
     } else {
       x_vals <- df[[x_idx]]
       y_vals <- df[[y_idx]]
       
-      # Get the mode using our new smart helper for single curves
-      plot_mode <- get_plot_mode(df, x_vals)
+      # Get settings dynamically
+      settings <- get_plot_settings(df, x_vals)
 
       plot_ly(
         x = ~x_vals, y = ~y_vals,
-        type = "scatter", mode = plot_mode,
-        line = list(color = "blue"), marker = list(size = 6)
+        type = settings$type,   # <--- Now dynamic!
+        mode = settings$mode,   # <--- Now dynamic!
+        line = if(settings$type == "scatter") list(color = "blue") else NULL,
+        marker = if(settings$type == "scatter") list(size = 6) else NULL
       ) %>%
         layout(
           title = paste("Interactive Plot for", response_name, "vs", stressor_name),
@@ -494,5 +498,4 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
         )
     }
   })
-
 # nolint end
