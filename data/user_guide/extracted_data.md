@@ -7,11 +7,11 @@
 | response.label | Name of the response variable (y-axis)                                         | string  | REQUIRED; Must have exactly 1 unique non-NA value across the entire file   |
 | response.y     | Numeric value of the biological response (y-axis)                              | numeric | REQUIRED; Y-values only; Must be numeric                                   |
 | units.y        | Units for response.y                                                           | string  | REQUIRED; Must have exactly 1 unique non-NA value across the entire file   |
-| plot.type      | Visual format of the data (e.g., scatter plot, continuous curve, bar chart)    | string  | OPTIONAL; Must be 'scatter', 'curve', 'bar', or left blank                 |
 | stressor.value | Optional curve-level descriptor (e.g., temperature 14, "low", replicate label) | any     | OPTIONAL; Can be any type, preferably a string or number                   |
 | lower.limit    | Optional lower confidence/uncertainty bound for response.y                     | numeric | OPTIONAL; NA allowed                                                       |
 | upper.limit    | Optional upper confidence/uncertainty bound for response.y                     | numeric | OPTIONAL; NA allowed                                                       |
-| sd             | Optional standard deviation for response.y                                     | numeric | OPTIONAL; NA allowed                                                       |
+| sd             | Optional standard deviation for response.y                                     | numeric | OPTIONAL; NA allowed
+| plot.type      | Visual format of the data (e.g., scatter plot, continuous curve, bar chart)    | string  | OPTIONAL; Must be 'scatter', 'curve', 'bar', or left blank                 |
 
 ### Examples of valid CSV files:
 
