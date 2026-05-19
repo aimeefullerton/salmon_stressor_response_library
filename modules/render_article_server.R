@@ -498,4 +498,5 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
         )
     }
   })
+}
 # nolint end
