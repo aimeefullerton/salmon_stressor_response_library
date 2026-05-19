@@ -644,11 +644,10 @@ upload_server <- function(id, db_conn = pool, current_user = NULL) {
           stressor.x = c(10, 15, 20, 25, 30), units.x = rep("degC", 5),
           response.label = rep("survival", 5), response.y = c(0.95, 0.85, 0.70, 0.50, 0.30),
           units.y = rep("proportion", 5), 
-          # --- NEW PLOT TYPE COLUMN ADDED HERE ---
-          plot.type = c("curve", "curve", "curve", "curve", "scatter"),
           stressor.value = rep("constant", 5),
           lower.limit = c(0.90, 0.80, 0.65, 0.45, 0.25), upper.limit = c(1.00, 0.90, 0.75, 0.55, 0.35),
-          sd = c(0.05, 0.05, 0.05, 0.05, 0.05)
+          sd = c(0.05, 0.05, 0.05, 0.05, 0.05),
+          plot.type = c("curve", "curve", "curve", "curve", "scatter")
         )
         write.csv(template_data, file, row.names = FALSE)
       }
