@@ -215,7 +215,7 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
     tagList(
       br(), br(),
       strong("SRF Formula"), br(), 
-      withMathJax(div(val)) # <-- Wrapped div(val) in withMathJax()
+      withMathJax(div(val))
     )
   })
   # ── Render confidence rankings ────────────────────────────────────────────────
@@ -275,11 +275,12 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
   })
 
   # ── Fetch CSV data from csv_data table ─────────────────────────────────────
+  # UPDATED: Added plot_type to the SELECT statement
   csv_rows <- dbGetQuery(db,
     "SELECT
        row_index, curve_id, stressor_label, stressor_x, units_x,
        response_label, response_y, units_y, stressor_value,
-       lower_limit, upper_limit, sd
+       lower_limit, upper_limit, sd, plot_type
      FROM csv_data
      WHERE article_id = $1
      ORDER BY row_index ASC",
@@ -399,7 +400,7 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
     display_df[, non_empty, drop = FALSE]
   }, striped = TRUE, hover = TRUE, bordered = TRUE)
 
-# ── Interactive plot ───────────────────────────────────────────────────────
+  # ── Interactive plot ───────────────────────────────────────────────────────
   output[[paste0("interactive_plot_", paper_id)]] <- renderPlotly({
     empty_plot <- function(msg, color = "black") {
       plot_ly(type = "scatter", mode = "markers", height = 200) %>%
@@ -431,9 +432,6 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
 
     # HELPER FUNCTION: Returns 'type' and 'mode' based on explicit metadata or fallback
     get_plot_settings <- function(data_subset, x_values) {
-      # DEBUG: Print to the server logs to see what's happening behind the scenes
-      print(paste("Columns received by plot module:", paste(nm_lower, collapse=", ")))
-      
       plot_idx <- grep("^plot[._]type$", nm_lower)
 
       if (length(plot_idx) > 0) {
@@ -442,7 +440,6 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
         
         if (length(ptype_vals) > 0) {
           ptype <- tolower(trimws(as.character(ptype_vals[1])))
-          print(paste("DEBUG - Plot type requested:", ptype)) # Prints to server log
           
           if (ptype == "scatter") return(list(type = "scatter", mode = "markers"))
           if (ptype == "curve") return(list(type = "scatter", mode = "lines+markers"))
@@ -450,7 +447,6 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
         }
       }
       
-      print("DEBUG - Falling back to auto-detection")
       # FALLBACK for old CSVs without the column
       is_scatter <- length(x_values) != length(unique(x_values))
       if (is_scatter) return(list(type = "scatter", mode = "markers"))
@@ -472,7 +468,7 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
         # Get settings dynamically
         settings <- get_plot_settings(subset_df, x_curve)
 
-        # Build the trace dynamically so we don't accidentally pass invalid arguments to Plotly
+        # Build the trace dynamically
         if (settings$type == "bar") {
           p <- p %>% add_trace(
             x = x_curve, y = y_curve,
@@ -532,4 +528,5 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
     }
   })
 }
+
 # nolint end
