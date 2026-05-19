@@ -160,14 +160,29 @@ get_csv_error_message <- function(validation_result) {
   # Create helpful guidance based on issue
   guidance <- ""
   if (length(issues) > 0) {
-    if (any(grepl("Missing required columns", issues, ignore.case = TRUE))) {
-      guidance <- "\n\n<strong>How to fix:</strong> Ensure your CSV file has exactly these columns: stressor, response, sd, low_limit, up_limit"
+    if (any(grepl("Missing required column", issues, ignore.case = TRUE))) {
+      guidance <- paste0(
+        "\n\n<strong>How to fix:</strong> Ensure your CSV contains these exactly named required columns:\n",
+        "• curve.id\n",
+        "• stressor.label\n",
+        "• stressor.x\n",
+        "• units.x\n",
+        "• response.label\n",
+        "• response.y\n",
+        "• units.y\n",
+        "\n<strong>Note:</strong> The following columns are optional:\n",
+        "• plot.type\n",
+        "• stressor.value\n",
+        "• lower.limit\n",
+        "• upper.limit\n",
+        "• sd"
+      )
     } else if (any(grepl("non-numeric", issues, ignore.case = TRUE))) {
       guidance <- "\n\n<strong>How to fix:</strong> Check that all numeric columns contain only numbers (no text, letters, or special characters except decimals)"
+    } else if (any(grepl("exactly 1 unique", issues, ignore.case = TRUE))) {
+      guidance <- "\n\n<strong>How to fix:</strong> The stressor.label, response.label, units.x, and units.y columns must have the exact same value in every row"
     } else if (any(grepl("empty", issues, ignore.case = TRUE))) {
-      guidance <- "\n\n<strong>How to fix:</strong> Fill in all required fields with valid data"
-    } else if (any(grepl("duplicate", issues, ignore.case = TRUE))) {
-      guidance <- "\n\n<strong>How to fix:</strong> Remove or consolidate duplicate stressor values"
+      guidance <- "\n\n<strong>How to fix:</strong> Fill in all required fields. curve.id and numeric columns cannot have empty values."
     }
   }
 
@@ -254,12 +269,6 @@ check_title_duplicate <- function(title, db_conn) {
 #' @param db_conn Database connection
 #'
 #' @return List with $conflict (logical) and $message (character)
-location <- function(input, data) {
-  updatePickerInput(session, "location_country", choices = getCategoryChoices("location_country"))
-  updatePickerInput(session, "location_state_province", choices = getCategoryChoices("location_state_province"))
-  updatePickerInput(session, "location_watershed_lab", choices = getCategoryChoices("location_watershed_lab"))
-  updatePickerInput(session, "location_river_creek", choices = getCategoryChoices("location_river_creek"))
-}
 check_data_conflict <- function(stressor, species, location, db_conn) {
   if (is.null(stressor) || is.null(species) || is.null(location)) {
     return(list(conflict = FALSE, message = ""))
