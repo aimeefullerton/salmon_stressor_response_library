@@ -13,7 +13,7 @@ edaUI <- function(id) {
   ns <- NS(id)
   tagList(
     fluidPage(
-      h3("Exploratory Data Analysis", style = "color: #0077b6; text-align: center;"),
+      h3("What's in the e-Library?", style = "color: #0077b6; text-align: center;"),
       tabsetPanel(
         tabPanel("Stressor Distribution", plotlyOutput(ns("plot_stressor"))),
         tabPanel("Species", plotlyOutput(ns("plot_species"))),
@@ -54,7 +54,7 @@ edaServer <- function(id) {
       p <- ggplot(df, aes(x = reorder(value, n), y = n, text = paste("Stressor:", value, "<br>Count:", n))) +
         geom_col(fill = bar_fill) +
         coord_flip() +
-        labs(title = "Top 10 Stressor Names", x = NULL, y = "Count") +
+        labs(title = "Top 10 Stressors in the e-Library", x = NULL, y = "Count") +
         theme_minimal() +
         theme(
           plot.title = element_text(size = 18, face = "bold", color = text_color),
@@ -85,7 +85,7 @@ edaServer <- function(id) {
       p <- ggplot(df1, aes(x = reorder(raw, n), y = n, text = paste("Species:", raw, "<br>Count:", n))) +
         geom_col(fill = bar_fill) +
         coord_flip() +
-        labs(title = "Top 10 Species", x = NULL, y = "Count") +
+        labs(title = "Top 10 Species in the e-Library", x = NULL, y = "Count") +
         theme_minimal() +
         theme(
           plot.title = element_text(size = 18, face = "bold", color = text_color),
@@ -116,7 +116,7 @@ edaServer <- function(id) {
       p <- ggplot(df1, aes(x = reorder(raw, n), y = n, text = paste("Life Stage:", raw, "<br>Count:", n))) +
         geom_col(fill = bar_fill) +
         coord_flip() +
-        labs(title = "Top 10 Life Stages", x = NULL, y = "Count") +
+        labs(title = "Top 10 Life Stages in the e-Library", x = NULL, y = "Count") +
         theme_minimal() +
         theme(
           plot.title = element_text(size = 18, face = "bold", color = text_color),
@@ -147,7 +147,7 @@ edaServer <- function(id) {
       p <- ggplot(df1, aes(x = reorder(raw, n), y = n, text = paste("Location:", raw, "<br>Count:", n))) +
         geom_col(fill = bar_fill) +
         coord_flip() +
-        labs(title = "Top 10 States / Provinces", x = NULL, y = "Count") +
+        labs(title = "Top 10 States / Provinces in the e-Library", x = NULL, y = "Count") +
         theme_minimal() +
         theme(
           plot.title = element_text(size = 18, face = "bold", color = text_color),
