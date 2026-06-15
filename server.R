@@ -153,6 +153,12 @@ server <- function(input, output, session) {
     full_metadata_reactive = filtered_data # Pass filtered_data so we have the metadata for the cards
   )
   
+  # ── Wire Action Bar Download Button ─────────────────────────────────────────
+  observeEvent(input$btn_download_selected, {
+    # Uses ShinyJS to securely trigger your master Excel export function
+    shinyjs::runjs("document.getElementById('download_csv').click();")
+  })
+  
 # ── Admin Upload Tab (Protected by Posit Connect) ────────────────────────
   admin_users <- c("aimee.fullerton", "paxton.calhoun", "morgan.bond") 
 
