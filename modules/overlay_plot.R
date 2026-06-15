@@ -25,22 +25,27 @@ overlay_plot_server <- function(id, selected_ids_reactive, db_conn, full_metadat
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    # 1. Fetch Quantitative Data for the selected IDs
+    # 1. Fetch Quantitative Data & Merge Titles
     plot_data <- reactive({
       ids <- selected_ids_reactive()
       req(length(ids) > 0)
       
-      # Convert IDs to a format SQL can read (e.g., '1','2','3')
       ids_sql <- paste(ids, collapse = ",")
-      
-      # Fetch the CSV data points for these specific articles
       query <- sprintf("SELECT * FROM csv_data WHERE article_id IN (%s)", ids_sql)
       
-      tryCatch({
+      df_csv <- tryCatch({
         dbGetQuery(db_conn, query)
       }, error = function(e) {
-        data.frame() # Return empty if error or no table
+        data.frame()
       })
+      
+      # Merge the real article title from the metadata so it shows in the legend
+      if(nrow(df_csv) > 0) {
+        meta <- full_metadata_reactive()
+        df_csv <- merge(df_csv, meta[, c("article_id", "title")], by = "article_id", all.x = TRUE)
+      }
+      
+      df_csv
     })
     
     # 2. Build the Interactive Plotly Graph
@@ -48,7 +53,6 @@ overlay_plot_server <- function(id, selected_ids_reactive, db_conn, full_metadat
       df <- plot_data()
       
       if (nrow(df) == 0) {
-        # If the user selected papers that don't have CSV data attached
         return(
           plot_ly() %>% 
             layout(
@@ -59,18 +63,18 @@ overlay_plot_server <- function(id, selected_ids_reactive, db_conn, full_metadat
         )
       }
       
-      # Ensure data is sorted by article and stressor x so lines draw correctly left-to-right
+      # Sort data so lines draw correctly left-to-right
       df <- df[order(df$article_id, df$curve_id, df$stressor_x), ]
       
-      # Create a unique group name for the legend
-      df$legend_group <- paste0("ID ", df$article_id, ": ", df$curve_id)
+      # Create clean legend groups (Handles old data where curve_id might be NA)
+      df$curve_label <- ifelse(is.na(df$curve_id) | df$curve_id == "", "", paste0(" (Curve: ", df$curve_id, ")"))
+      df$legend_group <- paste0(df$title, df$curve_label)
       
       # Draw the overlay plot
       p <- plot_ly(df, x = ~stressor_x, y = ~response_y, color = ~legend_group, 
                    type = 'scatter', mode = 'lines+markers',
                    hoverinfo = 'text',
-                   text = ~paste("<b>Article:</b>", article_id,
-                                 "<br><b>Curve:</b>", curve_id,
+                   text = ~paste("<b>Article:</b>", title,
                                  "<br><b>Stressor:</b>", stressor_x, units_x,
                                  "<br><b>Response:</b>", response_y, units_y)) %>%
         layout(
@@ -85,16 +89,14 @@ overlay_plot_server <- function(id, selected_ids_reactive, db_conn, full_metadat
       p
     })
     
-    # 3. Build the Summary Cards below the plot
+    # 3. Build the Summary Cards (UPDATED TO SALMONID SCHEMA)
     output$selected_summary_cards <- renderUI({
       ids <- selected_ids_reactive()
       req(length(ids) > 0)
       
-      # Filter the full dataset to only the selected rows
       all_meta <- full_metadata_reactive()
-      selected_meta <- all_meta[all_meta$article_id %in% ids, ]
+      selected_meta <- all_meta[as.character(all_meta$article_id) %in% as.character(ids), ]
       
-      # Generate a clean card for each selected item
       cards <- lapply(1:nrow(selected_meta), function(i) {
         row <- selected_meta[i, ]
         
@@ -102,9 +104,9 @@ overlay_plot_server <- function(id, selected_ids_reactive, db_conn, full_metadat
           style = "border: 1px solid #d1d8e0; border-left: 4px solid #3182ce; border-radius: 5px; padding: 15px; margin-bottom: 15px; background-color: #f8fafc;",
           fluidRow(
             column(12, h5(strong(paste0(row$article_id, ". ", row$title)), style = "margin-top: 0; color: #2b6cb0;")),
-            column(4, p(strong("Species: "), row$sav_species, style = "margin-bottom: 5px;")),
-            column(4, p(strong("Stressor: "), row$specific_sav_metric, style = "margin-bottom: 5px;")),
-            column(4, p(strong("Function: "), row$specific_sav_function, style = "margin-bottom: 5px;"))
+            column(4, p(strong("Species: "), row$species_common_name, style = "margin-bottom: 5px;")),
+            column(4, p(strong("Stressor: "), row$stressor_name, style = "margin-bottom: 5px;")),
+            column(4, p(strong("Response: "), row$response, style = "margin-bottom: 5px;"))
           )
         )
       })
