@@ -16,6 +16,7 @@ source("modules/downloads.R", local = TRUE)
 source("modules/upload.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
 source("modules/submit_relationship.R", local = TRUE)
+source("modules/overlay_plot.R", local = TRUE)
 
 server <- function(input, output, session) {
   db <- pool
@@ -75,6 +76,81 @@ server <- function(input, output, session) {
   edaServer("eda")
   render_papers_server(output, paginated_data, input, session)
   setup_download_csv(output, filtered_data, paginated_data, db, input, session)
+
+  # ── Multi-Select State Tracking ────────────────────────────────────────────
+  selected_articles <- reactiveVal(character(0))
+  
+  # Listen to all checkboxes dynamically as they are rendered
+  observe({
+    req(paginated_data())
+    current_ids <- paginated_data()$article_id
+    
+    lapply(current_ids, function(id) {
+      observeEvent(input[[paste0("select_article_", id)]], {
+        current_selection <- selected_articles()
+        if (input[[paste0("select_article_", id)]]) {
+          # Add ID to list if checked
+          selected_articles(unique(c(current_selection, as.character(id))))
+        } else {
+          # Remove ID from list if unchecked
+          selected_articles(setdiff(current_selection, as.character(id)))
+        }
+      }, ignoreInit = TRUE)
+    })
+  })
+  
+  # Render the Action Bar only if at least 1 item is selected
+  output$selection_action_bar <- renderUI({
+    req(length(selected_articles()) > 0)
+    
+    div(
+      style = "background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ced4da; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.05);",
+      
+      div(
+        style = "font-size: 1.1em; color: #2c3e50;",
+        icon("check-square", style = "color: #28a745; margin-right: 8px;"),
+        strong(sprintf("%d Profiles Selected", length(selected_articles())))
+      ),
+      
+      div(
+        actionButton("btn_overlay_plots", "Overlay Plots", class = "btn-primary", icon = icon("chart-line"), style = "margin-left: 10px; background-color: #2c6e49; border-color: #2c6e49;"),
+        actionButton("btn_clear_selection", "Clear All", class = "btn-default", style = "margin-left: 10px;")
+      )
+    )
+  })
+  
+  # Clear All Button Logic
+  observeEvent(input$btn_clear_selection, {
+    # 1. Clear the reactive tracker
+    selected_articles(character(0))
+    
+    # 2. Uncheck the visible boxes on the current page
+    ids <- paginated_data()$article_id
+    for (id in ids) {
+      updateCheckboxInput(session, paste0("select_article_", id), value = FALSE)
+    }
+  })
+
+  # ── Trigger the Overlay Modal ──────────────────────────────────────────────
+  observeEvent(input$btn_overlay_plots, {
+    showModal(modalDialog(
+      title = "Compare Stressor-Response Profiles",
+      size = "xl", # Extra large modal to fit the chart nicely
+      easyClose = TRUE,
+      footer = modalButton("Close"),
+      
+      # Call the UI from the new module
+      overlay_plot_ui("overlay_module")
+    ))
+  })
+  
+  # Initialize the module server, passing it the reactive IDs, database, and all metadata
+  overlay_plot_server(
+    id = "overlay_module", 
+    selected_ids_reactive = selected_articles, 
+    db_conn = db, 
+    full_metadata_reactive = filtered_data # Pass filtered_data so we have the metadata for the cards
+  )
   
 # ── Admin Upload Tab (Protected by Posit Connect) ────────────────────────
   admin_users <- c("aimee.fullerton", "paxton.calhoun", "morgan.bond") 
