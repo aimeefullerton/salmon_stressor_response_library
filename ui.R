@@ -199,6 +199,7 @@ ui <- navbarPage(
 
         # component for displaying the papers
         fluidRow(
+          column(8, offset = 2, uiOutput("selection_action_bar")),
           column(6, offset = 3, uiOutput("paper_cards"))
         ),
         br(), br(),
