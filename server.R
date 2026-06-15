@@ -114,7 +114,6 @@ server <- function(input, output, session) {
       
       div(
         actionButton("btn_overlay_plots", "Overlay Plots", class = "btn-primary", icon = icon("chart-line"), style = "margin-left: 10px; background-color: #2c6e49; border-color: #2c6e49;"),
-        actionButton("btn_download_selected", "Download Selected", class = "btn-info", icon = icon("download"), style = "margin-left: 10px; color: white;"),
         actionButton("btn_clear_selection", "Clear All", class = "btn-default", style = "margin-left: 10px;")
       )
     )
