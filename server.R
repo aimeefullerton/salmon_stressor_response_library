@@ -16,6 +16,7 @@ source("modules/downloads.R", local = TRUE)
 source("modules/upload.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
 source("modules/submit_relationship.R", local = TRUE)
+source("modules/overlay_plot.R", local = TRUE)
 
 server <- function(input, output, session) {
   db <- pool
@@ -130,6 +131,27 @@ server <- function(input, output, session) {
       updateCheckboxInput(session, paste0("select_article_", id), value = FALSE)
     }
   })
+
+  # ── Trigger the Overlay Modal ──────────────────────────────────────────────
+  observeEvent(input$btn_overlay_plots, {
+    showModal(modalDialog(
+      title = "Compare Stressor-Response Profiles",
+      size = "xl", # Extra large modal to fit the chart nicely
+      easyClose = TRUE,
+      footer = modalButton("Close"),
+      
+      # Call the UI from the new module
+      overlay_plot_ui("overlay_module")
+    ))
+  })
+  
+  # Initialize the module server, passing it the reactive IDs, database, and all metadata
+  overlay_plot_server(
+    id = "overlay_module", 
+    selected_ids_reactive = selected_articles, 
+    db_conn = db, 
+    full_metadata_reactive = filtered_data # Pass filtered_data so we have the metadata for the cards
+  )
   
 # ── Admin Upload Tab (Protected by Posit Connect) ────────────────────────
   admin_users <- c("aimee.fullerton", "paxton.calhoun", "morgan.bond") 
