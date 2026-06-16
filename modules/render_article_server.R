@@ -400,7 +400,7 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
     display_df[, non_empty, drop = FALSE]
   }, striped = TRUE, hover = TRUE, bordered = TRUE)
 
-  # ── Interactive plot ───────────────────────────────────────────────────────
+# ── Interactive plot ───────────────────────────────────────────────────────
   output[[paste0("interactive_plot_", paper_id)]] <- renderPlotly({
     empty_plot <- function(msg, color = "black") {
       plot_ly(type = "scatter", mode = "markers", height = 200) %>%
@@ -435,22 +435,44 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
       plot_idx <- grep("^plot[._]type$", nm_lower)
 
       if (length(plot_idx) > 0) {
-        # Get the first valid, non-NA plot type in this curve
         ptype_vals <- na.omit(data_subset[[plot_idx[1]]])
-        
         if (length(ptype_vals) > 0) {
           ptype <- tolower(trimws(as.character(ptype_vals[1])))
-          
           if (ptype == "scatter") return(list(type = "scatter", mode = "markers"))
           if (ptype == "curve") return(list(type = "scatter", mode = "lines+markers"))
-          if (ptype == "bar") return(list(type = "bar", mode = NULL)) # Bar charts MUST have mode = NULL
+          if (ptype == "bar") return(list(type = "bar", mode = NULL))
         }
       }
       
-      # FALLBACK for old CSVs without the column
       is_scatter <- length(x_values) != length(unique(x_values))
       if (is_scatter) return(list(type = "scatter", mode = "markers"))
       return(list(type = "scatter", mode = "lines+markers"))
+    }
+
+    # HELPER FUNCTION: Generates asymmetric error_y lists if limit columns are present
+    build_error_bars <- function(sub_df, y_vals) {
+      # Safely find columns mapping to lower/upper bounds
+      low_col <- grep("^lower\\.limit$", colnames(sub_df), ignore.case = TRUE)
+      upp_col <- grep("^upper\\.limit$", colnames(sub_df), ignore.case = TRUE)
+      
+      if (length(low_col) == 1 && length(upp_col) == 1) {
+        low_vals <- suppressWarnings(as.numeric(sub_df[[low_col]]))
+        upp_vals <- suppressWarnings(as.numeric(sub_df[[upp_col]]))
+        
+        # Check if we have non-NA values to render
+        if (any(!is.na(low_vals)) && any(!is.na(upp_vals))) {
+          return(list(
+            type = "data",
+            symmetric = FALSE,
+            array = upp_vals - y_vals,
+            arrayminus = y_vals - low_vals,
+            visible = TRUE,
+            color = "rgba(100,100,100,0.5)",
+            thickness = 1.5
+          ))
+        }
+      }
+      return(NULL) # No error metrics available
     }
 
     if (has_multiple_curves && !is.null(curve_info)) {
@@ -465,15 +487,15 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
         x_curve <- subset_df[[x_idx]]
         y_curve <- subset_df[[y_idx]]
 
-        # Get settings dynamically
         settings <- get_plot_settings(subset_df, x_curve)
+        err_settings <- build_error_bars(subset_df, y_curve)
 
-        # Build the trace dynamically
         if (settings$type == "bar") {
           p <- p %>% add_trace(
             x = x_curve, y = y_curve,
             type = "bar",
-            name = curve_info$label[i]
+            name = curve_info$label[i],
+            error_y = err_settings
           )
         } else {
           p <- p %>% add_trace(
@@ -482,7 +504,8 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
             mode = settings$mode, 
             name = curve_info$label[i],
             marker = list(size = 6),
-            line = if(settings$mode == "lines+markers") list(width = 2) else NULL
+            line = if(settings$mode == "lines+markers") list(width = 2) else NULL,
+            error_y = err_settings
           )
         }
       }
@@ -498,14 +521,14 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
       x_vals <- df[[x_idx]]
       y_vals <- df[[y_idx]]
       
-      # Get settings dynamically
       settings <- get_plot_settings(df, x_vals)
+      err_settings <- build_error_bars(df, y_vals)
 
-      # Build single curve dynamically
       if (settings$type == "bar") {
         plot_ly(
           x = x_vals, y = y_vals,
-          type = "bar"
+          type = "bar",
+          error_y = err_settings
         ) %>%
           layout(
             title = paste("Interactive Plot for", response_name, "vs", stressor_name),
@@ -517,7 +540,8 @@ render_article_server <- function(input, output, session, paper_id, paper_row, d
           x = x_vals, y = y_vals,
           type = "scatter", mode = settings$mode,
           line = if(settings$mode == "lines+markers") list(color = "blue", width = 2) else NULL, 
-          marker = list(size = 6)
+          marker = list(size = 6),
+          error_y = err_settings
         ) %>%
           layout(
             title = paste("Interactive Plot for", response_name, "vs", stressor_name),
