@@ -131,15 +131,23 @@ server <- function(input, output, session) {
     }
   })
 
-  # ── Trigger the Overlay Modal ──────────────────────────────────────────────
+# ── Trigger the Overlay Modal ──────────────────────────────────────────────
   observeEvent(input$btn_overlay_plots, {
     showModal(modalDialog(
       title = "Compare Stressor-Response Profiles",
-      size = "xl", # Extra large modal to fit the chart nicely
+      size = "xl", 
       easyClose = TRUE,
       footer = modalButton("Close"),
       
-      # Call the UI from the new module
+      # INJECTED CSS: Forces the modal to bypass Bootstrap limits and take up 95% of the screen width
+      tags$style(HTML("
+        .modal-xl {
+          width: 95vw !important;
+          max-width: 95vw !important;
+        }
+      ")),
+      
+      # Call the UI from the module
       overlay_plot_ui("overlay_module")
     ))
   })
