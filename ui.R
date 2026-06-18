@@ -66,7 +66,7 @@ ui <- navbarPage(
   tabPanel("User Guide", userGuideUI("user_guide")),
 
   # Analyze Data Tab
-  tabPanel("Analyze Data", edaUI("eda")),
+  tabPanel("Topics Covered", edaUI("eda")),
 
   # Dashboard Tab
   tabPanel(
