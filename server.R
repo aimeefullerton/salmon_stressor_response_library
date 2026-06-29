@@ -99,36 +99,38 @@ server <- function(input, output, session) {
     })
   })
   
-  # Render the Action Bar only if at least 1 item is selected
+# Render the Action Bar permanently (always visible)
   output$selection_action_bar <- renderUI({
-    req(length(selected_articles()) > 0)
+    num_selected <- length(selected_articles())
     
     div(
       style = "background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ced4da; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 4px rgba(0,0,0,0.05);",
       
       div(
         style = "font-size: 1.1em; color: #2c3e50;",
-        icon("check-square", style = "color: #28a745; margin-right: 8px;"),
-        strong(sprintf("%d Profiles Selected", length(selected_articles())))
+        icon("check-square", style = "color: if(num_selected > 0) '#28a745' else '#888'; margin-right: 8px;"),
+        strong(sprintf("%d Profiles Selected", num_selected))
       ),
       
       div(
-        actionButton("btn_overlay_plots", "Overlay Plots", class = "btn-primary", icon = icon("chart-line"), style = "margin-left: 10px; background-color: #2c6e49; border-color: #2c6e49;"),
-        actionButton("btn_clear_selection", "Clear All", class = "btn-default", style = "margin-left: 10px;")
+        # The button is visible, but grayed out/disabled if 0 items are selected
+        actionButton(
+          "btn_overlay_plots", 
+          "Overlay Plots", 
+          class = "btn-primary", 
+          icon = icon("chart-line"), 
+          style = "margin-left: 10px; background-color: #2c6e49; border-color: #2c6e49;",
+          disabled = if (num_selected == 0) "disabled" else NULL
+        ),
+        actionButton(
+          "btn_clear_selection", 
+          "Clear All", 
+          class = "btn-default", 
+          style = "margin-left: 10px;",
+          disabled = if (num_selected == 0) "disabled" else NULL
+        )
       )
     )
-  })
-  
-  # Clear All Button Logic
-  observeEvent(input$btn_clear_selection, {
-    # 1. Clear the reactive tracker
-    selected_articles(character(0))
-    
-    # 2. Uncheck the visible boxes on the current page
-    ids <- paginated_data()$article_id
-    for (id in ids) {
-      updateCheckboxInput(session, paste0("select_article_", id), value = FALSE)
-    }
   })
 
 # ── Trigger the Overlay Modal ──────────────────────────────────────────────
