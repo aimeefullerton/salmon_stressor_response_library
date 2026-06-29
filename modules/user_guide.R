@@ -50,9 +50,6 @@ userGuideUI <- function(id) {
         tags$li("Click the ", strong("Overlay Plots"), " button in the action bar persistently located at the top of the search results."),
         tags$li("An interactive chart will appear displaying all selected quantitative curves, along with a summary of the metadata for each selected profile.")
       ),
-      p(style = "font-style: italic; color: #555;",
-        "Note: Ensure that you are selecting articles that measure similar stressors and responses. If the selected articles measure fundamentally different metrics (e.g., comparing Temperature to Angling Effort), the plot will display a warning that you are comparing mixed metrics."
-      ),
       hr(),
       
       h2("Confidence Rankings"),
