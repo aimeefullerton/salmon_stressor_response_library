@@ -8,7 +8,7 @@ overlay_plot_ui <- function(id) {
   tagList(
     fluidRow(
       column(12,
-             plotlyOutput(ns("comparison_chart"), height = "550px")
+             plotlyOutput(ns("comparison_chart"), height = "750px")
       )
     ),
     hr(style = "margin-top: 30px; margin-bottom: 30px; border-top: 2px solid #eee;"),
