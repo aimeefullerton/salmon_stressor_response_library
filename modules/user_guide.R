@@ -18,6 +18,7 @@ userGuideUI <- function(id) {
       h2("Metadata Fields"),
       p("Each entry has an identifier and descriptive metadata fields."),
       includeMarkdown("data/user_guide/metadata_fields.md"),
+      
       h2("Extracted Data"),
       p("When you download an SR function as an Excel Spreadsheet, you receive:"),
       tags$ol(
@@ -39,6 +40,21 @@ userGuideUI <- function(id) {
         "Note: All extracted data entries include numeric Stressor (x) and Response (y) values and are associated with a single stressor per SRF entry. Each entry is fully labeled with a Stressor Label, Response Label, and corresponding units to ensure interpretability. Where multiple curves are present for the same stressor, they are distinguished using a curve identifier and, when applicable, a stressor value describing the curve. Early entries contributed by Canadian partners (e.g., CEMPRA, Joe Model) reported the biological response as Mean System Capacity, which scaled response values from 0% to 100%. Since NOAA assumed responsibility for stewardship of the library and expanded its scope, response values have been retained in the original units and formats reported in each source study, rather than standardized across entries. Extracted data may originate from reported tables, supplemental datasets, or digitized figures. When data are digitized from figures, small uncertainties may be introduced; these are documented where possible."
       ),
       hr(),
+      
+      # ── NEW SECTION: OVERLAY PLOTS ──
+      h2("Comparing Profiles (Overlay Plots)"),
+      p("To facilitate multi-study comparisons, the e-library allows users to visually overlay stressor-response curves from multiple articles onto a single interactive plot. This feature is especially useful when trying to determine which empirical relationships are most relevant for a specific study system or to visualize underlying sensitivity across different geographic regions."),
+      tags$ol(
+        tags$li("Use the ", strong("Show Filters"), " and search bar functionality on the main dashboard to isolate a specific stressor or metric of interest."),
+        tags$li("Check the box located on the left side of any relevant article card to add it to your selection."),
+        tags$li("Click the ", strong("Overlay Plots"), " button in the action bar persistently located at the top of the search results."),
+        tags$li("An interactive chart will appear displaying all selected quantitative curves, along with a summary of the metadata for each selected profile.")
+      ),
+      p(style = "font-style: italic; color: #555;",
+        "Note: Ensure that you are selecting articles that measure similar stressors and responses. If the selected articles measure fundamentally different metrics (e.g., comparing Temperature to Angling Effort), the plot will display a warning that you are comparing mixed metrics."
+      ),
+      hr(),
+      
       h2("Confidence Rankings"),
       p("Each stressor-response function in the e-library includes a set of confidence rankings that help users evaluate the strength, reliability, and applicability of the underlying relationship. These rankings identify five key areas where uncertainty may arise when deriving or applying a stressor-response function."),
       p(
