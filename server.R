@@ -133,6 +133,23 @@ server <- function(input, output, session) {
     )
   })
 
+# ── Clear All Button Logic ────────────────────────────────────────────────
+  observeEvent(input$btn_clear_selection, {
+    
+    # 1. Wipe the server's memory of selected profiles
+    selected_articles(character(0))
+    
+    # 2. Visually uncheck the boxes currently rendered on the active page
+    current_visible_ids <- paginated_data()$article_id
+    for (id in current_visible_ids) {
+      updateCheckboxInput(session, paste0("select_article_", id), value = FALSE)
+    }
+    
+    # 3. Uncheck the master "Select All" box if it is checked
+    updateCheckboxInput(session, "select_all", value = FALSE)
+    
+  }, ignoreInit = TRUE)
+
 # ── Trigger the Overlay Modal ──────────────────────────────────────────────
   observeEvent(input$btn_overlay_plots, {
     showModal(modalDialog(
