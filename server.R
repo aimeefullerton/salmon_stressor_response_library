@@ -17,6 +17,7 @@ source("modules/upload.R", local = TRUE)
 source("modules/eda.R", local = TRUE)
 source("modules/submit_relationship.R", local = TRUE)
 source("modules/overlay_plot.R", local = TRUE)
+source("modules/edit_article.R", local = TRUE)
 
 server <- function(input, output, session) {
   db <- pool
@@ -289,6 +290,33 @@ server <- function(input, output, session) {
                 )
               })
             }
+            
+            # ── Edit Profile Modal Trigger ────────────────────────────────────
+            observeEvent(input[[paste0("edit_article_", mid)]], {
+              # Fetch the most up-to-date data for this row
+              paper_to_edit <- data[data$article_id == mid, , drop = FALSE]
+              
+              showModal(modalDialog(
+                title = paste("Editing Article", mid, "-", paper_to_edit$title),
+                size = "xl",
+                easyClose = FALSE,
+                
+                # Load the pre-filled UI
+                edit_article_ui(paste0("edit_module_", mid), paper_to_edit),
+                
+                footer = tagList(
+                  modalButton("Cancel"),
+                  actionButton(
+                    paste0("save_edit_", mid), 
+                    "💾 Save Changes", 
+                    class = "btn-success"
+                  )
+                )
+              ))
+              
+              # Initialize the server logic for the edit form
+              edit_article_server(paste0("edit_module_", mid), paper_to_edit, db, session)
+            }, ignoreInit = TRUE)
 
             initialized_articles <<- c(initialized_articles, mid_str)
           }
