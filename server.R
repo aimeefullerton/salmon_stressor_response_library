@@ -215,17 +215,36 @@ server <- function(input, output, session) {
     lapply(ids, function(mid) {
       mid_str <- as.character(mid)
 
-      # ── Open modal ──────────────────────────────────────────────────────────
+# ── Open modal ──────────────────────────────────────────────────────────
       observeEvent(input[[paste0("view_article_", mid)]],
         {
           paper_row <- paginated_data()[paginated_data()$article_id == mid, , drop = FALSE]
 
-            showModal(modalDialog(
+          # DYNAMIC FOOTER: Check if current user is an admin to show the Edit button
+          modal_footer <- tags$div(
+            style = "display: flex; justify-content: space-between; width: 100%; align-items: center;",
+            tags$div(
+              if (!is.null(session$user) && session$user %in% admin_users) {
+                actionButton(
+                  paste0("edit_article_", mid), 
+                  "✏️ Edit Profile", 
+                  class = "btn-warning", 
+                  style = "background-color: #f0ad4e; border-color: #eea236; color: white;"
+                )
+              } else {
+                NULL
+              }
+            ),
+            modalButton("Close")
+          )
+
+          showModal(modalDialog(
             title     = paste("Article", mid),
             withMathJax(render_article_ui(mid, paginated_data())),
-            tags$script(HTML("if (window.MathJax) MathJax.Hub.Queue(['Typeset', MathJax.Hub]);")), # <--- Forces MathJax to re-scan!
+            tags$script(HTML("if (window.MathJax) MathJax.Hub.Queue(['Typeset', MathJax.Hub]);")),
             easyClose = TRUE,
-            size      = "l"
+            size      = "l",
+            footer    = modal_footer # <--- WIRED DYNAMIC FOOTER HERE
           ))
 
           if (!mid_str %in% initialized_articles) {
