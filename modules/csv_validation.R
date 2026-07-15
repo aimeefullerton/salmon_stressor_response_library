@@ -28,7 +28,7 @@
 MAX_FILE_SIZE_BYTES <- 2 * 1024 * 1024
 
 # Minimum valid data points per curve (excluding NA values)
-MIN_VALID_POINTS_PER_CURVE <- 4
+MIN_VALID_POINTS_PER_CURVE <- 1
 
 # Security: Dangerous prefixes that trigger formula injection in Excel/Google Sheets
 DANGEROUS_FORMULA_PREFIXES <- c("=", "+", "-", "@", "\t", "\r")
