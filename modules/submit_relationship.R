@@ -102,7 +102,7 @@ submit_relationship_ui <- function(id) {
               br(),
               "Optional columns: stressor.value, lower.limit, upper.limit, sd.",
               br(),
-              "Each curve must have at least 4 rows with valid (non-NA) stressor.x and response.y values.",
+              "Each curve must have valid (non-NA) stressor.x and response.y values.",
               br(),
               "2 MB limit. Allowed type: .csv"
             ),

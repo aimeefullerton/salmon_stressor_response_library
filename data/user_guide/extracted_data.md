@@ -15,8 +15,6 @@
 
 ### Examples of valid CSV files:
 
-_Note: the minimum number of data rows **per curve** for a valid csv file is **4**._
-
 #### Valid CSV File with No Optional Columns and a Single Curve
 
 ```csv

@@ -49,7 +49,7 @@ upload_ui <- function(id) {
             # --- UPDATED INSTRUCTIONS FOR PLOT TYPE ---
             "Optional columns: plot.type (use 'scatter' or 'curve'), stressor.value, lower.limit, upper.limit, sd.",
             br(),
-            "Each curve must have at least 4 rows with valid (non-NA) stressor.x and response.y values."
+            "Each curve must have valid (non-NA) stressor.x and response.y values."
           ),
           downloadButton(ns("download_csv_template"), "Download CSV Template", class = "btn btn-info mb-2"),
           uiOutput(ns("csv_validation_status"))
